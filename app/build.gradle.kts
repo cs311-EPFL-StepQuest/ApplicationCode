@@ -3,6 +3,16 @@ plugins {
     id ("org.jetbrains.kotlin.android")
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
+    id("org.sonarqube") version "4.4.1.3373"
+
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "cs311-EPFL-StepQuest_ApplicationCode")
+        property("sonar.organization", "cs311-epfl-stepquest")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
 
 android {
