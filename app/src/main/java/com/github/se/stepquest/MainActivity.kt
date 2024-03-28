@@ -5,15 +5,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,6 +27,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,7 +40,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -86,9 +94,11 @@ fun LoginPage() {
       AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build()
 
   Column(
-      modifier = Modifier.padding(15.dp).fillMaxSize(),
+      modifier = Modifier.padding(38.dp).fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.spacedBy(8.dp)) {
+      verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Spacer(modifier = Modifier.height(75.dp))
+
         // Temporary until we have a logo
         val greyColor = Color(0xFF808080)
         Canvas(
@@ -97,64 +107,85 @@ fun LoginPage() {
             onDraw = {
               drawRect(color = greyColor, topLeft = Offset.Zero, size = Size(500f, 500f))
             })
-        // Login area
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        // Login text
+        Text(
+            "Log In",
+            fontSize = 25.sp,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.align(Alignment.Start))
+
+        Spacer(modifier = Modifier.height(3.dp))
+
         // Username box
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-          Text("Username", modifier = Modifier.align(Alignment.Start))
+          Text("Username", fontSize = 20.sp, modifier = Modifier.align(Alignment.Start))
           TextField(
               value = username,
               onValueChange = { username = it },
+              shape = RoundedCornerShape(8.dp),
               singleLine = true,
               modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-              keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-              keyboardActions = KeyboardActions(onNext = { /* Handle next action */}))
+              keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next))
         }
         // Password box
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-          Text("Password", modifier = Modifier.align(Alignment.Start))
+          Text("Password", fontSize = 20.sp, modifier = Modifier.align(Alignment.Start))
           TextField(
               value = password,
               onValueChange = { password = it },
+              shape = RoundedCornerShape(8.dp),
               singleLine = true,
               modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
               keyboardOptions =
                   KeyboardOptions.Default.copy(
                       imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
-              keyboardActions = KeyboardActions(onDone = { /* Handle login action */}))
+              keyboardActions =
+                  KeyboardActions(onDone = { /* TODO: same things as the Sign in button */}))
+        }
+
+        Column {
+          // Sign in Button
+          Button(
+              onClick = { /* TODO: sign in using username + password */},
+              colors = ButtonDefaults.buttonColors(blueThemeColor),
+              modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
+              shape = RoundedCornerShape(8.dp)) {
+                Text(text = "Sign in", color = Color.White, fontSize = 24.sp)
+              }
 
           // Forgot password and sign up buttons
           Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    text = "Forgot Password?",
-                    style = TextStyle(color = Color.Gray),
-                    modifier = Modifier.padding(start = 8.dp))
-                Text(
-                    text = "Sign Up",
-                    style = TextStyle(color = blueThemeColor),
-                    modifier = Modifier.padding(end = 8.dp))
-              }
-
-          // Confirm Button
-          Button(
-              onClick = {},
-              colors = ButtonDefaults.buttonColors(blueThemeColor),
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(72.dp)
-                      .padding(vertical = 8.dp)
-                      .padding(horizontal = 16.dp),
-              shape = RoundedCornerShape(8.dp)) {
-                Text(text = "Confirm", color = Color.White, fontSize = 24.sp)
+                TextButton(onClick = { /* TODO: handle forgot password */}) {
+                  Text(
+                      text = "Forgot password",
+                      fontSize = 18.sp,
+                      style = TextStyle(color = Color.Gray))
+                }
+                TextButton(onClick = { /* TODO: account creation w/o Google */}) {
+                  Text(
+                      text = "Sign up", fontSize = 18.sp, style = TextStyle(color = blueThemeColor))
+                }
               }
         }
 
+        Spacer(modifier = Modifier.height(50.dp))
+
+        // Sign in with Google button
         Button(
+            modifier = Modifier.size(65.dp),
             onClick = { signInLauncher.launch(signInIntent) },
-            colors = ButtonDefaults.buttonColors(Color.Gray),
-            shape = RoundedCornerShape(8.dp)) {
-              Text(text = "Sign in with Google", fontSize = 20.sp)
+            border = BorderStroke(1.dp, Color(0xFF000000)),
+            colors = ButtonDefaults.buttonColors(Color.White),
+            contentPadding = PaddingValues(12.dp),
+            shape = CircleShape) {
+              Image(
+                  painter = painterResource(id = R.drawable.google),
+                  contentDescription = "Sign in with google")
             }
       }
 }
