@@ -40,9 +40,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.ui.navigation.Route
+import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
 class MainActivity : ComponentActivity() {
@@ -59,18 +63,24 @@ class MainActivity : ComponentActivity() {
   }
 }
 
+
 @Composable
 fun LoginPage() {
   var username by remember { mutableStateOf("") }
   var password by remember { mutableStateOf("") }
   val blueThemeColor = colorResource(id = R.color.blueTheme)
+//  val navController = rememberNavController()
+//  val navigationActions = remember(navController) { NavigationActions(navController) }
 
   fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 
     val response = result.idpResponse
 
     if (result.resultCode == RESULT_OK) {
+        println("Sign in successful!")
       // TODO: navigate to main menu
+      // TODO: move map to where it should be, put here just for develope perpose
+//      navigationActions.navigateTo(TopLevelDestination(Route.MAP))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
     }
