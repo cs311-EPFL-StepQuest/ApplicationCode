@@ -95,7 +95,8 @@ fun LoginPage(navigationActions: NavigationActions) {
       println("Sign in successful!")
       // TODO: navigate to main menu
 
-      // TODO: move map to where it should be after main menu is ready, put here just for develope purpose
+      // TODO: move map to where it should be after main menu is ready, put here just for develope
+      // purpose
       navigationActions.navigateTo(TopLevelDestination(Route.MAP))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
