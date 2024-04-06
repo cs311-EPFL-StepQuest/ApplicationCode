@@ -2,7 +2,6 @@ package com.github.se.stepquest
 
 import android.app.Activity.RESULT_OK
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -70,7 +69,6 @@ class MainActivity : ComponentActivity() {
       }
     }
   }
-
 }
 
 @Composable

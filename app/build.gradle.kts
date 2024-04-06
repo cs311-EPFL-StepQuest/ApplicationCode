@@ -131,6 +131,8 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-location:21.1.0")
     implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+
+    implementation ("androidx.compose.runtime:runtime-livedata:1.1.1")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
