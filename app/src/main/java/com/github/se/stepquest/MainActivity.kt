@@ -2,9 +2,11 @@ package com.github.se.stepquest
 
 import android.app.Activity.RESULT_OK
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,6 +49,7 @@ import androidx.navigation.compose.rememberNavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.github.se.stepquest.map.LocationViewModel
 import com.github.se.stepquest.map.Map
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.Route
@@ -54,30 +57,33 @@ import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
 class MainActivity : ComponentActivity() {
+  private val locationviewModel by viewModels<LocationViewModel>()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
       StepQuestTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          //          LoginPage()
-          MyAppNavHost()
+          MyAppNavHost(locationviewModel = locationviewModel)
         }
       }
     }
   }
+
 }
 
 @Composable
 fun MyAppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Route.LOGIN
+    startDestination: String = Route.LOGIN,
+    locationviewModel: LocationViewModel
 ) {
   val navigationActions = remember(navController) { NavigationActions(navController) }
   NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
     composable(Route.LOGIN) { LoginPage(navigationActions) }
-    composable(Route.MAP) { Map() }
+    composable(Route.MAP) { Map(locationviewModel) }
   }
 }
 
