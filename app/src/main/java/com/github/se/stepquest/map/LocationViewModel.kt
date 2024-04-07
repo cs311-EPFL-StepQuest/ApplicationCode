@@ -34,34 +34,56 @@ class LocationViewModel : ViewModel() {
             for (lo in p0.locations) {
               // Update UI with location data
               currentLocation.value = LocationDetails(lo.latitude, lo.longitude)
-              println("Location in view: ${currentLocation.value}")
+//              println("Location in view: ${currentLocation.value}")
               appendCurrentLocationToAllocations()
-              println("Allocations: ${_allocations.value}")
+//              println("Allocations: ${_allocations.value}")
             }
           }
         }
 
     locationCallback?.let {
-      val locationRequest =
-          LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-          }
+
+      val locationInterval = 100
+      val locationFastestInterval = 50
+      val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, locationInterval.toLong())
+        .setWaitForAccurateLocation(false)
+        .setMinUpdateIntervalMillis(locationFastestInterval.toLong())
+        .build()
+
       fusedLocationClient?.requestLocationUpdates(locationRequest, it, Looper.getMainLooper())
     }
   }
 
   fun appendCurrentLocationToAllocations() {
     val currentAllocations = _allocations.value ?: emptyList()
-    val current = currentLocation.value
+    var current = currentLocation.value
     val last = currentAllocations.lastOrNull()
 
-    if (current != null && (last == null || calculateDistance(last, current) > 1)) {
+//  // Here is for testing purposes: create a faking route by adding each time 1.2 meters to the previous location
+//    current=fakeRoute(current!!)
+
+    if (current != null && (last == null || calculateDistance(last, current) > 1) && locationUpdated.value==false) {
       _allocations.value = currentAllocations + current
       locationUpdated.value = true
     }
   }
+
+//  // Here is for testing purposes: create a faking route by adding each time 1.2 meters to the previous location
+//  var i = 0
+//  fun fakeRoute(current: LocationDetails): LocationDetails {
+//
+//    // Calculate new latitude and longitude with a distance of 1 meter
+//    val latRadians = Math.toRadians(current.latitude)
+//    val lonRadians = Math.toRadians(current.longitude)
+//    val earthRadius = 6371000 // Earth's radius in meters
+//    val meterIncrement = 1.2*i // Increment distance in meters
+//
+//    val newLatitude = Math.toDegrees(latRadians + meterIncrement / earthRadius)
+//    val newLongitude = Math.toDegrees(lonRadians + meterIncrement / (earthRadius * Math.cos(latRadians)))
+//    i+=1
+//    println("i: $i")
+//    return LocationDetails(newLatitude, newLongitude)
+//  }
 
   fun getAllocations(): List<LocationDetails>? {
     return _allocations.value

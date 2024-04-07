@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.github.se.stepquest.R
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -82,16 +84,17 @@ fun MapContent(locationViewModel: LocationViewModel, context: Context) {
                   map.value = googleMap
                   initMap(map.value!!)
               }
-
           }
       }, modifier = Modifier.fillMaxSize(),)
 
 
       val locationUpdated by locationViewModel.locationUpdated.observeAsState()
-
-      if (locationUpdated == true) {
-          // Update the map content
-          updateMap(map.value!!, locationViewModel)
+      LaunchedEffect(locationUpdated) {
+          if (locationUpdated == true) {
+              // Update the map content
+              updateMap(map.value!!, locationViewModel)
+              locationViewModel.locationUpdated.value = false
+          }
       }
 
     // Button for creating a route
@@ -109,7 +112,7 @@ fun MapContent(locationViewModel: LocationViewModel, context: Context) {
           }
         },
         modifier =
-            Modifier.padding(16.dp).align(Alignment.BottomEnd).testTag("createRouteButton")) {
+            Modifier.padding(16.dp).align(Alignment.BottomStart).testTag("createRouteButton")) {
           Image(
               painter = painterResource(id = R.drawable.addbutton),
               contentDescription = "image description",
@@ -119,27 +122,27 @@ fun MapContent(locationViewModel: LocationViewModel, context: Context) {
 }
 
 
-@Composable
+
 fun updateMap(googleMap: GoogleMap, locationViewModel: LocationViewModel) {
     val allocations = locationViewModel.getAllocations() ?: return
-
-
-//        map.addMarker(MarkerOptions().position(currentLocation.value!!.toLatLng()))
-        if (allocations.size == 1) {
-            // Add marker for the only allocation
-            googleMap.addMarker(MarkerOptions().position(allocations.first().toLatLng()))
-        } else {
-            // Draw polyline connecting the last two allocations
-            val lastAllocation = allocations.last()
-            val secondLastAllocation = allocations[allocations.size - 2]
-            val polylineOptions = PolylineOptions().apply {
-                color(Color.BLUE)
-                width(5f)
-                add(lastAllocation.toLatLng())
-                add(secondLastAllocation.toLatLng())
-            }
-            googleMap.addPolyline(polylineOptions)
+//    println("all locations in map: $allocations")
+    if (allocations.size == 1) {
+        // Add marker for the only allocation
+        googleMap.addMarker(MarkerOptions().position(allocations.first().toLatLng()))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(allocations.first().toLatLng(), 20f))
+    } else {
+        // Draw polyline connecting the last two allocations
+//        println("Drawing polyline")
+        val lastAllocation = allocations.last()
+        val secondLastAllocation = allocations[allocations.size - 2]
+        val polylineOptions = PolylineOptions().apply {
+            color(Color.BLUE)
+            width(10f)
+            add(lastAllocation.toLatLng())
+            add(secondLastAllocation.toLatLng())
         }
+        googleMap.addPolyline(polylineOptions)
+    }
     }
 
 
@@ -149,7 +152,9 @@ fun LocationDetails.toLatLng(): LatLng {
 }
 
 fun initMap(googleMap: GoogleMap){
+//    println("Initiate map")
     googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)
+    googleMap.uiSettings.isZoomControlsEnabled = true
 }
 
 // @Preview
