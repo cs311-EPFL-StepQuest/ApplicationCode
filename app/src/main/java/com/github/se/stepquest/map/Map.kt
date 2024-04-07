@@ -45,15 +45,9 @@ import com.google.maps.android.ktx.addMarker
 import com.google.maps.android.ktx.model.cameraPosition
 
 @Composable
-fun Map(viewModel: LocationViewModel) {
+fun Map(locationViewModel: LocationViewModel) {
   //  println("Here in Map")
   val context = LocalContext.current
-
-  MapContent(viewModel, context)
-}
-
-@Composable
-fun MapContent(locationViewModel: LocationViewModel, context: Context) {
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -75,7 +69,7 @@ fun MapContent(locationViewModel: LocationViewModel, context: Context) {
 
   val map = remember { mutableStateOf<GoogleMap?>(null) }
 
-  Box(modifier = Modifier.fillMaxSize()) {
+  Box(modifier = Modifier.fillMaxSize().testTag("MapScreen")) {
       AndroidView(factory = { context ->
           MapView(context).apply {
               onCreate(null) // Lifecycle integration
