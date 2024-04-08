@@ -2,7 +2,6 @@ package com.github.se.stepquest.map
 // Map.kt
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.widget.Toast
@@ -11,16 +10,17 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -34,20 +34,18 @@ import com.github.se.stepquest.R
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapType
 import com.google.maps.android.ktx.addMarker
-import com.google.maps.android.ktx.model.cameraPosition
 
 @Composable
 fun Map(locationViewModel: LocationViewModel) {
   //  println("Here in Map")
   val context = LocalContext.current
+  var stopCreatingRoute= false
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -55,8 +53,8 @@ fun Map(locationViewModel: LocationViewModel) {
         val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
         if (areGranted) {
           println("Permission true")
-            locationViewModel.locationRequired.value = true
-            locationViewModel.startLocationUpdates(context as ComponentActivity)
+          locationViewModel.locationRequired.value = true
+          locationViewModel.startLocationUpdates(context as ComponentActivity)
           Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
         } else {
           println("Permission false")
@@ -69,86 +67,127 @@ fun Map(locationViewModel: LocationViewModel) {
 
   val map = remember { mutableStateOf<GoogleMap?>(null) }
 
-  Box(modifier = Modifier.fillMaxSize().testTag("MapScreen")) {
-      AndroidView(factory = { context ->
+  Box(modifier = Modifier
+      .fillMaxSize()
+      .testTag("MapScreen")) {
+    AndroidView(
+        factory = { context ->
           MapView(context).apply {
-              onCreate(null) // Lifecycle integration
-              // Get the GoogleMap asynchronously
-              getMapAsync { googleMap ->
-                  map.value = googleMap
-                  initMap(map.value!!)
-              }
-          }
-      }, modifier = Modifier.fillMaxSize(),)
-
-
-      val locationUpdated by locationViewModel.locationUpdated.observeAsState()
-      LaunchedEffect(locationUpdated) {
-          if (locationUpdated == true) {
-              // Update the map content
-              updateMap(map.value!!, locationViewModel)
-              locationViewModel.locationUpdated.value = false
-          }
-      }
-
-    // Button for creating a route
-    FloatingActionButton(
-        onClick = {
-          if (permissions.all {
-            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-          }) {
-            // Get the location
-              locationViewModel.startLocationUpdates(context as ComponentActivity)
-            println("Permission granted")
-          } else {
-            println("Ask Permission")
-            launcherMultiplePermissions.launch(permissions)
+            onCreate(null) // Lifecycle integration
+            // Get the GoogleMap asynchronously
+            getMapAsync { googleMap ->
+              map.value = googleMap
+              initMap(map.value!!)
+            }
           }
         },
-        modifier =
-            Modifier.padding(16.dp).align(Alignment.BottomStart).testTag("createRouteButton")) {
-          Image(
-              painter = painterResource(id = R.drawable.addbutton),
-              contentDescription = "image description",
-              contentScale = ContentScale.None)
-        }
+        modifier = Modifier.fillMaxSize(),
+    )
+
+    val locationUpdated by locationViewModel.locationUpdated.observeAsState()
+    LaunchedEffect(locationUpdated) {
+      if (locationUpdated == true) {
+        // Update the map content
+        updateMap(map.value!!, locationViewModel)
+        locationViewModel.locationUpdated.value = false
+      }
+    }
+      Column(modifier = Modifier.align(Alignment.BottomStart)) {
+          // Button for creating a route
+          FloatingActionButton(
+              onClick = {
+                  if (permissions.all {
+                          ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+                      }) {
+                      // Get the location
+                      locationViewModel.startLocationUpdates(context as ComponentActivity)
+                      println("Permission granted")
+                  } else {
+                      println("Ask Permission")
+                      launcherMultiplePermissions.launch(permissions)
+                  }
+
+              },
+              modifier =
+              Modifier
+                  .padding(16.dp)
+                  .testTag("createRouteButton"),
+              content = {
+                  Image(
+                      painter = painterResource(id = R.drawable.addbutton),
+                      contentDescription = "add button to start create route",
+                      contentScale = ContentScale.None
+                  )
+
+              }
+          )
+
+          // Button for stopping a route
+          FloatingActionButton(
+              onClick = {
+                  locationViewModel.onPause()
+                  stopCreatingRoute= true
+                  updateMap(map.value!!, locationViewModel,stopCreatingRoute)
+                  // //TODO: clean all location and maps after the confirmation of the route (put this two line in the right place)
+                  //map.value!!.clear()
+                  //locationViewModel.cleanAllocations()
+              },
+              modifier =
+              Modifier
+                  .padding(16.dp)
+                  .testTag("stopRouteButton"),
+              // Set visibility based on the route state
+              content = {
+                  Image(
+                      painter = painterResource(id = R.drawable.stopbutton),
+                      contentDescription = "stop button to stop create route",
+                      contentScale = ContentScale.None
+                  )
+
+              }
+          )
+      }
+
   }
 }
 
-
-
-fun updateMap(googleMap: GoogleMap, locationViewModel: LocationViewModel) {
-    val allocations = locationViewModel.getAllocations() ?: return
-//    println("all locations in map: $allocations")
-    if (allocations.size == 1) {
-        // Add marker for the only allocation
-        googleMap.addMarker(MarkerOptions().position(allocations.first().toLatLng()))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(allocations.first().toLatLng(), 20f))
-    } else {
-        // Draw polyline connecting the last two allocations
-//        println("Drawing polyline")
-        val lastAllocation = allocations.last()
-        val secondLastAllocation = allocations[allocations.size - 2]
-        val polylineOptions = PolylineOptions().apply {
-            color(Color.BLUE)
-            width(10f)
-            add(lastAllocation.toLatLng())
-            add(secondLastAllocation.toLatLng())
-        }
-        googleMap.addPolyline(polylineOptions)
-    }
-    }
-
+fun updateMap(googleMap: GoogleMap, locationViewModel: LocationViewModel, stopCreatingRoute: Boolean=false) {
+  val allocations = locationViewModel.getAllocations() ?: return
+  //    println("all locations in map: $allocations")
+  if (allocations.size == 1) {
+    // Add marker for the only allocation
+    googleMap.addMarker(MarkerOptions().position(allocations.first().toLatLng()))
+    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(allocations.first().toLatLng(), 20f))
+  } else {
+      if (!stopCreatingRoute){
+          // Draw polyline connecting the last two allocations
+          //        println("Drawing polyline")
+          val lastAllocation = allocations.last()
+          val secondLastAllocation = allocations[allocations.size - 2]
+          val polylineOptions =
+              PolylineOptions().apply {
+                  color(Color.BLUE)
+                  width(10f)
+                  add(lastAllocation.toLatLng())
+                  add(secondLastAllocation.toLatLng())
+              }
+          googleMap.addPolyline(polylineOptions)
+      }
+      else{
+          googleMap.addMarker(MarkerOptions().position(allocations.last().toLatLng()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
+      }
+  }
+}
 
 // Extension function to convert LocationDetails to LatLng
 fun LocationDetails.toLatLng(): LatLng {
-    return LatLng(latitude, longitude)
+  return LatLng(latitude, longitude)
 }
 
-fun initMap(googleMap: GoogleMap){
-//    println("Initiate map")
-    googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)
-    googleMap.uiSettings.isZoomControlsEnabled = true
+fun initMap(googleMap: GoogleMap) {
+  //    println("Initiate map")
+  googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)
+  googleMap.uiSettings.isZoomControlsEnabled = true
 }
 
 // @Preview
