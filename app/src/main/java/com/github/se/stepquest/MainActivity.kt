@@ -42,8 +42,7 @@ class MainActivity : ComponentActivity() {
             StepQuestTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     LoginPage()
                 }
@@ -88,15 +87,12 @@ fun LoginPage() {
 
         // Temporary until we have a logo
         val greyColor = Color(0xFF808080)
-        Canvas(
-            modifier =
-            Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(200.dp)
-                .padding(vertical = 16.dp),
-            onDraw = {
-                drawRect(color = greyColor, topLeft = Offset.Zero, size = Size(500f, 500f))
-            })
+        Canvas(modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .size(200.dp)
+            .padding(vertical = 16.dp), onDraw = {
+            drawRect(color = greyColor, topLeft = Offset.Zero, size = Size(500f, 500f))
+        })
 
         Spacer(modifier = Modifier.height(150.dp))
 
