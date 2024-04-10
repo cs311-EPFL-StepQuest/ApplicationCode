@@ -17,15 +17,6 @@ data class TopLevelDestination(
     val textId: Int? = null
 )
 
-// val TOP_LEVEL_DESTINATIONS =
-//    listOf(
-//        TopLevelDestination(
-//            Route.OVERVIEW,
-//            { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "overview") },
-//            R.string.overview),
-//        TopLevelDestination(
-//            Route.MAP, { Icon(Icons.Default.Search, contentDescription = "map") }, R.string.map),
-//    )
 
 class NavigationActions(private val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, uid: String? = null) {

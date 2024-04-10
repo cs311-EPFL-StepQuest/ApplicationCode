@@ -7,7 +7,6 @@ import com.google.maps.android.compose.GoogleMap
 
 @Composable
 fun Map() {
-  //  println("Here in Map")
   GoogleMap(
       modifier = Modifier.fillMaxSize(),
   ) {}
