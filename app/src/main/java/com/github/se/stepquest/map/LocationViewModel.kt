@@ -19,8 +19,8 @@ class LocationViewModel : ViewModel() {
   val locationUpdated = MutableLiveData<Boolean>()
 
   init {
-    locationRequired.value = false
-    locationUpdated.value = false
+    locationRequired.postValue(false)
+    locationUpdated.postValue(false)
   }
 
   @SuppressLint("MissingPermission")

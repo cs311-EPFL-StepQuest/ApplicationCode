@@ -49,20 +49,20 @@ fun Map(locationViewModel: LocationViewModel) {
   //  println("Here in Map")
   val context = LocalContext.current
 
-  val launcherMultiplePermissions =
-      rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-          permissionsMap ->
-        val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
-        if (areGranted) {
-          println("Permission true")
-            locationViewModel.locationRequired.value = true
-            locationViewModel.startLocationUpdates(context as ComponentActivity)
-          Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-        } else {
-          println("Permission false")
-          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-      }
+//  val launcherMultiplePermissions =
+//      rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+//          permissionsMap ->
+//        val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
+//        if (areGranted) {
+//          println("Permission true")
+//            locationViewModel.locationRequired.value = true
+//            locationViewModel.startLocationUpdates(context as ComponentActivity)
+//          Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+//        } else {
+//          println("Permission false")
+//          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+//        }
+//      }
 
   val permissions =
       arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -102,7 +102,7 @@ fun Map(locationViewModel: LocationViewModel) {
             println("Permission granted")
           } else {
             println("Ask Permission")
-            launcherMultiplePermissions.launch(permissions)
+//            launcherMultiplePermissions.launch(permissions)
           }
         },
         modifier =

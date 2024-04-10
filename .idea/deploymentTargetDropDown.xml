@@ -5,7 +5,13 @@
       <entry key="All Tests">
         <State />
       </entry>
+      <entry key="MapTest">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="createRouteButton()">
         <State />
       </entry>
     </value>
