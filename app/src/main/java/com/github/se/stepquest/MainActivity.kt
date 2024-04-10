@@ -1,6 +1,7 @@
 package com.github.se.stepquest
 
 import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -48,9 +50,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
 class MainActivity : ComponentActivity() {
@@ -73,12 +77,18 @@ fun LoginPage() {
   var password by remember { mutableStateOf("") }
   val blueThemeColor = colorResource(id = R.color.blueTheme)
 
+  val context = LocalContext.current
+
   fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 
     val response = result.idpResponse
 
     if (result.resultCode == RESULT_OK) {
       // TODO: navigate to main menu
+
+
+      // Start the step counter:
+        ContextCompat.startForegroundService(context, Intent(context, StepCounterService::class.java))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
     }
