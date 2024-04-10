@@ -17,7 +17,6 @@ data class TopLevelDestination(
     val textId: Int? = null
 )
 
-
 class NavigationActions(private val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, uid: String? = null) {
     val routeWithUid =
