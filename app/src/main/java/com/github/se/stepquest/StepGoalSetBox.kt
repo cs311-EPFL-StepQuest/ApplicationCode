@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -33,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
+fun calculation() {
+
+}
 @Composable
 fun SetStepGoalsDialog(
     onDismiss: () -> Unit,
@@ -69,12 +73,13 @@ fun SetStepGoalsDialog(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Daily steps")
                 TextField(
                     value = newDailyStepGoal,
                     onValueChange = { newDailyStepGoal = it.filter { it.isDigit() }
                         .take(5) },
-                    label = { Text("Daily Step Goal") },
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword)
+                    placeholder = {Text("5000")},
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
