@@ -7,23 +7,21 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.IBinder
+import android.text.format.DateFormat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import java.util.Date
 
-class StepCounterService : Service(), SensorEventListener {
+class StepCounterService() : Service(), SensorEventListener {
 
-    private lateinit var sensorManager: SensorManager
-    private var stepSensor: Sensor? = null
+    lateinit var sensorManager: SensorManager
+    var stepSensor: Sensor? = null
     private var stepCount = 0
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var database: FirebaseDatabase
+    lateinit var firebaseAuth: FirebaseAuth
+    lateinit var database: FirebaseDatabase
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -64,10 +62,25 @@ class StepCounterService : Service(), SensorEventListener {
         TODO("Not yet implemented")
     }
 
-    private fun saveStepCountToDatabase(newSteps: Int) {
+    fun saveStepCountToDatabase(newSteps: Int) {
         val userId = firebaseAuth.currentUser?.uid
         if (userId != null) {
-            val stepsRef = database.reference.child("users").child(userId).child("steps")
+            val stepsRefTotal = database.reference.child("users").child(userId).child("totalSteps")
+            stepsRefTotal.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val currentSteps = dataSnapshot.getValue(Int::class.java) ?: 0
+                    val totalSteps = currentSteps + newSteps
+                    stepsRefTotal.setValue(totalSteps)
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    //add code when failing to access database
+                }
+            })
+
+            val d = Date();
+            val s: CharSequence = DateFormat.format("MMMM d, yyyy ", d.getTime())
+            val stepsRef = database.reference.child("users").child(userId).child("dailySteps $s")
             stepsRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val currentSteps = dataSnapshot.getValue(Int::class.java) ?: 0

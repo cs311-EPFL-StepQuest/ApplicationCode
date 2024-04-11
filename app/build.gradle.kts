@@ -117,6 +117,9 @@ dependencies {
     implementation("com.google.android.play:core-ktx:1.7.0")
 
     implementation("com.google.android.gms:play-services-fitness:20.0.0")
+
+    testImplementation("org.mockito:mockito-core:3.12.4")
+    androidTestImplementation("org.mockito:mockito-android:3.12.4")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
