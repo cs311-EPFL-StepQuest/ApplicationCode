@@ -2,10 +2,10 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="SetStepGoalsDialogTest">
+      <entry key="All Tests">
         <State />
       </entry>
-      <entry key="app">
+      <entry key="MapKtTest">
         <State />
       </entry>
       <entry key="dialog_confirm_button_click_rounding_check()">
