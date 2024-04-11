@@ -69,6 +69,7 @@ fun MyAppNavHost(
   NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
     composable(Route.LOGIN) { LoginPage(navigationActions) }
     composable(Route.MAP) { Map() }
+    composable(Route.USER_CREATION) { UserCreationScreen() }
   }
 }
 
@@ -141,7 +142,7 @@ fun LoginPage(navigationActions: NavigationActions) {
 
         // New user button
         Button(
-            onClick = { /* TODO: navigate to user creation */},
+            onClick = { navigationActions.navigateTo(TopLevelDestination(Route.USER_CREATION)) },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
             shape = RoundedCornerShape(8.dp)) {

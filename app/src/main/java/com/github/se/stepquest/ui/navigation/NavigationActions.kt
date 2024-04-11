@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 object Route {
   const val MAP = "map"
   const val LOGIN = "login"
+  const val USER_CREATION = "user creation"
 }
 
 data class TopLevelDestination(
