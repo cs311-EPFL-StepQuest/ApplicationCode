@@ -26,8 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.firebase.ui.auth.AuthUI
@@ -36,63 +36,61 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            StepQuestTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
-                ) {
-                    LoginPage()
-                }
-            }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent {
+      StepQuestTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+          LoginPage()
         }
+      }
     }
+  }
 }
 
 @Composable
 fun LoginPage() {
-    val blueThemeColor = colorResource(id = R.color.blueTheme)
+  val blueThemeColor = colorResource(id = R.color.blueTheme)
 
-    fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+  fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 
-        val response = result.idpResponse
+    val response = result.idpResponse
 
-        if (result.resultCode == RESULT_OK) {
-            // TODO: navigate to main menu
-        } else if (response != null) {
-            throw Exception(response.error?.errorCode.toString())
-        }
+    if (result.resultCode == RESULT_OK) {
+      // TODO: navigate to main menu
+    } else if (response != null) {
+      throw Exception(response.error?.errorCode.toString())
     }
+  }
 
-    val signInLauncher =
-        rememberLauncherForActivityResult(contract = FirebaseAuthUIActivityResultContract()) {
-            onSignInResult(it)
-        }
+  val signInLauncher =
+      rememberLauncherForActivityResult(contract = FirebaseAuthUIActivityResultContract()) {
+        onSignInResult(it)
+      }
 
-    val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
+  val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
 
-    val signInIntent =
-        AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build()
+  val signInIntent =
+      AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build()
 
-    Column(
-        modifier = Modifier
-            .padding(38.dp)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
+  Column(
+      modifier = Modifier.padding(38.dp).fillMaxSize(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(5.dp)) {
         Spacer(modifier = Modifier.height(100.dp))
 
         // Temporary until we have a logo
         val greyColor = Color(0xFF808080)
-        Canvas(modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .size(200.dp)
-            .padding(vertical = 16.dp), onDraw = {
-            drawRect(color = greyColor, topLeft = Offset.Zero, size = Size(500f, 500f))
-        })
+        Canvas(
+            modifier =
+                Modifier.align(Alignment.CenterHorizontally)
+                    .size(200.dp)
+                    .padding(vertical = 16.dp)
+                    .testTag("App logo"),
+            onDraw = {
+              drawRect(color = greyColor, topLeft = Offset.Zero, size = Size(500f, 500f))
+            })
 
         Spacer(modifier = Modifier.height(150.dp))
 
@@ -100,34 +98,20 @@ fun LoginPage() {
         Button(
             onClick = { signInLauncher.launch(signInIntent) },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(72.dp)
-                .padding(vertical = 8.dp),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text(text = "Log in", color = Color.White, fontSize = 24.sp)
-        }
+            modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
+            shape = RoundedCornerShape(8.dp)) {
+              Text(text = "Log in", color = Color.White, fontSize = 24.sp)
+            }
 
         Spacer(modifier = Modifier.height(25.dp))
 
         // New user button
         Button(
-            onClick = { /* TODO: navigate to user creation */ },
+            onClick = { /* TODO: navigate to user creation */},
             colors = ButtonDefaults.buttonColors(blueThemeColor),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(72.dp)
-                .padding(vertical = 8.dp),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text(text = "New player", color = Color.White, fontSize = 24.sp)
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    StepQuestTheme { LoginPage() }
+            modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
+            shape = RoundedCornerShape(8.dp)) {
+              Text(text = "New player", color = Color.White, fontSize = 24.sp)
+            }
+      }
 }
