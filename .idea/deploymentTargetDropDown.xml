@@ -5,7 +5,19 @@
       <entry key="MainActivity">
         <State />
       </entry>
+      <entry key="SetStepGoalsDialogTest">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="dialog_confirm_button_click()">
+        <State />
+      </entry>
+      <entry key="dialog_opens_correctly()">
+        <State />
+      </entry>
+      <entry key="dialog_ui_elements_displayed_correctly()">
         <State />
       </entry>
     </value>

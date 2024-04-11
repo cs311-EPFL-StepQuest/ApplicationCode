@@ -89,14 +89,10 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.6.0")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
     implementation("com.google.firebase:firebase-database-ktx:20.3.0")
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    debugImplementation("androidx.compose.ui:ui-tooling:1.4.0")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.0")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.5")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.3.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.5")
+    debugImplementation(libs.ui.test.manifest)
 
     androidTestImplementation("com.kaspersky.android-components:kaspresso:1.4.3")
     // Allure support

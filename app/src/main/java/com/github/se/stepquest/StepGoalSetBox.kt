@@ -28,15 +28,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
-fun calculation() {
-
-}
 @Composable
 fun SetStepGoalsDialog(
     onDismiss: () -> Unit,
@@ -44,7 +43,7 @@ fun SetStepGoalsDialog(
 ) {
     val blueThemeColor = colorResource(id = R.color.blueTheme)
     var newDailyStepGoal by remember { mutableStateOf("") }
-    var newWeeklyStepGoal by remember { mutableStateOf("") }
+    val newWeeklyStepGoal by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Surface(
@@ -74,12 +73,37 @@ fun SetStepGoalsDialog(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(text = "Daily steps")
-                TextField(
+                Spacer(modifier = Modifier.height(2.dp))
+                TextField( modifier = Modifier.testTag("daily_steps_setter"),
                     value = newDailyStepGoal,
                     onValueChange = { newDailyStepGoal = it.filter { it.isDigit() }
                         .take(5) },
+                    label = {Text("Enter your daily step goal")},
                     placeholder = {Text("5000")},
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword,
+                        imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        val dailyStep = newDailyStepGoal
+                            .filter { it.isDigit() }
+                            .take(5)
+                            .let {
+                                if (it.isBlank()) {
+                                    5000 // Default value if blank
+                                } else {
+                                    val parsedInput = it.toIntOrNull() ?: 0
+                                    val roundedValue =
+                                        (parsedInput + 249) / 250 * 250
+                                    if (roundedValue < 1000) {
+                                        1000
+                                    } else {
+                                        roundedValue
+                                    }
+                                }
+                            }
+                        val weeklyStep = newWeeklyStepGoal.takeIf { it.isNotBlank() }?.toInt() ?: (dailyStep * 7)
+                        onConfirm(dailyStep, weeklyStep)
+                        onDismiss()
+                    })
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
