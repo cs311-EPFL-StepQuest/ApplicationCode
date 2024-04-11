@@ -4,7 +4,7 @@ name: CI - Test Runner
 on:
   push:
     branches:
-      - main
+      - 20-implement-a-step-counter
 
   pull_request:
     types:
