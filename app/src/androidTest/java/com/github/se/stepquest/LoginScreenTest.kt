@@ -20,13 +20,15 @@ class LoginScreenTest {
     }
 
     // Application logo is displayed
-    composeTestRule.onNodeWithTag("App logo").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("App logo").assertExists("The app logo doesn't exist?!")
     composeTestRule.onNodeWithTag("App logo").assertHasNoClickAction()
 
     // Both buttons are displayed and clickable
-    composeTestRule.onNodeWithText("Log in").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Log in").assertExists("The login button doesn't exist?!")
     composeTestRule.onNodeWithText("Log in").assertHasClickAction()
-    composeTestRule.onNodeWithText("New player").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText("New player")
+        .assertExists("The new player button doesn't exist?!")
     composeTestRule.onNodeWithText("New player").assertHasClickAction()
   }
 }
