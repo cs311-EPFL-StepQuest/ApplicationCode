@@ -9,12 +9,12 @@ import com.github.se.stepquest.ui.theme.StepQuestTheme
 import org.junit.Rule
 import org.junit.Test
 
-class MainScreenTest {
+class HomeScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
   fun dummy_is_correctly_displayed() {
-    composeTestRule.setContent { StepQuestTheme { MainScreen() } }
+    composeTestRule.setContent { StepQuestTheme { HomeScreen() } }
     // Verify that the messages button is displayed
     composeTestRule.onNodeWithTag("messages_button").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("messages_icon").assertIsDisplayed()

@@ -48,7 +48,7 @@ val TOP_LEVEL_DESTINATIONS =
 */
 @Preview(showBackground = true, widthDp = 393, heightDp = 808)
 @Composable
-fun MainScreen() {
+fun HomeScreen() {
   Scaffold(
       containerColor = Color(0xFF0D99FF),
       // Three main icons
