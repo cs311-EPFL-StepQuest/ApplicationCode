@@ -2,8 +2,6 @@ package com.github.se.stepquest
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.navigation.compose.rememberNavController
-import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 import org.junit.Rule
 import org.junit.Test
@@ -15,9 +13,7 @@ class LoginScreenTest {
   @Test
   fun everythingIsDisplayed() {
 
-    composeTestRule.setContent {
-      StepQuestTheme { LoginPage(NavigationActions(rememberNavController())) }
-    }
+    composeTestRule.setContent { StepQuestTheme { MyAppNavHost() } }
 
     // Application logo is displayed
     composeTestRule.onNodeWithTag("App logo").assertExists("The app logo doesn't exist?!")
@@ -35,9 +31,7 @@ class LoginScreenTest {
   @Test
   fun buttonsAreClickable() {
 
-    composeTestRule.setContent {
-      StepQuestTheme { LoginPage(NavigationActions(rememberNavController())) }
-    }
+    composeTestRule.setContent { StepQuestTheme { MyAppNavHost() } }
 
     composeTestRule.onNodeWithText("New player").performClick()
     composeTestRule
