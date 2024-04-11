@@ -2,22 +2,16 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MainActivity">
-        <State />
-      </entry>
       <entry key="SetStepGoalsDialogTest">
         <State />
       </entry>
       <entry key="app">
         <State />
       </entry>
-      <entry key="dialog_confirm_button_click()">
+      <entry key="dialog_confirm_button_click_rounding_check()">
         <State />
       </entry>
-      <entry key="dialog_opens_correctly()">
-        <State />
-      </entry>
-      <entry key="dialog_ui_elements_displayed_correctly()">
+      <entry key="dialog_confirm_button_click_upper_bound()">
         <State />
       </entry>
     </value>
