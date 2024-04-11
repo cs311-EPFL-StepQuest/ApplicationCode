@@ -30,9 +30,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.github.se.stepquest.map.Map
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.ui.navigation.Route
+import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
 class MainActivity : ComponentActivity() {
@@ -42,7 +50,7 @@ class MainActivity : ComponentActivity() {
       StepQuestTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          LoginPage()
+          MyAppNavHost()
         }
       }
     }
@@ -50,7 +58,22 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LoginPage() {
+fun MyAppNavHost(
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = Route.LOGIN
+) {
+  val navigationActions = remember(navController) { NavigationActions(navController) }
+  NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
+    composable(Route.LOGIN) { LoginPage(navigationActions) }
+    composable(Route.MAP) { Map() }
+  }
+}
+
+@Composable
+fun LoginPage(navigationActions: NavigationActions) {
+  var username by remember { mutableStateOf("") }
+  var password by remember { mutableStateOf("") }
   val blueThemeColor = colorResource(id = R.color.blueTheme)
 
   fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
@@ -58,9 +81,16 @@ fun LoginPage() {
     val response = result.idpResponse
 
     if (result.resultCode == RESULT_OK) {
+      println("Sign in successful!")
       // TODO: navigate to main menu
+
+      // TODO: move map to where it should be after main menu is ready, put here just for develope
+      // purpose
+      navigationActions.navigateTo(TopLevelDestination(Route.MAP))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
+    } else {
+      throw Exception("Sign in failed")
     }
   }
 
@@ -72,7 +102,11 @@ fun LoginPage() {
   val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
 
   val signInIntent =
-      AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build()
+      AuthUI.getInstance()
+          .createSignInIntentBuilder()
+          .setAvailableProviders(providers)
+          .setIsSmartLockEnabled(false)
+          .build()
 
   Column(
       modifier = Modifier.padding(38.dp).fillMaxSize(),
@@ -114,4 +148,14 @@ fun LoginPage() {
               Text(text = "New player", color = Color.White, fontSize = 24.sp)
             }
       }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+  StepQuestTheme {
+    val navController = rememberNavController()
+    val navigationActions = remember(navController) { NavigationActions(navController) }
+    LoginPage(navigationActions)
+  }
 }
