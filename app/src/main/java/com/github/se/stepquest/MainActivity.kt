@@ -87,8 +87,6 @@ fun LoginPage() {
     if (result.resultCode == RESULT_OK) {
       // TODO: navigate to main menu
 
-
-
       // Start the step counter:
       ContextCompat.startForegroundService(context, Intent(context, StepCounterService::class.java))
       isLoggedIn = true
@@ -202,9 +200,9 @@ fun LoginPage() {
             }
       }
 
-    if (isLoggedIn) {
-        Greeting()
-    }
+  if (isLoggedIn) {
+    Greeting()
+  }
 }
 
 @Preview(showBackground = true)
@@ -215,20 +213,15 @@ fun GreetingPreview() {
 
 @Composable
 fun MainMenuPage(username: String) {
-    // Existing main menu code...
+  // Existing main menu code...
 
-    Text(
-        text = "Hello $username!",
-        // Other text properties...
-    )
-
+  Text(
+      text = "Hello $username!",
+      // Other text properties...
+  )
 }
 
 @Composable
 fun Greeting() {
-    Text(
-        "Hello!",
-        fontSize = 25.sp,
-        fontWeight = FontWeight.ExtraBold
-    )
+  Text("Hello!", fontSize = 25.sp, fontWeight = FontWeight.ExtraBold)
 }
