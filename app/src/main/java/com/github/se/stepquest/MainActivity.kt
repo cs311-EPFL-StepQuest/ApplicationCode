@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -66,17 +67,17 @@ import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
 class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent {
-      StepQuestTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          MyAppNavHost()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            StepQuestTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    MyAppNavHost()
+                }
+            }
         }
-      }
     }
-  }
 }
 
 @Composable
@@ -85,68 +86,70 @@ fun MyAppNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: String = Route.LOGIN
 ) {
-  val navigationActions = remember(navController) { NavigationActions(navController) }
-  NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
-    composable(Route.LOGIN) { LoginPage(navigationActions) }
-    composable(Route.MAP) { Map() }
-  }
+    val navigationActions = remember(navController) { NavigationActions(navController) }
+    NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
+        composable(Route.LOGIN) { LoginPage(navigationActions) }
+        composable(Route.MAP) { Map() }
+    }
 }
 
 @Composable
 fun LoginPage(navigationActions: NavigationActions) {
-  var username by remember { mutableStateOf("") }
-  var password by remember { mutableStateOf("") }
-  val blueThemeColor = colorResource(id = R.color.blueTheme)
 
-  val context = LocalContext.current
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    val blueThemeColor = colorResource(id = R.color.blueTheme)
 
-  fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+    val context = LocalContext.current
 
-    val response = result.idpResponse
+    fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 
-    if (result.resultCode == RESULT_OK) {
-      println("Sign in successful!")
-      // TODO: navigate to main menu
+        val response = result.idpResponse
 
-      // Start the step counter:
-      ContextCompat.startForegroundService(context, Intent(context, StepCounterService::class.java))
-      // TODO: move map to where it should be after main menu is ready, put here just for develope
-      // purpose
-      navigationActions.navigateTo(TopLevelDestination(Route.MAP))
-    } else if (response != null) {
-      throw Exception(response.error?.errorCode.toString())
-    } else {
-      throw Exception("Sign in failed")
+        if (result.resultCode == RESULT_OK) {
+            println("Sign in successful!")
+            // TODO: navigate to main menu
+
+            // Start the step counter:
+            context.startService(Intent(context, StepCounterService::class.java))
+            
+            // TODO: move map to where it should be after main menu is ready, put here just for develope
+            // purpose
+            navigationActions.navigateTo(TopLevelDestination(Route.MAP))
+        } else if (response != null) {
+            throw Exception(response.error?.errorCode.toString())
+        } else {
+            throw Exception("Sign in failed")
+        }
     }
-  }
 
-  val signInLauncher =
-      rememberLauncherForActivityResult(contract = FirebaseAuthUIActivityResultContract()) {
-        onSignInResult(it)
-      }
+    val signInLauncher =
+        rememberLauncherForActivityResult(contract = FirebaseAuthUIActivityResultContract()) {
+            onSignInResult(it)
+        }
 
-  val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
+    val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
 
-  val signInIntent =
-      AuthUI.getInstance()
-          .createSignInIntentBuilder()
-          .setAvailableProviders(providers)
-          .setIsSmartLockEnabled(false)
-          .build()
+    val signInIntent =
+        AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            .setIsSmartLockEnabled(false)
+            .build()
 
-  Column(
-      modifier = Modifier.padding(38.dp).fillMaxSize(),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.spacedBy(5.dp)) {
+    Column(
+        modifier = Modifier.padding(38.dp).fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)) {
         Spacer(modifier = Modifier.height(75.dp))
 
         // Temporary until we have a logo
         val greyColor = Color(0xFF808080)
         Canvas(
             modifier =
-                Modifier.align(Alignment.CenterHorizontally).size(200.dp).padding(vertical = 16.dp),
+            Modifier.align(Alignment.CenterHorizontally).size(200.dp).padding(vertical = 16.dp),
             onDraw = {
-              drawRect(color = greyColor, topLeft = Offset.Zero, size = Size(500f, 500f))
+                drawRect(color = greyColor, topLeft = Offset.Zero, size = Size(500f, 500f))
             })
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -162,56 +165,56 @@ fun LoginPage(navigationActions: NavigationActions) {
 
         // Username box
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-          Text("Username", fontSize = 20.sp, modifier = Modifier.align(Alignment.Start))
-          TextField(
-              value = username,
-              onValueChange = { username = it },
-              shape = RoundedCornerShape(8.dp),
-              singleLine = true,
-              modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-              keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next))
+            Text("Username", fontSize = 20.sp, modifier = Modifier.align(Alignment.Start))
+            TextField(
+                value = username,
+                onValueChange = { username = it },
+                shape = RoundedCornerShape(8.dp),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next))
         }
         // Password box
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-          Text("Password", fontSize = 20.sp, modifier = Modifier.align(Alignment.Start))
-          TextField(
-              value = password,
-              onValueChange = { password = it },
-              shape = RoundedCornerShape(8.dp),
-              singleLine = true,
-              modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-              keyboardOptions =
-                  KeyboardOptions.Default.copy(
-                      imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
-              keyboardActions =
-                  KeyboardActions(onDone = { /* TODO: same things as the Sign in button */}))
+            Text("Password", fontSize = 20.sp, modifier = Modifier.align(Alignment.Start))
+            TextField(
+                value = password,
+                onValueChange = { password = it },
+                shape = RoundedCornerShape(8.dp),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
+                keyboardActions =
+                KeyboardActions(onDone = { /* TODO: same things as the Sign in button */}))
         }
 
         Column {
-          // Sign in Button
-          Button(
-              onClick = { /* TODO: sign in using username + password */},
-              colors = ButtonDefaults.buttonColors(blueThemeColor),
-              modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
-              shape = RoundedCornerShape(8.dp)) {
+            // Sign in Button
+            Button(
+                onClick = { /* TODO: sign in using username + password */},
+                colors = ButtonDefaults.buttonColors(blueThemeColor),
+                modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
+                shape = RoundedCornerShape(8.dp)) {
                 Text(text = "Sign in", color = Color.White, fontSize = 24.sp)
-              }
+            }
 
-          // Forgot password and sign up buttons
-          Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween) {
+            // Forgot password and sign up buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween) {
                 TextButton(onClick = { /* TODO: handle forgot password */}) {
-                  Text(
-                      text = "Forgot password",
-                      fontSize = 18.sp,
-                      style = TextStyle(color = Color.Gray))
+                    Text(
+                        text = "Forgot password",
+                        fontSize = 18.sp,
+                        style = TextStyle(color = Color.Gray))
                 }
                 TextButton(onClick = { /* TODO: account creation w/o Google */}) {
-                  Text(
-                      text = "Sign up", fontSize = 18.sp, style = TextStyle(color = blueThemeColor))
+                    Text(
+                        text = "Sign up", fontSize = 18.sp, style = TextStyle(color = blueThemeColor))
                 }
-              }
+            }
         }
 
         Spacer(modifier = Modifier.height(50.dp))
@@ -224,19 +227,19 @@ fun LoginPage(navigationActions: NavigationActions) {
             colors = ButtonDefaults.buttonColors(Color.White),
             contentPadding = PaddingValues(12.dp),
             shape = CircleShape) {
-              Image(
-                  painter = painterResource(id = R.drawable.google),
-                  contentDescription = "Sign in with google")
-            }
-      }
+            Image(
+                painter = painterResource(id = R.drawable.google),
+                contentDescription = "Sign in with google")
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-  StepQuestTheme {
-    val navController = rememberNavController()
-    val navigationActions = remember(navController) { NavigationActions(navController) }
-    LoginPage(navigationActions)
-  }
+    StepQuestTheme {
+        val navController = rememberNavController()
+        val navigationActions = remember(navController) { NavigationActions(navController) }
+        LoginPage(navigationActions)
+    }
 }
