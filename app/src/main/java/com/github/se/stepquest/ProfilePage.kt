@@ -39,13 +39,6 @@ fun ProfilePageLayout() {
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-          ClickableText(
-              text = AnnotatedString("Back"),
-              onClick = {
-                // Navigation
-              },
-              modifier = Modifier.padding(start = 16.dp),
-              style = LocalTextStyle.current.copy(fontSize = 24.sp))
           Spacer(modifier = Modifier.weight(1f))
           Image(
               painter = painterResource(id = R.drawable.settings),

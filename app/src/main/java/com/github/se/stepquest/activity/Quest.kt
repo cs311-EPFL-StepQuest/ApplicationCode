@@ -5,6 +5,6 @@ class Quest(
     val questType: String,
     val questGoal: String,
     val currentState: String,
-    val questStatus: String,
+    val questDescription: String,
     val completionStatus: String,
 )
