@@ -24,10 +24,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.R
+import com.github.se.stepquest.activity.Challenge
+import com.github.se.stepquest.activity.Quest
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.firebase.auth.FirebaseAuth
+
 
 /*
 object Route {
@@ -45,20 +49,31 @@ val TOP_LEVEL_DESTINATIONS =
         TopLevelDestination(Route.Map, R.string.tab_map),
         TopLevelDestination(Route.Progression, R.string.tab_progression)
     )
+
 */
-@Preview(showBackground = true, widthDp = 393, heightDp = 808)
+
+
 @Composable
-fun HomeScreen() {
-  Scaffold(
+fun HomeScreen(quests: List<Quest>, challenges: List<Challenge>) {
+    val user = FirebaseAuth.getInstance().currentUser.getPhotoUrl()
+
+
+    Scaffold(
       containerColor = Color(0xFF0D99FF),
+
       // Three main icons
       topBar = {
-        Row(modifier = Modifier.height(100.dp).fillMaxWidth().padding(start = 15.dp, end = 15.dp)) {
+        Row(modifier = Modifier
+            .height(100.dp)
+            .fillMaxWidth()
+            .padding(start = 15.dp, end = 15.dp)) {
           // Messages icon
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("messages_button")) {
             Image(
                 painter = painterResource(R.drawable.messages),
-                modifier = Modifier.fillMaxHeight().size(50.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .size(50.dp),
                 contentDescription = "messages_icon")
           }
           Spacer(Modifier.weight(1f))
@@ -66,21 +81,27 @@ fun HomeScreen() {
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("notifications_button")) {
             Image(
                 painter = painterResource(R.drawable.notification),
-                modifier = Modifier.fillMaxHeight().size(50.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .size(50.dp),
                 contentDescription = "notifications_icon")
           }
           // Profile icon
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("profile_button")) {
             Image(
                 painter = painterResource(R.drawable.profile),
-                modifier = Modifier.fillMaxHeight().size(50.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .size(50.dp),
                 contentDescription = "profile_icon")
           }
         }
       },
       bottomBar = {}) { innerPadding ->
         // Main content of the home screen
-        Column(modifier = Modifier.padding(innerPadding).fillMaxWidth()) {
+        Column(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxWidth()) {
 
           // Start game button
           Button(
@@ -88,9 +109,10 @@ fun HomeScreen() {
               shape = RoundedCornerShape(20.dp),
               colors = ButtonDefaults.buttonColors(Color.White),
               modifier =
-                  Modifier.fillMaxWidth()
-                      .padding(start = 25.dp, end = 25.dp, top = 5.dp)
-                      .height(70.dp)) {
+              Modifier
+                  .fillMaxWidth()
+                  .padding(start = 25.dp, end = 25.dp, top = 5.dp)
+                  .height(70.dp)) {
                 Text(
                     text = "Start Game",
                     color = Color.Black,
@@ -104,7 +126,10 @@ fun HomeScreen() {
               }
           // Challenges tab
           Card(
-              modifier = Modifier.fillMaxWidth().padding(25.dp).height(190.dp),
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(25.dp)
+                  .height(190.dp),
               colors = CardDefaults.cardColors(containerColor = Color.White)) {
                 Column {
                   Text(
@@ -123,9 +148,10 @@ fun HomeScreen() {
                           onClick = { /*TODO*/},
                           colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
                           modifier =
-                              Modifier.padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
-                                  .height(35.dp)
-                                  .width(140.dp)) {
+                          Modifier
+                              .padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
+                              .height(35.dp)
+                              .width(140.dp)) {
                             Text(
                                 text = "Accept",
                                 fontSize = 16.sp,
@@ -139,9 +165,10 @@ fun HomeScreen() {
                           onClick = { /*TODO*/},
                           colors = ButtonDefaults.buttonColors(Color.Gray),
                           modifier =
-                              Modifier.padding(end = 20.dp, top = 10.dp)
-                                  .height(35.dp)
-                                  .width(140.dp)) {
+                          Modifier
+                              .padding(end = 20.dp, top = 10.dp)
+                              .height(35.dp)
+                              .width(140.dp)) {
                             Text(text = "Reject", color = Color.Black, fontSize = 16.sp)
                           }
                     }
@@ -151,7 +178,10 @@ fun HomeScreen() {
 
           // Daily quests tab
           Card(
-              modifier = Modifier.fillMaxWidth().padding(start = 25.dp, end = 25.dp).height(250.dp),
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(start = 25.dp, end = 25.dp)
+                  .height(250.dp),
               colors = CardDefaults.cardColors(containerColor = Color.White)) {
                 Text(
                     text = "Daily Quests",
