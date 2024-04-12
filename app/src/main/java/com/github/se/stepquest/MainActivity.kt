@@ -48,14 +48,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.github.se.stepquest.map.Map
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.ui.theme.StepQuestTheme
@@ -109,9 +105,7 @@ fun LoginPage(navigationActions: NavigationActions) {
           .build()
 
   Column(
-      modifier = Modifier
-          .padding(38.dp)
-          .fillMaxSize(),
+      modifier = Modifier.padding(38.dp).fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(5.dp)) {
         Spacer(modifier = Modifier.height(75.dp))
@@ -120,10 +114,7 @@ fun LoginPage(navigationActions: NavigationActions) {
         val greyColor = Color(0xFF808080)
         Canvas(
             modifier =
-            Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(200.dp)
-                .padding(vertical = 16.dp),
+                Modifier.align(Alignment.CenterHorizontally).size(200.dp).padding(vertical = 16.dp),
             onDraw = {
               drawRect(color = greyColor, topLeft = Offset.Zero, size = Size(500f, 500f))
             })
@@ -147,9 +138,7 @@ fun LoginPage(navigationActions: NavigationActions) {
               onValueChange = { username = it },
               shape = RoundedCornerShape(8.dp),
               singleLine = true,
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(vertical = 4.dp),
+              modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
               keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next))
         }
         // Password box
@@ -160,9 +149,7 @@ fun LoginPage(navigationActions: NavigationActions) {
               onValueChange = { password = it },
               shape = RoundedCornerShape(8.dp),
               singleLine = true,
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(vertical = 4.dp),
+              modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
               keyboardOptions =
                   KeyboardOptions.Default.copy(
                       imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
@@ -173,12 +160,9 @@ fun LoginPage(navigationActions: NavigationActions) {
         Column {
           // Sign in Button
           Button(
-              onClick = { /* TODO: sign in using username + password */ },
+              onClick = { /* TODO: sign in using username + password */},
               colors = ButtonDefaults.buttonColors(blueThemeColor),
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .height(72.dp)
-                  .padding(vertical = 8.dp),
+              modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
               shape = RoundedCornerShape(8.dp)) {
                 Text(text = "Sign in", color = Color.White, fontSize = 24.sp)
               }
