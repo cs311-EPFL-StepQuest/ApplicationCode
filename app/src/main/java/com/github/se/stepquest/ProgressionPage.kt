@@ -1,5 +1,6 @@
 package com.github.se.stepquest
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import java.util.Date
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
@@ -42,8 +49,28 @@ fun ProgressionPage() {
   val levelList = arrayListOf<String>("Current lvl", "Next lvl")
   var progress by remember { mutableStateOf(0.5f) }
   var showDialog by remember { mutableStateOf(false) }
-  var dailyStepsMade by remember { mutableStateOf(5400) }
-  var weeklyStepsMade by remember { mutableStateOf(7400) }
+  var dailyStepsMade by remember { mutableStateOf(0) }
+  var weeklyStepsMade by remember { mutableStateOf(0) }
+
+  val firebaseAuth = FirebaseAuth.getInstance()
+  val userId = firebaseAuth.currentUser?.uid
+  val database = FirebaseDatabase.getInstance()
+  val d = Date()
+
+  val s: CharSequence = DateFormat.format("MMMM d, yyyy ", d.getTime())
+  val stepsRef = database.reference.child("users").child(userId!!).child("dailySteps $s")
+  stepsRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          dailyStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
+          weeklyStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+          // add code when failing to access database
+        }
+      })
+
   var dailyStepGoal by remember { mutableIntStateOf(5000) }
   var weeklyStepGoal by remember { mutableIntStateOf(35000) }
   var dailyGoalAchieved by remember { mutableStateOf(dailyStepsMade > dailyStepGoal) }
