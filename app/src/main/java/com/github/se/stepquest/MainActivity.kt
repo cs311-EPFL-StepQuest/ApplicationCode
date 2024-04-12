@@ -204,13 +204,3 @@ fun LoginPage() {
 fun GreetingPreview() {
   StepQuestTheme { LoginPage() }
 }
-
-@Composable
-fun MainMenuPage(username: String) {
-  // Existing main menu code...
-
-  Text(
-      text = "Hello $username!",
-      // Other text properties...
-  )
-}
