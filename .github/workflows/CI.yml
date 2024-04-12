@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - 11-implement-a-button-to-start-the-creation-of-a-route
 
   pull_request:
     types:
