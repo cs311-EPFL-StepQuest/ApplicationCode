@@ -4,7 +4,7 @@ name: SonarCloud
 on:
   push:
     branches:
-      - 16-implement-the-ui-to-set-step-goals
+      - 39-daily-achievement
 
   pull_request:
     types:
