@@ -34,8 +34,6 @@ class LoginScreenTest {
     composeTestRule.setContent { StepQuestTheme { MyAppNavHost() } }
 
     composeTestRule.onNodeWithText("New player").performClick()
-    composeTestRule
-        .onNodeWithText("User creation screen (to be implemented...)")
-        .assertExists()
+    composeTestRule.onNodeWithText("User creation screen (to be implemented...)").assertExists()
   }
 }
