@@ -130,6 +130,11 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore:24.10.0")
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
     implementation("com.google.android.play:core-ktx:1.7.0")
+
+    implementation("com.google.android.gms:play-services-fitness:20.0.0")
+
+    testImplementation("org.mockito:mockito-core:3.12.4")
+    androidTestImplementation("org.mockito:mockito-android:3.12.4")
     implementation("io.coil-kt:coil-compose:2.6.0")
 }
 

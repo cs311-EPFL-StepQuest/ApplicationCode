@@ -1,6 +1,7 @@
 package com.github.se.stepquest
 
 import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.ui.theme.StepQuestTheme
@@ -58,12 +61,15 @@ class MainActivity : ComponentActivity() {
 fun LoginPage(navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
 
+  val context = LocalContext.current
+
   fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 
     val response = result.idpResponse
 
     if (result.resultCode == RESULT_OK) {
       println("Sign in successful!")
+      context.startService(Intent(context, StepCounterService::class.java))
       navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
