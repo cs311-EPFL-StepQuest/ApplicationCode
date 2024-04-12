@@ -13,21 +13,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,15 +51,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 
 @Preview(
     showSystemUi = true,
     showBackground = true
 )
 @Composable
-fun progressionPage() {
-    var levelList = arrayListOf<String>("Current lvl", "Next lvl")
-    var progress = 0.5f
+fun ProgressionPage() {
+    val levelList = arrayListOf<String>("Current lvl", "Next lvl")
+    val progress = 0.5f
     var showDialog by remember { mutableStateOf(false) }
     var dailyStepGoal by remember { mutableIntStateOf(5000) }
     var weeklyStepGoal by remember { mutableIntStateOf(35000) }
@@ -102,17 +113,18 @@ fun progressionPage() {
 
             }
             Box(modifier = Modifier.height(40.dp))
-            buildStats(icon = R.drawable.step_icon, title = "Daily steps", value = "3400/5000")
+            BuildStats(icon = R.drawable.step_icon, title = "Daily steps", value = "3400/5000")
             Box(modifier = Modifier.height(20.dp))
-            buildStats(icon = R.drawable.step_icon, title = "Weekly steps", value = "7400/20000")
+            BuildStats(icon = R.drawable.step_icon, title = "Weekly steps", value = "7400/20000")
             Box(modifier = Modifier.height(20.dp))
-            buildStats(icon = R.drawable.boss_icon, title = "Bosses defeated", value = "24")
-            Box(modifier = Modifier.height(80.dp))
+            BuildStats(icon = R.drawable.boss_icon, title = "Bosses defeated", value = "24")
+            Box(modifier = Modifier.height(60.dp))
             Button(
                 onClick = {showDialog = true},
                 colors = ButtonDefaults.buttonColors(colorResource(id = R.color.blueTheme)),
                 modifier =
-                Modifier.fillMaxWidth()
+                Modifier
+                    .fillMaxWidth()
                     .height(72.dp)
                     .padding(vertical = 8.dp)
                     .padding(horizontal = 16.dp),
@@ -136,7 +148,7 @@ fun progressionPage() {
 }
 
 @Composable
-fun buildStats(icon: Int, title: String, value: String) {
+fun BuildStats(icon: Int, title: String, value: String) {
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -156,6 +168,102 @@ fun buildStats(icon: Int, title: String, value: String) {
 }
 
 @Composable
+fun HomeScreen(){
+    BuildDefaultScreen(name = "Home")
+}
+@Composable
+fun MapScreen() {
+    BuildDefaultScreen(name = "Map")
+}
+
+@Composable
+fun BuildDefaultScreen(name:String){
+    Column (modifier = Modifier
+        .fillMaxSize()
+        .wrapContentSize(Alignment.Center)){
+        Text(name)
+    }
+}
+
+@Composable
+fun BuildNavigationBar(
+    navigationController: NavHostController,
+) {
+    val screens = listOf(Routes.HomeScreen,
+        Routes.MapScreen,
+        Routes.ProgressionScreen,)
+    val navigationBackStack by navigationController.currentBackStackEntryAsState()
+    val currentPage = navigationBackStack?.destination?.route
+
+    NavigationBar (
+        containerColor = Color.White,
+        contentColor = Color.Black
+    ){
+        screens.forEach { screen ->
+            NavigationBarItem(
+                label = {Text(text = screen.title, fontSize = 16.sp)},
+                selected = currentPage == screen.routName,
+                onClick = {
+                    navigationController.navigate(screen.routName){
+                        popUpTo(navigationController.graph.findStartDestination().id){
+                            saveState = true
+                        }
+                    }
+
+
+                },
+                icon = { Icons.Filled.Home },
+                colors = NavigationBarItemDefaults.colors(
+                    unselectedTextColor = Color.Black, selectedTextColor = colorResource(id = R.color.blueTheme)
+                ),
+            )}
+    }
+}
+
+@Composable
+fun BuildNavigationPage(navigationController: NavHostController){
+    NavHost(navigationController,
+        startDestination = Routes.HomeScreen.routName,){
+        composable(Routes.HomeScreen.routName){
+            HomeScreen()
+        }
+        composable(Routes.MapScreen.routName){
+            MapScreen()
+        }
+        composable(Routes.ProgressionScreen.routName){
+            ProgressionPage()
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun BuildPage() {
+        Greeting()
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Greeting(){
+    val navigationController:NavHostController = rememberNavController()
+    val bottomBarHeight = 70.dp
+    val bottomBarOffset = remember {
+        mutableStateOf(0f)
+    }
+    Scaffold (bottomBar = {
+        BuildNavigationBar(navigationController = navigationController,
+        )
+    }){ paddingValues ->
+        Box(
+            modifier = Modifier.padding(paddingValues)
+        ){
+            BuildNavigationPage(navigationController = navigationController)
+        }
+    }
+
+}
+
+@Composable
 fun SetStepGoalsDialog(
     onDismiss: () -> Unit,
     onConfirm: (dailyStepGoal: Int, weeklyStepGoal: Int) -> Unit
@@ -171,7 +279,9 @@ fun SetStepGoalsDialog(
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.padding(16.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
