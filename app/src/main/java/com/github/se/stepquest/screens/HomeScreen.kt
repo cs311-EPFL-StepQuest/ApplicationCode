@@ -20,7 +20,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.activity.Challenge
 import com.github.se.stepquest.activity.Quest
@@ -43,19 +41,19 @@ fun HomeScreen(navigationActions: NavigationActions) {
   // Added for testing purposes ------
   var quests: List<Quest> = emptyList()
   var challenges: List<Challenge> = emptyList()
-    val firstChallenge =
-        Challenge(
-            challengeId = "1",
-            challengerName = "John_Doe",
-            challengeSteps = "1000",
-            challengeDeadline = "Friday",
-            challengeStatus = "0",
-            completionStatus = "0",
-            challengedId = "2")
-    challenges = challenges.plus(firstChallenge)
-    val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
-    quests = quests.plus(firstQuest)
-    // ---------------------------------
+  val firstChallenge =
+      Challenge(
+          challengeId = "1",
+          challengerName = "John_Doe",
+          challengeSteps = "1000",
+          challengeDeadline = "Friday",
+          challengeStatus = "0",
+          completionStatus = "0",
+          challengedId = "2")
+  challenges = challenges.plus(firstChallenge)
+  val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
+  quests = quests.plus(firstQuest)
+  // ---------------------------------
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),
@@ -79,12 +77,16 @@ fun HomeScreen(navigationActions: NavigationActions) {
                 contentDescription = "notifications_icon")
           }
           // Profile icon
-          TextButton(onClick = {navigationActions.navigateTo(TopLevelDestination(Routes.ProfileScreen.routName))}, modifier = Modifier.testTag("profile_button")) {
-            Image(
-                painter = painterResource(com.github.se.stepquest.R.drawable.profile),
-                modifier = Modifier.fillMaxHeight().size(50.dp),
-                contentDescription = "profile_icon")
-          }
+          TextButton(
+              onClick = {
+                navigationActions.navigateTo(TopLevelDestination(Routes.ProfileScreen.routName))
+              },
+              modifier = Modifier.testTag("profile_button")) {
+                Image(
+                    painter = painterResource(com.github.se.stepquest.R.drawable.profile),
+                    modifier = Modifier.fillMaxHeight().size(50.dp),
+                    contentDescription = "profile_icon")
+              }
         }
       },
       bottomBar = {}) { innerPadding ->
@@ -222,7 +224,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
                           modifier = Modifier.padding(top = 40.dp, start = 30.dp).fillMaxWidth(),
                           horizontalArrangement = Arrangement.Center,
                           verticalAlignment = Alignment.CenterVertically) {
-                          // Icon of a blue dot
+                            // Icon of a blue dot
 
                             Image(
                                 painter =
@@ -230,18 +232,17 @@ fun HomeScreen(navigationActions: NavigationActions) {
                                         com.github.se.stepquest.R.drawable.quest_not_finished),
                                 modifier = Modifier.size(20.dp).fillMaxHeight().fillMaxWidth(),
                                 contentDescription = "profile_challenges")
-                            Row(
-                                modifier = Modifier.fillMaxWidth()) {
-                                  Spacer(modifier = Modifier.width(10.dp))
-                                  Text(
-                                      text = "${quest.currentState}/${quest.questGoal}",
-                                      fontSize = 18.sp)
-                                    Spacer(modifier = Modifier.padding(10.dp))
-                                  Text(
-                                      text = quest.questDescription,
-                                      fontSize = 18.sp,
-                                      fontWeight = FontWeight.Bold)
-                                }
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                              Spacer(modifier = Modifier.width(10.dp))
+                              Text(
+                                  text = "${quest.currentState}/${quest.questGoal}",
+                                  fontSize = 18.sp)
+                              Spacer(modifier = Modifier.padding(10.dp))
+                              Text(
+                                  text = quest.questDescription,
+                                  fontSize = 18.sp,
+                                  fontWeight = FontWeight.Bold)
+                            }
                           }
                     }
                   }
