@@ -1,10 +1,7 @@
 package com.github.se.stepquest
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.NavigationBar
@@ -15,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -27,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.github.se.stepquest.map.Map
+import com.github.se.stepquest.screens.HomeScreen
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
@@ -57,18 +54,6 @@ fun BuildNavigationBar(navigationController: NavHostController) {
                   selectedTextColor = colorResource(id = R.color.blueTheme)),
       )
     }
-  }
-}
-
-@Composable
-fun HomeScreen(navigationController: NavHostController = rememberNavController()) {
-  BuildDefaultScreen("Home")
-}
-
-@Composable
-fun BuildDefaultScreen(name: String) {
-  Column(modifier = androidx.compose.ui.Modifier.fillMaxSize().wrapContentSize(Alignment.Center)) {
-    Text(name)
   }
 }
 
