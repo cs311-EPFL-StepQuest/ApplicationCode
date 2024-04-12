@@ -8,6 +8,9 @@
       <entry key="app">
         <State />
       </entry>
+      <entry key="progression_page_is_correctly_displayed()">
+        <State />
+      </entry>
     </value>
   </component>
 </project>

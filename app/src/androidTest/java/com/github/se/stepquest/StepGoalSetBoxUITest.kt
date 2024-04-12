@@ -11,24 +11,8 @@ class SetStepGoalsDialogTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun dummy_is_correctly_displayed() {
-    composeTestRule.setContent { StepQuestTheme { ProgressionPageLayout() } }
-    // Verify that the character image is displayed
-    composeTestRule.onNodeWithContentDescription("tempCharacter").assertIsDisplayed()
-
-    // Verify that the "Daily Steps" text is displayed
-    composeTestRule.onNodeWithText("Daily Steps : 0/5000").assertIsDisplayed()
-
-    // Verify that the "Weekly Steps" text is displayed
-    composeTestRule.onNodeWithText("Weekly Steps : 0/35000").assertIsDisplayed()
-
-    // Verify that the "Set new step goals" button is displayed
-    composeTestRule.onNodeWithText("Set new step goals").assertIsDisplayed()
-  }
-
-  @Test
   fun dialog_opens_correctly() {
-    composeTestRule.setContent { StepQuestTheme { ProgressionPageLayout() } }
+    composeTestRule.setContent { StepQuestTheme { ProgressionPage() } }
     // Click on the "Set new step goals" button
     composeTestRule.onNodeWithText("Set new step goals").performClick()
 

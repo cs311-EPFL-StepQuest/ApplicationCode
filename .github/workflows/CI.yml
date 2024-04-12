@@ -4,7 +4,6 @@ name: SonarCloud
 on:
   push:
     branches:
-      - main
       - 16-implement-the-ui-to-set-step-goals
 
   pull_request:
