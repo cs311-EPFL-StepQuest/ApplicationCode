@@ -136,7 +136,7 @@ fun HomeScreen() {
                                       painterResource(
                                           com.github.se.stepquest.R.drawable.profile_challenges),
                                   modifier = Modifier.size(40.dp).fillMaxHeight().fillMaxWidth(),
-                                  contentDescription = "profile_icon")
+                                  contentDescription = "profile_challenges")
                               Column(
                                   modifier = Modifier.fillMaxWidth(),
                                   horizontalAlignment = Alignment.CenterHorizontally) {
