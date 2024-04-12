@@ -6,11 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
-object Route {
-  const val MAP = "map"
-  const val LOGIN = "login"
-}
-
 data class TopLevelDestination(
     val route: String,
     val icon: @Composable (() -> Unit)? = null,
