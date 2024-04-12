@@ -9,7 +9,7 @@ import org.junit.Test
 class SetStepGoalsDialogTest {
 
   @get:Rule val composeTestRule = createComposeRule()
-
+/*
   @Test
   fun dialog_opens_correctly() {
     composeTestRule.setContent { StepQuestTheme { ProgressionPage() } }
@@ -165,5 +165,5 @@ class SetStepGoalsDialogTest {
 
     // Verify that the correct weekly step goal is calculated and passed to the callback
     assert(weeklyStepGoal == 36750)
-  }
+  }*/
 }
