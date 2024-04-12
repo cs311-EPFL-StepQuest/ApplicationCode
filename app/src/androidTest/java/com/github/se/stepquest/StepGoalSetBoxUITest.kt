@@ -2,14 +2,12 @@ package com.github.se.stepquest
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.github.se.stepquest.ui.theme.StepQuestTheme
 import org.junit.Rule
-import org.junit.Test
 
 class SetStepGoalsDialogTest {
 
   @get:Rule val composeTestRule = createComposeRule()
-/*
+  /*
   @Test
   fun dialog_opens_correctly() {
     composeTestRule.setContent { StepQuestTheme { ProgressionPage() } }
