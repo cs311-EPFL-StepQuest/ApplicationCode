@@ -69,7 +69,6 @@ fun MyAppNavHost(
   NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
     composable(Route.LOGIN) { LoginPage(navigationActions) }
     composable(Route.MAP) { Map() }
-    composable(Route.USER_CREATION) { UserCreationScreen() }
   }
 }
 
@@ -142,7 +141,7 @@ fun LoginPage(navigationActions: NavigationActions) {
 
         // New user button
         Button(
-            onClick = { navigationActions.navigateTo(TopLevelDestination(Route.USER_CREATION)) },
+            onClick = { println("User creation screen to be implemented") },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
             shape = RoundedCornerShape(8.dp)) {
