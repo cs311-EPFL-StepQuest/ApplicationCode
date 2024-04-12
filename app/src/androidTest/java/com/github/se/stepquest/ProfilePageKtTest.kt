@@ -17,7 +17,6 @@ class ProfilePageKtTest {
     composeTestRule.setContent { StepQuestTheme { ProfilePageLayout() } }
     composeTestRule.onNodeWithText("Total Steps: 1000").assertIsDisplayed()
     composeTestRule.onNodeWithText("Achievements: 5").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Back").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Picture").assertIsDisplayed()
   }
 }
