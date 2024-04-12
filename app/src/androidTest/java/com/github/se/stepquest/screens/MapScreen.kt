@@ -8,6 +8,6 @@ class MapScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<MapScreen>(
         semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("MapScreen") }) {
 
-    // Structural elements of the UI
-    val createRouteButton: KNode = child { hasTestTag("createRouteButton") }
+  // Structural elements of the UI
+  val createRouteButton: KNode = child { hasTestTag("createRouteButton") }
 }
