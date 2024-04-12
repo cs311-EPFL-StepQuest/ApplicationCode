@@ -29,45 +29,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.ui.theme.StepQuestTheme
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-
 
 @Composable
 fun ProfilePageLayout() {
-    val blueThemeColor = colorResource(id = R.color.blueTheme)
-    //val user = Firebase.auth.currentUser
-    Column(
-        modifier = Modifier
-            .padding(32.dp)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            ClickableText(
-                text = AnnotatedString("Back"),
-                onClick = {
-                    //Navigation
-                },
-                modifier = Modifier.padding(start = 16.dp) ,
-                style = LocalTextStyle.current.copy(fontSize = 24.sp)
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Image(
-                painter = painterResource(id = R.drawable.settings),
-                contentDescription = "Settings",
-                modifier = Modifier
-                    .size(30.dp)
-            )
+  val blueThemeColor = colorResource(id = R.color.blueTheme)
+  // val user = Firebase.auth.currentUser
+  Column(
+      modifier = Modifier.padding(32.dp).fillMaxSize(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+          ClickableText(
+              text = AnnotatedString("Back"),
+              onClick = {
+                // Navigation
+              },
+              modifier = Modifier.padding(start = 16.dp),
+              style = LocalTextStyle.current.copy(fontSize = 24.sp))
+          Spacer(modifier = Modifier.weight(1f))
+          Image(
+              painter = painterResource(id = R.drawable.settings),
+              contentDescription = "Settings",
+              modifier = Modifier.size(30.dp))
         }
-        Text(
-            text = "Profile",
-            fontWeight = FontWeight.Bold,
-            fontSize = 40.sp
-        )
+        Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 40.sp)
         /*user?.let {
             val photoUrl = it.photoUrl
             Image(
@@ -84,46 +69,36 @@ fun ProfilePageLayout() {
         Image(
             painter = painterResource(id = R.drawable.dummypfp),
             contentDescription = "Profile Picture",
-            modifier = Modifier.size(200.dp)
-        )
+            modifier = Modifier.size(200.dp))
         Text(
             text = "Total Steps: 1000", // Replace with actual total steps
             fontSize = 24.sp,
-            modifier = Modifier.padding(top = 16.dp)
-        )
+            modifier = Modifier.padding(top = 16.dp))
         ClickableText(
             text = AnnotatedString("Achievements: 5"), // Replace with actual number of achievements
             onClick = {
-                // Handle click action for achievements
+              // Handle click action for achievements
             },
-            style = TextStyle(
-                fontSize = 24.sp
-            ),
-            modifier = Modifier.padding(top = 8.dp)
-        )
+            style = TextStyle(fontSize = 24.sp),
+            modifier = Modifier.padding(top = 8.dp))
         Button(
             onClick = {
-                // Handle click action for Friends List button
+              // Handle click action for Friends List button
             },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier =
-            Modifier.fillMaxWidth()
-                .height(72.dp)
-                .padding(vertical = 8.dp)
-                .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text(
-                text = "Friends List",
-                fontSize = 24.sp,
-                color = Color.White
-            )
-        }
-    }
+                Modifier.fillMaxWidth()
+                    .height(72.dp)
+                    .padding(vertical = 8.dp)
+                    .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(8.dp)) {
+              Text(text = "Friends List", fontSize = 24.sp, color = Color.White)
+            }
+      }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ProfilePagePreview() {
-    StepQuestTheme { ProfilePageLayout() }
+  StepQuestTheme { ProfilePageLayout() }
 }
