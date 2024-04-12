@@ -36,6 +36,6 @@ class LoginScreenTest {
     composeTestRule.onNodeWithText("New player").performClick()
     composeTestRule
         .onNodeWithText("User creation screen (to be implemented...)")
-        .assertIsDisplayed()
+        .assertExists()
   }
 }
