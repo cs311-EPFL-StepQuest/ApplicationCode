@@ -78,7 +78,6 @@ fun LoginPage() {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
 
   val context = LocalContext.current
-  var isLoggedIn by remember { mutableStateOf(false) }
 
   fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 
@@ -89,7 +88,6 @@ fun LoginPage() {
 
       // Start the step counter:
       ContextCompat.startForegroundService(context, Intent(context, StepCounterService::class.java))
-      isLoggedIn = true
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
     }
@@ -199,10 +197,6 @@ fun LoginPage() {
                   contentDescription = "Sign in with google")
             }
       }
-
-  if (isLoggedIn) {
-    Greeting()
-  }
 }
 
 @Preview(showBackground = true)
@@ -219,9 +213,4 @@ fun MainMenuPage(username: String) {
       text = "Hello $username!",
       // Other text properties...
   )
-}
-
-@Composable
-fun Greeting() {
-  Text("Hello!", fontSize = 25.sp, fontWeight = FontWeight.ExtraBold)
 }
