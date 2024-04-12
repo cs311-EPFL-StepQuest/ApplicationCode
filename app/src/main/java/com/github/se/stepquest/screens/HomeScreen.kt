@@ -34,9 +34,9 @@ import com.github.se.stepquest.activity.Quest
 
 @Composable
 fun HomeScreen() {
+  // Added for testing purposes ------
   var quests: List<Quest> = emptyList()
   var challenges: List<Challenge> = emptyList()
-
   val firstChallenge =
       Challenge(
           challengeId = "1",
@@ -47,23 +47,19 @@ fun HomeScreen() {
           completionStatus = "0",
           challengedId = "2")
   challenges = challenges.plus(firstChallenge)
+  // ---------------------------------
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),
 
       // Three main icons
       topBar = {
-        Row(modifier = Modifier
-            .height(100.dp)
-            .fillMaxWidth()
-            .padding(start = 15.dp, end = 15.dp)) {
+        Row(modifier = Modifier.height(100.dp).fillMaxWidth().padding(start = 15.dp, end = 15.dp)) {
           // Messages icon
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("messages_button")) {
             Image(
                 painter = painterResource(com.github.se.stepquest.R.drawable.messages),
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .size(50.dp),
+                modifier = Modifier.fillMaxHeight().size(50.dp),
                 contentDescription = "messages_icon")
           }
           Spacer(Modifier.weight(1f))
@@ -71,27 +67,21 @@ fun HomeScreen() {
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("notifications_button")) {
             Image(
                 painter = painterResource(com.github.se.stepquest.R.drawable.notification),
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .size(50.dp),
+                modifier = Modifier.fillMaxHeight().size(50.dp),
                 contentDescription = "notifications_icon")
           }
           // Profile icon
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("profile_button")) {
             Image(
                 painter = painterResource(com.github.se.stepquest.R.drawable.profile),
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .size(50.dp),
+                modifier = Modifier.fillMaxHeight().size(50.dp),
                 contentDescription = "profile_icon")
           }
         }
       },
       bottomBar = {}) { innerPadding ->
         // Main content of the home screen
-        Column(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxWidth()) {
+        Column(modifier = Modifier.padding(innerPadding).fillMaxWidth()) {
 
           // Start game button
           Button(
@@ -99,10 +89,9 @@ fun HomeScreen() {
               shape = RoundedCornerShape(20.dp),
               colors = ButtonDefaults.buttonColors(Color.White),
               modifier =
-              Modifier
-                  .fillMaxWidth()
-                  .padding(start = 25.dp, end = 25.dp, top = 5.dp)
-                  .height(70.dp)) {
+                  Modifier.fillMaxWidth()
+                      .padding(start = 25.dp, end = 25.dp, top = 5.dp)
+                      .height(70.dp)) {
                 Text(
                     text = "Start Game",
                     color = Color.Black,
@@ -117,10 +106,7 @@ fun HomeScreen() {
 
           // Challenges tab
           Card(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(25.dp)
-                  .height(190.dp),
+              modifier = Modifier.fillMaxWidth().padding(25.dp).height(190.dp),
               colors = CardDefaults.cardColors(containerColor = Color.White)) {
                 Column {
                   Text(
@@ -133,9 +119,7 @@ fun HomeScreen() {
                     if (challenges.isEmpty()) {
                       Text(
                           text = "No challenges available",
-                          modifier = Modifier
-                              .fillMaxWidth()
-                              .fillMaxHeight(),
+                          modifier = Modifier.fillMaxWidth().fillMaxHeight(),
                           fontSize = 16.sp,
                           textAlign = TextAlign.Center,
                           fontWeight = FontWeight.Bold)
@@ -143,46 +127,40 @@ fun HomeScreen() {
 
                       for (challenge in challenges) {
                         // Challenge details
-                        Row (
+                        Row(
                             modifier = Modifier.padding(top = 20.dp, start = 30.dp).fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Image(
-                                painter = painterResource(com.github.se.stepquest.R.drawable.profile_challenges),
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .fillMaxHeight()
-                                    .fillMaxWidth(),
-                                contentDescription = "profile_icon")
-                            Column (
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ){
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(
-                                    text = "${challenge.challengerName} challenges you!",
-                                    fontSize = 18.sp)
-                                Text(
-                                    text =
-                                    "${challenge.challengeSteps} steps until ${challenge.challengeDeadline}!",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold)
+                            verticalAlignment = Alignment.CenterVertically) {
+                              Image(
+                                  painter =
+                                      painterResource(
+                                          com.github.se.stepquest.R.drawable.profile_challenges),
+                                  modifier = Modifier.size(40.dp).fillMaxHeight().fillMaxWidth(),
+                                  contentDescription = "profile_icon")
+                              Column(
+                                  modifier = Modifier.fillMaxWidth(),
+                                  horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = "${challenge.challengerName} challenges you!",
+                                        fontSize = 18.sp)
+                                    Text(
+                                        text =
+                                            "${challenge.challengeSteps} steps until ${challenge.challengeDeadline}!",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold)
+                                  }
                             }
-                        }
                       }
-                      Row (
-                          modifier = Modifier.padding(top = 15.dp)
-                      ){
+                      Row(modifier = Modifier.padding(top = 15.dp)) {
                         // Accept button
                         Button(
                             onClick = { /*TODO*/},
                             colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
                             modifier =
-                            Modifier
-                                .padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
-                                .height(35.dp)
-                                .width(140.dp)) {
+                                Modifier.padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
+                                    .height(35.dp)
+                                    .width(140.dp)) {
                               Text(
                                   text = "Accept",
                                   fontSize = 16.sp,
@@ -196,10 +174,9 @@ fun HomeScreen() {
                             onClick = { /*TODO*/},
                             colors = ButtonDefaults.buttonColors(Color.Gray),
                             modifier =
-                            Modifier
-                                .padding(end = 20.dp, top = 10.dp)
-                                .height(35.dp)
-                                .width(140.dp)) {
+                                Modifier.padding(end = 20.dp, top = 10.dp)
+                                    .height(35.dp)
+                                    .width(140.dp)) {
                               Text(text = "Reject", color = Color.Black, fontSize = 16.sp)
                             }
                       }
@@ -212,10 +189,10 @@ fun HomeScreen() {
 
           // Daily quests tab
           Card(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(start = 25.dp, end = 25.dp)
-                  .height(250.dp),
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(start = 25.dp, end = 25.dp, bottom = 30.dp)
+                      .height(250.dp),
               colors = CardDefaults.cardColors(containerColor = Color.White)) {
                 Text(
                     text = "Daily Quests",

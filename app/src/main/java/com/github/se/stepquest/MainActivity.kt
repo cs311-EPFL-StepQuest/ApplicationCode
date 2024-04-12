@@ -32,17 +32,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.github.se.stepquest.map.Map
-import com.github.se.stepquest.screens.HomeScreen
 import com.github.se.stepquest.ui.navigation.NavigationActions
-import com.github.se.stepquest.ui.navigation.Route
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
@@ -53,24 +47,10 @@ class MainActivity : ComponentActivity() {
       StepQuestTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          MyAppNavHost()
+          AppNavigationHost()
         }
       }
     }
-  }
-}
-
-@Composable
-fun MyAppNavHost(
-    modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
-    startDestination: String = Route.HOME
-) {
-  val navigationActions = remember(navController) { NavigationActions(navController) }
-  NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
-    composable(Route.LOGIN) { LoginPage(navigationActions) }
-    composable(Route.HOME) { HomeScreen() }
-    composable(Route.MAP) { Map() }
   }
 }
 
@@ -84,11 +64,7 @@ fun LoginPage(navigationActions: NavigationActions) {
 
     if (result.resultCode == RESULT_OK) {
       println("Sign in successful!")
-      // TODO: navigate to main menu
-
-      // TODO: move map to where it should be after main menu is ready, put here just for develope
-      // purpose
-      navigationActions.navigateTo(TopLevelDestination(Route.HOME))
+      navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
     } else {

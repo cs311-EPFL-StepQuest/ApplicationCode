@@ -13,7 +13,7 @@ class LoginScreenTest {
   @Test
   fun everythingIsDisplayed() {
 
-    composeTestRule.setContent { StepQuestTheme { MyAppNavHost() } }
+    composeTestRule.setContent { StepQuestTheme { AppNavigationHost() } }
 
     // Application logo is displayed
     composeTestRule.onNodeWithTag("App logo").assertExists("The app logo doesn't exist?!")
@@ -31,6 +31,6 @@ class LoginScreenTest {
   @Test
   fun buttonsAreClickable() {
 
-    composeTestRule.setContent { StepQuestTheme { MyAppNavHost() } }
+    composeTestRule.setContent { StepQuestTheme { AppNavigationHost() } }
   }
 }
