@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - 25-update-login-screen-ui
 
   pull_request:
     types:
@@ -39,6 +40,11 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
+
+      # To Load a fake google map api key for the test
+      - name: Loading Local.properties (dummy)
+        run: |
+          echo MAPS_API_KEY=\"0\" > ./local.properties
 
       # Caching is a very useful part of a CI, as a workflow is executed in a clean environment every time,
       # this means that one would need to re-download and re-process gradle files for every run. Which is very time consuming.

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
@@ -30,6 +32,17 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        //load the values from .properties file
+        val mapsKeyFile = project.rootProject.file("local.properties")
+        val properties = Properties()
+        properties.load(mapsKeyFile.inputStream())
+
+        //fetch the map key
+        val apiKey = properties.getProperty("MAPS_API_KEY") ?: ""
+
+        //inject the key dynamically into the manifest
+        manifestPlaceholders["GOOGLE_MAP_KEY"] = apiKey
     }
 
     buildTypes {
@@ -92,6 +105,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.3.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.5")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     debugImplementation("androidx.compose.ui:ui-tooling:1.4.0")
