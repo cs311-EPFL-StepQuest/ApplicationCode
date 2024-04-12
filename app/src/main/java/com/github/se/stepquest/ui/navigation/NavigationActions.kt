@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 
 object Route {
   const val MAP = "map"
+  const val HOME = "home"
   const val LOGIN = "login"
 }
 

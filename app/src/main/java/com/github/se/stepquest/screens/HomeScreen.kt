@@ -1,6 +1,7 @@
 package com.github.se.stepquest.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,46 +20,35 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.se.stepquest.R
 import com.github.se.stepquest.activity.Challenge
 import com.github.se.stepquest.activity.Quest
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.firebase.auth.FirebaseAuth
-
-
-/*
-object Route {
-    const val Home = "Home"
-    const val Map = "Map"
-    const val Progression = "Progression"
-}
-
-data class TopLevelDestination(val route: String, val textId: Int) {}
-
-
-val TOP_LEVEL_DESTINATIONS =
-    listOf(
-        TopLevelDestination(Route.Home, R.string.tab_home),
-        TopLevelDestination(Route.Map, R.string.tab_map),
-        TopLevelDestination(Route.Progression, R.string.tab_progression)
-    )
-
-*/
-
 
 @Composable
-fun HomeScreen(quests: List<Quest>, challenges: List<Challenge>) {
-    val user = FirebaseAuth.getInstance().currentUser.getPhotoUrl()
+fun HomeScreen() {
+  var quests: List<Quest> = emptyList()
+  var challenges: List<Challenge> = emptyList()
 
+  val firstChallenge =
+      Challenge(
+          challengeId = "1",
+          challengerName = "John_Doe",
+          challengeSteps = "1000",
+          challengeDeadline = "Friday",
+          challengeStatus = "0",
+          completionStatus = "0",
+          challengedId = "2")
+  challenges = challenges.plus(firstChallenge)
 
-    Scaffold(
+  Scaffold(
       containerColor = Color(0xFF0D99FF),
 
       // Three main icons
@@ -70,7 +60,7 @@ fun HomeScreen(quests: List<Quest>, challenges: List<Challenge>) {
           // Messages icon
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("messages_button")) {
             Image(
-                painter = painterResource(R.drawable.messages),
+                painter = painterResource(com.github.se.stepquest.R.drawable.messages),
                 modifier = Modifier
                     .fillMaxHeight()
                     .size(50.dp),
@@ -80,7 +70,7 @@ fun HomeScreen(quests: List<Quest>, challenges: List<Challenge>) {
           // Notifications icon
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("notifications_button")) {
             Image(
-                painter = painterResource(R.drawable.notification),
+                painter = painterResource(com.github.se.stepquest.R.drawable.notification),
                 modifier = Modifier
                     .fillMaxHeight()
                     .size(50.dp),
@@ -89,7 +79,7 @@ fun HomeScreen(quests: List<Quest>, challenges: List<Challenge>) {
           // Profile icon
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("profile_button")) {
             Image(
-                painter = painterResource(R.drawable.profile),
+                painter = painterResource(com.github.se.stepquest.R.drawable.profile),
                 modifier = Modifier
                     .fillMaxHeight()
                     .size(50.dp),
@@ -120,10 +110,11 @@ fun HomeScreen(quests: List<Quest>, challenges: List<Challenge>) {
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold)
                 Image(
-                    painter = painterResource(R.drawable.play_icon),
+                    painter = painterResource(com.github.se.stepquest.R.drawable.play_icon),
                     contentDescription = "play_icon",
                     modifier = Modifier.size(40.dp))
               }
+
           // Challenges tab
           Card(
               modifier = Modifier
@@ -138,40 +129,83 @@ fun HomeScreen(quests: List<Quest>, challenges: List<Challenge>) {
                       fontSize = 20.sp,
                       fontWeight = FontWeight.Bold)
                   Column {
-                    // Challenge ....
+                    // Challenge
+                    if (challenges.isEmpty()) {
+                      Text(
+                          text = "No challenges available",
+                          modifier = Modifier
+                              .fillMaxWidth()
+                              .fillMaxHeight(),
+                          fontSize = 16.sp,
+                          textAlign = TextAlign.Center,
+                          fontWeight = FontWeight.Bold)
+                    } else {
 
-                    // Buttons
-                    Spacer(modifier = Modifier.weight(1f))
-                    Row {
-                      // Accept button
-                      Button(
-                          onClick = { /*TODO*/},
-                          colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
-                          modifier =
-                          Modifier
-                              .padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
-                              .height(35.dp)
-                              .width(140.dp)) {
-                            Text(
-                                text = "Accept",
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(0.dp))
-                          }
+                      for (challenge in challenges) {
+                        // Challenge details
+                        Row (
+                            modifier = Modifier.padding(top = 20.dp, start = 30.dp).fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Image(
+                                painter = painterResource(com.github.se.stepquest.R.drawable.profile_challenges),
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(),
+                                contentDescription = "profile_icon")
+                            Column (
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ){
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(
+                                    text = "${challenge.challengerName} challenges you!",
+                                    fontSize = 18.sp)
+                                Text(
+                                    text =
+                                    "${challenge.challengeSteps} steps until ${challenge.challengeDeadline}!",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold)
+                            }
+                        }
+                      }
+                      Row (
+                          modifier = Modifier.padding(top = 15.dp)
+                      ){
+                        // Accept button
+                        Button(
+                            onClick = { /*TODO*/},
+                            colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
+                            modifier =
+                            Modifier
+                                .padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
+                                .height(35.dp)
+                                .width(140.dp)) {
+                              Text(
+                                  text = "Accept",
+                                  fontSize = 16.sp,
+                                  modifier = Modifier.padding(0.dp))
+                            }
 
-                      Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.weight(1f))
 
-                      // Reject button
-                      Button(
-                          onClick = { /*TODO*/},
-                          colors = ButtonDefaults.buttonColors(Color.Gray),
-                          modifier =
-                          Modifier
-                              .padding(end = 20.dp, top = 10.dp)
-                              .height(35.dp)
-                              .width(140.dp)) {
-                            Text(text = "Reject", color = Color.Black, fontSize = 16.sp)
-                          }
+                        // Reject button
+                        Button(
+                            onClick = { /*TODO*/},
+                            colors = ButtonDefaults.buttonColors(Color.Gray),
+                            modifier =
+                            Modifier
+                                .padding(end = 20.dp, top = 10.dp)
+                                .height(35.dp)
+                                .width(140.dp)) {
+                              Text(text = "Reject", color = Color.Black, fontSize = 16.sp)
+                            }
+                      }
                     }
+                    // Buttons
+
                   }
                 }
               }

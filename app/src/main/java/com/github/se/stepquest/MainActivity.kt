@@ -40,6 +40,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.github.se.stepquest.map.Map
+import com.github.se.stepquest.screens.HomeScreen
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.Route
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
@@ -63,11 +64,12 @@ class MainActivity : ComponentActivity() {
 fun MyAppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Route.LOGIN
+    startDestination: String = Route.HOME
 ) {
   val navigationActions = remember(navController) { NavigationActions(navController) }
   NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
     composable(Route.LOGIN) { LoginPage(navigationActions) }
+    composable(Route.HOME) { HomeScreen() }
     composable(Route.MAP) { Map() }
   }
 }
@@ -86,7 +88,7 @@ fun LoginPage(navigationActions: NavigationActions) {
 
       // TODO: move map to where it should be after main menu is ready, put here just for develope
       // purpose
-      navigationActions.navigateTo(TopLevelDestination(Route.MAP))
+      navigationActions.navigateTo(TopLevelDestination(Route.HOME))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
     } else {

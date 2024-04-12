@@ -1,6 +1,6 @@
 package com.github.se.stepquest.activity
 
-class Quest (
+class Quest(
     val questId: String,
     val questType: String,
     val questGoal: String,

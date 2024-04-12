@@ -1,6 +1,6 @@
 package com.github.se.stepquest.activity
 
-class Challenge (
+class Challenge(
     val challengeId: String,
     val challengerName: String,
     val challengeSteps: String,
