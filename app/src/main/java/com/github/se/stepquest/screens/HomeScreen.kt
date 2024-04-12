@@ -29,11 +29,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.stepquest.Routes
 import com.github.se.stepquest.activity.Challenge
 import com.github.se.stepquest.activity.Quest
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navigationActions: NavigationActions) {
+
   // Added for testing purposes ------
   var quests: List<Quest> = emptyList()
   var challenges: List<Challenge> = emptyList()
@@ -47,6 +51,8 @@ fun HomeScreen() {
           completionStatus = "0",
           challengedId = "2")
   challenges = challenges.plus(firstChallenge)
+  val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
+  quests = quests.plus(firstQuest)
   // ---------------------------------
 
   Scaffold(
@@ -71,12 +77,16 @@ fun HomeScreen() {
                 contentDescription = "notifications_icon")
           }
           // Profile icon
-          TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("profile_button")) {
-            Image(
-                painter = painterResource(com.github.se.stepquest.R.drawable.profile),
-                modifier = Modifier.fillMaxHeight().size(50.dp),
-                contentDescription = "profile_icon")
-          }
+          TextButton(
+              onClick = {
+                navigationActions.navigateTo(TopLevelDestination(Routes.ProfileScreen.routName))
+              },
+              modifier = Modifier.testTag("profile_button")) {
+                Image(
+                    painter = painterResource(com.github.se.stepquest.R.drawable.profile),
+                    modifier = Modifier.fillMaxHeight().size(50.dp),
+                    contentDescription = "profile_icon")
+              }
         }
       },
       bottomBar = {}) { innerPadding ->
@@ -119,7 +129,7 @@ fun HomeScreen() {
                     if (challenges.isEmpty()) {
                       Text(
                           text = "No challenges available",
-                          modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                          modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 50.dp),
                           fontSize = 16.sp,
                           textAlign = TextAlign.Center,
                           fontWeight = FontWeight.Bold)
@@ -200,7 +210,42 @@ fun HomeScreen() {
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold)
                 Column {
-                  // Daily quests...
+                  if (quests.isEmpty()) {
+                    Text(
+                        text = "No daily quests available",
+                        modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 70.dp),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold)
+                  } else {
+                    for (quest in quests) {
+                      // Quest details
+                      Row(
+                          modifier = Modifier.padding(top = 40.dp, start = 30.dp).fillMaxWidth(),
+                          horizontalArrangement = Arrangement.Center,
+                          verticalAlignment = Alignment.CenterVertically) {
+                            // Icon of a blue dot
+
+                            Image(
+                                painter =
+                                    painterResource(
+                                        com.github.se.stepquest.R.drawable.quest_not_finished),
+                                modifier = Modifier.size(20.dp).fillMaxHeight().fillMaxWidth(),
+                                contentDescription = "profile_challenges")
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                              Spacer(modifier = Modifier.width(10.dp))
+                              Text(
+                                  text = "${quest.currentState}/${quest.questGoal}",
+                                  fontSize = 18.sp)
+                              Spacer(modifier = Modifier.padding(10.dp))
+                              Text(
+                                  text = quest.questDescription,
+                                  fontSize = 18.sp,
+                                  fontWeight = FontWeight.Bold)
+                            }
+                          }
+                    }
+                  }
                 }
               }
         }

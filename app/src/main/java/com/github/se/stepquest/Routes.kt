@@ -10,4 +10,6 @@ open class Routes(val routName: String, val title: String) {
   object ProgressionScreen : Routes(routName = "/progression", title = "Progression")
 
   object MainScreen : Routes(routName = "/main", title = "Main")
+
+  object ProfileScreen : Routes(routName = "/profile", title = "Profile")
 }

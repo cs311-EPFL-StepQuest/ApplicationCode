@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,13 +38,6 @@ fun ProfilePageLayout() {
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-          ClickableText(
-              text = AnnotatedString("Back"),
-              onClick = {
-                // Navigation
-              },
-              modifier = Modifier.padding(start = 16.dp),
-              style = LocalTextStyle.current.copy(fontSize = 24.sp))
           Spacer(modifier = Modifier.weight(1f))
           Image(
               painter = painterResource(id = R.drawable.settings),

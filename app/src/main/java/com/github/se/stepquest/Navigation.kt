@@ -70,9 +70,10 @@ fun AppNavigationHost(
       startDestination = startDestination) {
         composable(Routes.LoginScreen.routName) { LoginPage(navigationActions) }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
-        composable(Routes.HomeScreen.routName) { HomeScreen() }
+        composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
         composable(Routes.MapScreen.routName) { Map() }
         composable(Routes.ProgressionScreen.routName) { ProgressionPage() }
+        composable(Routes.ProfileScreen.routName) { ProfilePageLayout() }
       }
 }
 
