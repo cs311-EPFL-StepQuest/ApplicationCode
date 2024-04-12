@@ -8,7 +8,7 @@
       <entry key="app">
         <State />
       </entry>
-      <entry key="progression_page_is_correctly_displayed()">
+      <entry key="dialog_opens_correctly()">
         <State />
       </entry>
     </value>

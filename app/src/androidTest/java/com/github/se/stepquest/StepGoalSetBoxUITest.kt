@@ -14,7 +14,7 @@ class SetStepGoalsDialogTest {
   fun dialog_opens_correctly() {
     composeTestRule.setContent { StepQuestTheme { ProgressionPage() } }
     // Click on the "Set new step goals" button
-    composeTestRule.onNodeWithText("Set new step goals").performClick()
+    composeTestRule.onNodeWithText("Set a new step goal").performClick()
 
     // Check if "Daily steps" from the dialog box is here to see if it opened
     composeTestRule.onNodeWithText("Daily steps").assertIsDisplayed()
