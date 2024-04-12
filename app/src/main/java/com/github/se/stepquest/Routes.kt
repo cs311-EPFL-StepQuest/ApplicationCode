@@ -1,7 +1,10 @@
 package com.github.se.stepquest
 
 open class Routes (val routName: String, val title:String){
-
+    object LoginScreen: Routes(
+        routName = "/login",
+        title = "Login"
+    )
     object HomeScreen: Routes(
         routName = "/home",
         title = "Home"
