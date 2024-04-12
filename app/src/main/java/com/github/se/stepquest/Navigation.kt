@@ -74,7 +74,7 @@ fun BuildDefaultScreen(name:String){
 @Composable
 fun AppNavigationHost(modifier: Modifier = Modifier,
                       navigationController: NavHostController = rememberNavController(),
-                      startDestination: String = Routes.HomeScreen.routName){
+                      startDestination: String = Routes.LoginScreen.routName){
     val navigationActions = remember(navigationController) { NavigationActions(navigationController) }
     NavHost(
         modifier = modifier,
@@ -84,8 +84,11 @@ fun AppNavigationHost(modifier: Modifier = Modifier,
         composable(Routes.LoginScreen.routName) {
             LoginPage(navigationActions)
         }
-        composable(Routes.HomeScreen.routName){
+        composable(Routes.MainScreen.routName){
             BuildMainScreen()
+        }
+        composable(Routes.HomeScreen.routName){
+            HomeScreen()
         }
         composable(Routes.MapScreen.routName){
             Map()
@@ -95,7 +98,7 @@ fun AppNavigationHost(modifier: Modifier = Modifier,
         }
     }
 }
-//@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BuildMainScreen(){
     val navigationController:NavHostController = rememberNavController()
@@ -103,7 +106,7 @@ fun BuildMainScreen(){
         BuildNavigationBar(navigationController = navigationController)
     }){ paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)){
-            AppNavigationHost(navigationController = navigationController)
+            AppNavigationHost(navigationController = navigationController, startDestination = Routes.HomeScreen.routName)
         }
     }
 }

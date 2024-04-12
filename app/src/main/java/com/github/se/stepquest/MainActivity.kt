@@ -86,11 +86,7 @@ fun LoginPage(navigationActions: NavigationActions) {
 
     if (result.resultCode == RESULT_OK) {
       println("Sign in successful!")
-      // TODO: navigate to main menu
-
-      // TODO: move map to where it should be after main menu is ready, put here just for develope
-      // purpose
-      navigationActions.navigateTo(TopLevelDestination(Routes.MapScreen.routName))
+      navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
     } else {

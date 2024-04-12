@@ -17,5 +17,9 @@ open class Routes (val routName: String, val title:String){
         routName = "/progression",
         title = "Progression"
     )
+    object MainScreen: Routes(
+        routName = "/main",
+        title = "Main"
+    )
 
 }
