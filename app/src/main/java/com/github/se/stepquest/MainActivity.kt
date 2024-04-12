@@ -1,7 +1,6 @@
 package com.github.se.stepquest
 
 import android.app.Activity.RESULT_OK
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -28,25 +27,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.compose.rememberNavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.github.se.stepquest.services.StepCounterService
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.github.se.stepquest.map.Map
 import com.github.se.stepquest.ui.navigation.NavigationActions
-import com.github.se.stepquest.ui.navigation.Route
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
@@ -57,7 +47,7 @@ class MainActivity : ComponentActivity() {
             StepQuestTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    MyAppNavHost()
+                    AppNavigationHost()
                 }
             }
         }
@@ -65,22 +55,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyAppNavHost(
-    modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
-    startDestination: String = Route.LOGIN
-) {
-    val navigationActions = remember(navController) { NavigationActions(navController) }
-    NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
-        composable(Route.LOGIN) { LoginPage(navigationActions) }
-        composable(Route.MAP) { Map() }
-    }
-}
-
-@Composable
 fun LoginPage(navigationActions: NavigationActions) {
-
-  val blueThemeColor = colorResource(id = R.color.blueTheme)
+    val blueThemeColor = colorResource(id = R.color.blueTheme)
 
     val context = LocalContext.current
 
@@ -90,14 +66,8 @@ fun LoginPage(navigationActions: NavigationActions) {
 
         if (result.resultCode == RESULT_OK) {
             println("Sign in successful!")
-            // TODO: navigate to main menu
-
-            // Start the step counter:
             context.startService(Intent(context, StepCounterService::class.java))
-
-            // TODO: move map to where it should be after main menu is ready, put here just for develope
-            // purpose
-            navigationActions.navigateTo(TopLevelDestination(Route.MAP))
+            navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
         } else if (response != null) {
             throw Exception(response.error?.errorCode.toString())
         } else {
@@ -119,20 +89,20 @@ fun LoginPage(navigationActions: NavigationActions) {
             .setIsSmartLockEnabled(false)
             .build()
 
-  Column(
-      modifier = Modifier.padding(38.dp).fillMaxSize(),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.spacedBy(5.dp)) {
+    Column(
+        modifier = Modifier.padding(38.dp).fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)) {
         Spacer(modifier = Modifier.height(100.dp))
 
         // Temporary until we have a logo
         val greyColor = Color(0xFF808080)
         Canvas(
             modifier =
-                Modifier.align(Alignment.CenterHorizontally)
-                    .size(200.dp)
-                    .padding(vertical = 16.dp)
-                    .testTag("App logo"),
+            Modifier.align(Alignment.CenterHorizontally)
+                .size(200.dp)
+                .padding(vertical = 16.dp)
+                .testTag("App logo"),
             onDraw = {
                 drawRect(color = greyColor, topLeft = Offset.Zero, size = Size(500f, 500f))
             })
@@ -145,8 +115,8 @@ fun LoginPage(navigationActions: NavigationActions) {
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
             shape = RoundedCornerShape(8.dp)) {
-              Text(text = "Log in", color = Color.White, fontSize = 24.sp)
-            }
+            Text(text = "Log in", color = Color.White, fontSize = 24.sp)
+        }
 
         Spacer(modifier = Modifier.height(25.dp))
 
@@ -156,9 +126,9 @@ fun LoginPage(navigationActions: NavigationActions) {
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
             shape = RoundedCornerShape(8.dp)) {
-              Text(text = "New player", color = Color.White, fontSize = 24.sp)
-            }
-      }
+            Text(text = "New player", color = Color.White, fontSize = 24.sp)
+        }
+    }
 }
 
 @Preview(showBackground = true)
