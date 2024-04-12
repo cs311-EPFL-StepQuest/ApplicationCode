@@ -135,6 +135,7 @@ dependencies {
 
     testImplementation("org.mockito:mockito-core:3.12.4")
     androidTestImplementation("org.mockito:mockito-android:3.12.4")
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
