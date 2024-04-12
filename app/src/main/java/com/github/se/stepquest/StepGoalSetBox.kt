@@ -78,14 +78,16 @@ fun SetStepGoalsDialog(
                     keyboardActions =
                         KeyboardActions(
                             onDone = {
-                                val (dailyStep, weeklyStep) = calculateStepGoals(newDailyStepGoal, newWeeklyStepGoal)
+                              val (dailyStep, weeklyStep) =
+                                  calculateStepGoals(newDailyStepGoal, newWeeklyStepGoal)
                               onConfirm(dailyStep, weeklyStep)
                               onDismiss()
                             }))
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        val (dailyStep, weeklyStep) = calculateStepGoals(newDailyStepGoal, newWeeklyStepGoal)
+                      val (dailyStep, weeklyStep) =
+                          calculateStepGoals(newDailyStepGoal, newWeeklyStepGoal)
                       onConfirm(dailyStep, weeklyStep)
                       onDismiss()
                     },
@@ -99,26 +101,26 @@ fun SetStepGoalsDialog(
   }
 }
 
-fun calculateStepGoals(newDailyStepGoal: String, newWeeklyStepGoal: String) : Pair<Int, Int> {
-    val dailyStep = newDailyStepGoal
-        .filter { it.isDigit() }
-        .take(5)
-        .let {
+fun calculateStepGoals(newDailyStepGoal: String, newWeeklyStepGoal: String): Pair<Int, Int> {
+  val dailyStep =
+      newDailyStepGoal
+          .filter { it.isDigit() }
+          .take(5)
+          .let {
             if (it.isBlank()) {
-                5000 // Default value if blank
+              5000 // Default value if blank
             } else {
-                val parsedInput = it.toIntOrNull() ?: 0
-                val roundedValue = (parsedInput + 249) / 250 * 250
-                if (roundedValue < 1000) {
-                    1000
-                } else {
-                    roundedValue
-                }
+              val parsedInput = it.toIntOrNull() ?: 0
+              val roundedValue = (parsedInput + 249) / 250 * 250
+              if (roundedValue < 1000) {
+                1000
+              } else {
+                roundedValue
+              }
             }
-        }
+          }
 
-    val weeklyStep = newWeeklyStepGoal.takeIf { it.isNotBlank() }?.toInt()
-        ?: (dailyStep * 7)
+  val weeklyStep = newWeeklyStepGoal.takeIf { it.isNotBlank() }?.toInt() ?: (dailyStep * 7)
 
-    return Pair(dailyStep, weeklyStep)
+  return Pair(dailyStep, weeklyStep)
 }
