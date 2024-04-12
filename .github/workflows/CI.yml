@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - 25-update-login-screen-ui
+      - 16-implement-the-ui-to-set-step-goals
 
   pull_request:
     types:
