@@ -41,7 +41,7 @@ fun ProgressionPageLayout() {
       verticalArrangement = Arrangement.spacedBy(64.dp)) {
         // Temporary until we have a real character
         Image(
-            painter = painterResource(id = R.drawable.character),
+            painter = painterResource(id = R.drawable.tempchar),
             contentDescription = "tempCharacter",
             modifier = Modifier.width(200.dp).height(200.dp))
         Text(text = "Daily Steps : 0/$dailyStepGoal")
