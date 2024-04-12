@@ -2,10 +2,13 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MainActivity">
+      <entry key="SetStepGoalsDialogTest">
         <State />
       </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="dialog_opens_correctly()">
         <State />
       </entry>
     </value>
