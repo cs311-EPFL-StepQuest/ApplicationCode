@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - 11-implement-a-button-to-start-the-creation-of-a-route
 
   pull_request:
     types:
@@ -17,6 +18,9 @@ jobs:
     name: CI
     # Execute the CI on the course's runners
     runs-on: ubuntu-latest
+
+    permissions:
+      checks: write
 
     steps:
       # First step : Checkout the repository on the runner
