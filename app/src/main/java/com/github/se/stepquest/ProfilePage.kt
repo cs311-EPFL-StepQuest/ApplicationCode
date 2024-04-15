@@ -31,16 +31,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.stepquest.screens.AddFriendScreen
+import com.github.se.stepquest.screens.Friend
 import com.github.se.stepquest.screens.FriendsListDialog
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
+val fakeFriendsList = listOf(
+    Friend("Alice", "https://example.com/alice.jpg", true),
+    Friend("Bob", "https://example.com/bob.jpg", false),
+    Friend("Charlie", "https://example.com/charlie.jpg", true),
+    Friend("David", "https://example.com/david.jpg", false),
+)
 @Composable
 fun ProfilePageLayout() {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showDialog by remember { mutableStateOf(false) }
   // val user = Firebase.auth.currentUser
   Column(
-      modifier = Modifier.padding(32.dp).fillMaxSize(),
+      modifier = Modifier
+          .padding(32.dp)
+          .fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -83,15 +93,16 @@ fun ProfilePageLayout() {
             onClick = { showDialog = true },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier =
-                Modifier.fillMaxWidth()
-                    .height(72.dp)
-                    .padding(vertical = 8.dp)
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxWidth()
+                .height(72.dp)
+                .padding(vertical = 8.dp)
+                .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(8.dp)) {
               Text(text = "Friends List", fontSize = 24.sp, color = Color.White)
             }
         if (showDialog) {
-          FriendsListDialog(onDismiss = { showDialog = false })
+          FriendsListDialog(onDismiss = { showDialog = false }, fakeFriendsList)
         }
       }
 }
