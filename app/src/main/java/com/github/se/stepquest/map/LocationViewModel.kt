@@ -61,7 +61,7 @@ class LocationViewModel : ViewModel() {
 
     //  // Here is for testing purposes: create a faking route by adding each time 1.2 meters to the
     // previous location
-    //    current=fakeRoute(current!!)
+    current = fakeRoute(current!!)
 
     if (current != null &&
         (last == null || calculateDistance(last, current) > 1) &&
@@ -71,24 +71,25 @@ class LocationViewModel : ViewModel() {
     }
   }
 
-  //  // Here is for testing purposes: create a faking route by adding each time 1.2 meters to the
+  // Here is for testing purposes: create a faking route by adding each time 1.2 meters to the
   // previous location
-  //  var i = 0
-  //  fun fakeRoute(current: LocationDetails): LocationDetails {
-  //
-  //    // Calculate new latitude and longitude with a distance of 1 meter
-  //    val latRadians = Math.toRadians(current.latitude)
-  //    val lonRadians = Math.toRadians(current.longitude)
-  //    val earthRadius = 6371000 // Earth's radius in meters
-  //    val meterIncrement = 1.2*i // Increment distance in meters
-  //
-  //    val newLatitude = Math.toDegrees(latRadians + meterIncrement / earthRadius)
-  //    val newLongitude = Math.toDegrees(lonRadians + meterIncrement / (earthRadius *
-  // Math.cos(latRadians)))
-  //    i+=1
-  //    println("i: $i")
-  //    return LocationDetails(newLatitude, newLongitude)
-  //  }
+  var i = 0
+
+  fun fakeRoute(current: LocationDetails): LocationDetails {
+
+    // Calculate new latitude and longitude with a distance of 1 meter
+    val latRadians = Math.toRadians(current.latitude)
+    val lonRadians = Math.toRadians(current.longitude)
+    val earthRadius = 6371000 // Earth's radius in meters
+    val meterIncrement = 1.2 * i // Increment distance in meters
+
+    val newLatitude = Math.toDegrees(latRadians + meterIncrement / earthRadius)
+    val newLongitude =
+        Math.toDegrees(lonRadians + meterIncrement / (earthRadius * Math.cos(latRadians)))
+    i += 1
+    println("i: $i")
+    return LocationDetails(newLatitude, newLongitude)
+  }
 
   fun getAllocations(): List<LocationDetails>? {
     return _allocations.value
