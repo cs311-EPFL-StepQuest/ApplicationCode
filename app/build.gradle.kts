@@ -76,20 +76,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
-    packaging {
-        resources {
-            merges += "META-INF/LICENSE.md"
-            merges += "META-INF/LICENSE-notice.md"
-        }
-    }
-    testOptions {
-        packagingOptions {
-            jniLibs {
-                useLegacyPackaging = true
-            }
-        }
-    }
 }
 
 dependencies {
@@ -117,10 +103,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
     implementation("com.google.firebase:firebase-database-ktx:20.3.0")
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-    testImplementation("junit:junit:4.12")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.3.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.5")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.0")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     debugImplementation("androidx.compose.ui:ui-tooling:1.4.0")
@@ -145,26 +131,11 @@ dependencies {
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
     implementation("com.google.android.play:core-ktx:1.7.0")
 
-    implementation("com.google.android.gms:play-services-location:21.1.0")
-    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+    implementation("com.google.android.gms:play-services-fitness:20.0.0")
 
-    implementation ("androidx.compose.runtime:runtime-livedata:1.1.1")
-    testImplementation("org.robolectric:robolectric:4.11.1")
-
-    // Dependencies for using MockK in instrumented tests
-    androidTestImplementation("io.mockk:mockk:1.13.7")
-    androidTestImplementation("io.mockk:mockk-android:1.13.7")
-    androidTestImplementation("io.mockk:mockk-agent:1.13.7")
-    androidTestImplementation("org.mockito:mockito-core:3.11.2")
-    androidTestImplementation("junit:junit: 4.13.2")
-    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-
-//    testImplementation("org.mockito.kotlin:mockito-kotlin: 3.2.0")
-//    testImplementation("androidx.test:core: 1.4.0")
-    testImplementation("junit:junit: 4.13.2")
-
-
-
+    testImplementation("org.mockito:mockito-core:3.12.4")
+    androidTestImplementation("org.mockito:mockito-android:3.12.4")
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
