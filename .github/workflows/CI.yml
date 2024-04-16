@@ -4,7 +4,7 @@ name: SonarCloud
 on:
   push:
     branches:
-      - 39-daily-achievement
+      - main
 
   pull_request:
     types:
