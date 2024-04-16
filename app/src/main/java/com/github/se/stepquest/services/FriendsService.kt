@@ -1,11 +1,13 @@
 package com.github.se.stepquest.services
 
 import android.text.format.DateFormat
+import com.github.se.stepquest.Friend
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 import java.util.Date
 
 class FriendsService {
@@ -35,9 +37,15 @@ class FriendsService {
             friendsListRef.addListenerForSingleValueEvent(
                 object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        val currentFriendsList = dataSnapshot.getValue(String()::class.java) ?: ""
-                        val newFriendsList =
-                        friendsListRef.setValue(totalSteps)
+                        val currentFriendsList: MutableList<Friend> = dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
+                        currentFriendsList.add(friend)
+                        friendsListRef.setValue(currentFriendsList)
+                            .addOnSuccessListener {
+                                // Handle success if needed
+                            }
+                            .addOnFailureListener { e ->
+                                // Handle failure if needed
+                            }
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
