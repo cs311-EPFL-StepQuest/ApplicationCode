@@ -30,6 +30,7 @@ fun Map() {
   // The gestures are still enabled, but the zoom controls are hidden
   var uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = false)) }
   var showProgression by remember { mutableStateOf(false) }
+
   var routeLength by rememberSaveable { mutableFloatStateOf(0f) }
   var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
 

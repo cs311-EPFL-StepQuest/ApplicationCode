@@ -133,7 +133,7 @@ fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: 
                                     fontWeight = FontWeight.Normal,
                                     color = Color.Red)) {
                               append(
-                                  "$extraKilometers extra kilometer or $extraCheckpoints extra checkpoints for ")
+                                  "$extraKilometers extra kilometers or $extraCheckpoints extra checkpoints for ")
                             }
                         withStyle(
                             style =
