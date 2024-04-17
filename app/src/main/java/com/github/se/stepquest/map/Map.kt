@@ -48,12 +48,12 @@ fun Map(locationViewModel: LocationViewModel) {
           permissionsMap ->
         val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
         if (areGranted) {
-          println("Permission true")
+          println("Permission Granted")
           locationViewModel.locationRequired.value = true
           locationViewModel.startLocationUpdates(context as ComponentActivity)
           Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
         } else {
-          println("Permission false")
+          println("Permission Denied")
           Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
       }
@@ -92,12 +92,12 @@ fun Map(locationViewModel: LocationViewModel) {
           if (permissions.all {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
           }) {
+            println("Permission granted")
             // Get the location
             locationViewModel.startLocationUpdates(context as ComponentActivity)
-            println("Permission granted")
           } else {
             println("Ask Permission")
-            //            launcherMultiplePermissions.launch(permissions)
+            launcherMultiplePermissions.launch(permissions)
           }
         },
         modifier =
