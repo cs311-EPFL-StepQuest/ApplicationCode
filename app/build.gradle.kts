@@ -76,6 +76,20 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    packaging {
+        resources {
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+        }
+    }
+    testOptions {
+        packagingOptions {
+            jniLibs {
+                useLegacyPackaging = true
+            }
+        }
+    }
 }
 
 dependencies {
@@ -149,11 +163,8 @@ dependencies {
     androidTestImplementation("io.mockk:mockk-agent:1.13.7")
     androidTestImplementation("org.mockito:mockito-core:3.11.2")
     androidTestImplementation("junit:junit: 4.13.2")
-    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+//    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
 
-//    testImplementation("org.mockito.kotlin:mockito-kotlin: 3.2.0")
-//    testImplementation("androidx.test:core: 1.4.0")
-    testImplementation("junit:junit: 4.13.2")
 
 }
 
