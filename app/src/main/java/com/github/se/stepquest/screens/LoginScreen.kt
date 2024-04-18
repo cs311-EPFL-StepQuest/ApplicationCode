@@ -33,6 +33,7 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.services.StepCounterService
+import com.github.se.stepquest.services.setOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
@@ -48,6 +49,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
 
     if (result.resultCode == Activity.RESULT_OK) {
       println("Sign in successful!")
+      setOnline()
       context.startService(Intent(context, StepCounterService::class.java))
       navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
     } else if (response != null) {
