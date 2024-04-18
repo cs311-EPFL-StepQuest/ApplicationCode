@@ -17,7 +17,7 @@ class HomeScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun test_HomeScreen() {
+  fun tests_HomeScreen() {
     val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
     composeTestRule.setContent {
