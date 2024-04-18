@@ -29,7 +29,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -39,9 +38,21 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.github.se.stepquest.screens.Friend
+import com.github.se.stepquest.screens.FriendsListScreen
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.ui.navigation.TopLevelDestination
+
+val fakeFriendsList =
+    listOf(
+        Friend("Alice", "https://example.com/alice.jpg", true),
+        Friend("Bob", "https://example.com/bob.jpg", false),
+        Friend("Charlie", "https://example.com/charlie.jpg", true),
+        Friend("David", "https://example.com/david.jpg", false),
+    )
 
 @Composable
-fun ProfilePageLayout() {
+fun ProfilePageLayout(navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   val firebaseAuth = FirebaseAuth.getInstance()
   val userId = firebaseAuth.currentUser?.uid
@@ -59,6 +70,7 @@ fun ProfilePageLayout() {
           // add code when failing to access database
         }
       })
+  var showDialog by remember { mutableStateOf(false) }
   Column(
       modifier = Modifier.padding(32.dp).fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -94,7 +106,7 @@ fun ProfilePageLayout() {
             modifier = Modifier.padding(top = 8.dp))
         Button(
             onClick = {
-              // Handle click action for Friends List button
+              navigationActions.navigateTo(TopLevelDestination(Routes.FriendsListScreen.routName))
             },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier =
@@ -106,10 +118,4 @@ fun ProfilePageLayout() {
               Text(text = "Friends List", fontSize = 24.sp, color = Color.White)
             }
       }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfilePagePreview() {
-  StepQuestTheme { ProfilePageLayout() }
 }
