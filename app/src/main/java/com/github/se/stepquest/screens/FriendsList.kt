@@ -39,42 +39,38 @@ data class Friend(val name: String, val profilePictureUrl: String, val status: B
 fun FriendsListScreen(friendsList: List<Friend>, navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
-    if (showAddFriendScreen) {
-      AddFriendScreen(
-          onDismiss = { showAddFriendScreen = false })
-    } else {
-      Surface(
-          color = Color.White,
-          modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally) {
-                  Row(
-                      modifier = Modifier.fillMaxWidth(),
-                      horizontalArrangement = Arrangement.Start,
-                      verticalAlignment = Alignment.CenterVertically) {
-                      Text(
-                          text = "Back",
-                          fontSize = 20.sp,
-                          modifier = Modifier.clickable { navigationActions.navigateTo(
-                              TopLevelDestination(Routes.FriendsListScreen.routName)) })
-                      }
-                  Text(text = "Friends", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                  Spacer(modifier = Modifier.height(16.dp))
-                  Button(
-                      onClick = { showAddFriendScreen = true },
-                      modifier = Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally),
-                      colors = ButtonDefaults.buttonColors(blueThemeColor)) {
-                        Text(text = "Add Friends", color = Color.White)
-                      }
-                LazyColumn {
-                    items(friendsList) { friend ->
-                        FriendItem(friend = friend)
-                    }
+  if (showAddFriendScreen) {
+    AddFriendScreen(onDismiss = { showAddFriendScreen = false })
+  } else {
+    Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
+      Column(
+          modifier = Modifier.padding(16.dp).fillMaxWidth(),
+          horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically) {
+                  Text(
+                      text = "Back",
+                      fontSize = 20.sp,
+                      modifier =
+                          Modifier.clickable {
+                            navigationActions.navigateTo(
+                                TopLevelDestination(Routes.FriendsListScreen.routName))
+                          })
                 }
+            Text(text = "Friends", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { showAddFriendScreen = true },
+                modifier = Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally),
+                colors = ButtonDefaults.buttonColors(blueThemeColor)) {
+                  Text(text = "Add Friends", color = Color.White)
                 }
+            LazyColumn { items(friendsList) { friend -> FriendItem(friend = friend) } }
           }
     }
+  }
 }
 
 @Composable

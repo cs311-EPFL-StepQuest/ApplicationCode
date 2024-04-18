@@ -28,14 +28,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.screens.Friend
 import com.github.se.stepquest.screens.FriendsListScreen
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
-import com.github.se.stepquest.ui.theme.StepQuestTheme
 
 val fakeFriendsList =
     listOf(
@@ -91,7 +89,9 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
             style = TextStyle(fontSize = 24.sp),
             modifier = Modifier.padding(top = 8.dp))
         Button(
-            onClick = { navigationActions.navigateTo(TopLevelDestination(Routes.FriendsListScreen.routName)) },
+            onClick = {
+              navigationActions.navigateTo(TopLevelDestination(Routes.FriendsListScreen.routName))
+            },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier =
                 Modifier.fillMaxWidth()

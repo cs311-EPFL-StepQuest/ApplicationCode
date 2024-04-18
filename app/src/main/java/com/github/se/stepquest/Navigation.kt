@@ -76,15 +76,17 @@ fun AppNavigationHost(
         composable(Routes.MapScreen.routName) { Map() }
         composable(Routes.ProgressionScreen.routName) { ProgressionPage() }
         composable(Routes.ProfileScreen.routName) { ProfilePageLayout(navigationActions) }
-        composable(Routes.FriendsListScreen.routName) { FriendsListScreen(
-            friendsList = listOf(
-                Friend("Alice", "https://example.com/alice.jpg", true),
-                Friend("Bob", "https://example.com/bob.jpg", false),
-                Friend("Charlie", "https://example.com/charlie.jpg", true),
-                Friend("David", "https://example.com/david.jpg", false),
-            ),
-            navigationActions = navigationActions
-        )}
+        composable(Routes.FriendsListScreen.routName) {
+          FriendsListScreen(
+              friendsList =
+                  listOf(
+                      Friend("Alice", "https://example.com/alice.jpg", true),
+                      Friend("Bob", "https://example.com/bob.jpg", false),
+                      Friend("Charlie", "https://example.com/charlie.jpg", true),
+                      Friend("David", "https://example.com/david.jpg", false),
+                  ),
+              navigationActions = navigationActions)
+        }
       }
 }
 
