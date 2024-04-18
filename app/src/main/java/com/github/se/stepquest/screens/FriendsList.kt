@@ -40,7 +40,7 @@ fun FriendsListScreen(friendsList: List<Friend>, navigationActions: NavigationAc
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
   if (showAddFriendScreen) {
-    AddFriendScreen(onDismiss = { showAddFriendScreen = false })
+    //dialog add friends
   } else {
     Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
       Column(
