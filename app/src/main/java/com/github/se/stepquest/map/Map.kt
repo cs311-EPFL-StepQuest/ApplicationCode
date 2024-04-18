@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -43,19 +44,21 @@ fun Map(locationViewModel: LocationViewModel) {
   //  println("Here in Map")
   val context = LocalContext.current
   val launcherMultiplePermissions =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-                permissionsMap ->
-            val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
-            if (areGranted) {
-                println("Permission Granted")
-                locationViewModel.locationRequired.value = true
-                locationViewModel.startLocationUpdates(context as ComponentActivity)
-                Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            } else {
-                println("Permission Denied")
-                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-            }
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+          permissionsMap ->
+        val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
+        if (areGranted) {
+          println("Permission Granted")
+          locationViewModel.locationRequired.value = true
+          locationViewModel.startLocationUpdates(context as ComponentActivity)
+          Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+        } else {
+          println("Permission Denied")
+          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
+      }
+  val permissions =
+        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 
   val map = remember { mutableStateOf<GoogleMap?>(null) }
 
@@ -71,8 +74,7 @@ fun Map(locationViewModel: LocationViewModel) {
             }
           }
         },
-        modifier = Modifier.fillMaxSize(),
-    )
+        modifier = Modifier.fillMaxSize().testTag("GoogleMap"))
     val locationUpdated by locationViewModel.locationUpdated.observeAsState()
     LaunchedEffect(locationUpdated) {
       if (locationUpdated == true) {
@@ -84,9 +86,7 @@ fun Map(locationViewModel: LocationViewModel) {
 
     // Button for creating a route
     FloatingActionButton(
-        onClick = {
-            locationPermision(locationViewModel, context, launcherMultiplePermissions)
-        },
+        onClick = { locationPermission(locationViewModel, context, launcherMultiplePermissions,permissions) },
         modifier =
             Modifier.padding(16.dp).align(Alignment.BottomStart).testTag("createRouteButton")) {
           Image(
@@ -131,19 +131,20 @@ fun initMap(googleMap: GoogleMap) {
   googleMap.uiSettings.isZoomControlsEnabled = true
 }
 
-
-fun locationPermision(locationViewModel: LocationViewModel, context: Context, launcherMultiplePermissions: ActivityResultLauncher<Array<String>>){
-    val permissions =
-        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-
-    if (permissions.all {
-            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-        }) {
-        println("Permission granted")
-        // Get the location
-        locationViewModel.startLocationUpdates(context as ComponentActivity)
-    } else {
-        println("Ask Permission")
-        launcherMultiplePermissions.launch(permissions)
-    }
+fun locationPermission(
+    locationViewModel: LocationViewModel,
+    context: Context,
+    launcherMultiplePermissions: ActivityResultLauncher<Array<String>>,
+    permissions: Array<String>
+) {
+  if (permissions.all {
+          PermissionChecker.checkSelfPermission(context, it) == PermissionChecker.PERMISSION_GRANTED
+  }) {
+    println("Permission successful")
+    // Get the location
+    locationViewModel.startLocationUpdates(context)
+  } else {
+    println("Ask Permission")
+    launcherMultiplePermissions.launch(permissions)
+  }
 }
