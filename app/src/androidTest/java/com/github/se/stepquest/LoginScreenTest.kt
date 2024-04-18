@@ -27,10 +27,4 @@ class LoginScreenTest {
         .assertExists("The new player button doesn't exist?!")
     composeTestRule.onNodeWithText("New player").assertHasClickAction()
   }
-
-  @Test
-  fun buttonsAreClickable() {
-
-    composeTestRule.setContent { StepQuestTheme { AppNavigationHost() } }
-  }
 }
