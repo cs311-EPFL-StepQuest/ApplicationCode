@@ -17,7 +17,7 @@ class HomeScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun dummy_is_correctly_displayed() {
+  fun test_HomeScreen() {
     val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
     composeTestRule.setContent {
