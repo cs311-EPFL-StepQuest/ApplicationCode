@@ -45,6 +45,7 @@ fun Map(locationViewModel: LocationViewModel) {
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
           permissionsMap ->
         val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
+          println("launcherMultiplePermissions")
         if (areGranted) {
           println("Permission Granted")
           locationViewModel.locationRequired.value = true

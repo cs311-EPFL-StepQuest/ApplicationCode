@@ -2,16 +2,16 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MapTest">
+      <entry key="All Tests">
+        <State />
+      </entry>
+      <entry key="LocationViewModelTest">
         <State />
       </entry>
       <entry key="app">
         <State />
       </entry>
-      <entry key="testUpdateMap()">
-        <State />
-      </entry>
-      <entry key="testUpdateMap_multiplelocation()">
+      <entry key="startLocationUpdatesTest()">
         <State />
       </entry>
     </value>
