@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
@@ -56,17 +57,28 @@ fun FriendsListScreen(friendsList: List<Friend>, navigationActions: NavigationAc
                       modifier =
                           Modifier.clickable {
                             navigationActions.navigateTo(
-                                TopLevelDestination(Routes.FriendsListScreen.routName))
+                                TopLevelDestination(Routes.ProfileScreen.routName))
                           })
                 }
-            Text(text = "Friends", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Friends", fontWeight = FontWeight.Bold, fontSize = 40.sp)
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { showAddFriendScreen = true },
-                modifier = Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally),
-                colors = ButtonDefaults.buttonColors(blueThemeColor)) {
-                  Text(text = "Add Friends", color = Color.White)
+                onClick = {
+                  navigationActions.navigateTo(
+                      TopLevelDestination(Routes.FriendsListScreen.routName))
+                },
+                colors = ButtonDefaults.buttonColors(blueThemeColor),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .height(72.dp)
+                        .padding(vertical = 8.dp)
+                        .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(8.dp)) {
+                  androidx.compose.material3.Text(
+                      text = "Add Friends", fontSize = 24.sp, color = Color.White)
                 }
+            Spacer(modifier = Modifier.height(16.dp))
             LazyColumn { items(friendsList) { friend -> FriendItem(friend = friend) } }
           }
     }
@@ -80,7 +92,7 @@ fun FriendItem(friend: Friend) {
   val status = if (friend.status) "ONLINE" else "OFFLINE"
   Surface(
       color = backgroundColor,
-      modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth().padding(horizontal = 8.dp),
+      modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth().padding(horizontal = 16.dp),
       shape = MaterialTheme.shapes.medium) {
         Row(
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
@@ -90,8 +102,11 @@ fun FriendItem(friend: Friend) {
                   text = friend.name,
                   modifier = Modifier.weight(1f),
                   color = Color.White,
-                  style = MaterialTheme.typography.body1)
-              Text(text = status, color = Color.White, style = MaterialTheme.typography.body1)
+                  style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold))
+              Text(
+                  text = status,
+                  color = Color.White,
+                  style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold))
             }
       }
 }
