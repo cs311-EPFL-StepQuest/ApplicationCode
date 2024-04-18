@@ -33,8 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.github.se.stepquest.services.addFriend
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -45,22 +43,22 @@ import com.google.firebase.database.ValueEventListener
 @Composable
 fun ProfilePageLayout() {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-    val firebaseAuth = FirebaseAuth.getInstance()
-    val userId = firebaseAuth.currentUser?.uid
-    val profilePictureURL = firebaseAuth.currentUser?.photoUrl
-    val database = FirebaseDatabase.getInstance()
-    var totalStepsMade by remember { mutableStateOf(0) }
-    val stepsRef = database.reference.child("users").child(userId!!).child("totalSteps")
-    stepsRef.addListenerForSingleValueEvent(
-        object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
-            }
+  val firebaseAuth = FirebaseAuth.getInstance()
+  val userId = firebaseAuth.currentUser?.uid
+  val profilePictureURL = firebaseAuth.currentUser?.photoUrl
+  val database = FirebaseDatabase.getInstance()
+  var totalStepsMade by remember { mutableStateOf(0) }
+  val stepsRef = database.reference.child("users").child(userId!!).child("totalSteps")
+  stepsRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
+        }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                // add code when failing to access database
-            }
-        })
+        override fun onCancelled(databaseError: DatabaseError) {
+          // add code when failing to access database
+        }
+      })
   Column(
       modifier = Modifier.padding(32.dp).fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,19 +71,18 @@ fun ProfilePageLayout() {
               modifier = Modifier.size(30.dp))
         }
         Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 40.sp)
-      profilePictureURL?.let { uri ->
+        profilePictureURL?.let { uri ->
           Image(
               painter = rememberAsyncImagePainter(uri),
               contentDescription = "Profile Picture",
-              modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp))
-          )
-      }
+              modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
+        }
         /*Image(
-            painter = painterResource(id = R.drawable.dummypfp),
-            contentDescription = "Profile Picture",
-            modifier = Modifier.size(200.dp))*/
+        painter = painterResource(id = R.drawable.dummypfp),
+        contentDescription = "Profile Picture",
+        modifier = Modifier.size(200.dp))*/
         Text(
-            text = "Total Steps: $totalStepsMade", 
+            text = "Total Steps: $totalStepsMade",
             fontSize = 24.sp,
             modifier = Modifier.padding(top = 16.dp))
         ClickableText(
@@ -97,7 +94,7 @@ fun ProfilePageLayout() {
             modifier = Modifier.padding(top = 8.dp))
         Button(
             onClick = {
-                // Handle click action for Friends List button
+              // Handle click action for Friends List button
             },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier =
