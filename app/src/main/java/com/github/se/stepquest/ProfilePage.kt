@@ -32,7 +32,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.screens.Friend
-import com.github.se.stepquest.screens.FriendsListDialog
+import com.github.se.stepquest.screens.FriendsListScreen
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 
 val fakeFriendsList =
@@ -44,7 +46,7 @@ val fakeFriendsList =
     )
 
 @Composable
-fun ProfilePageLayout() {
+fun ProfilePageLayout(navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showDialog by remember { mutableStateOf(false) }
   // val user = Firebase.auth.currentUser
@@ -89,7 +91,7 @@ fun ProfilePageLayout() {
             style = TextStyle(fontSize = 24.sp),
             modifier = Modifier.padding(top = 8.dp))
         Button(
-            onClick = { showDialog = true },
+            onClick = { navigationActions.navigateTo(TopLevelDestination(Routes.FriendsListScreen.routName)) },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier =
                 Modifier.fillMaxWidth()
@@ -99,14 +101,5 @@ fun ProfilePageLayout() {
             shape = RoundedCornerShape(8.dp)) {
               Text(text = "Friends List", fontSize = 24.sp, color = Color.White)
             }
-        if (showDialog) {
-          FriendsListDialog(onDismiss = { showDialog = false }, fakeFriendsList)
-        }
       }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfilePagePreview() {
-  StepQuestTheme { ProfilePageLayout() }
 }

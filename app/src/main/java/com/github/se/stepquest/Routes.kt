@@ -12,4 +12,6 @@ open class Routes(val routName: String, val title: String) {
   object MainScreen : Routes(routName = "/main", title = "Main")
 
   object ProfileScreen : Routes(routName = "/profile", title = "Profile")
+
+  object FriendsListScreen : Routes(routName = "/friendsList", title = "FriendsList")
 }

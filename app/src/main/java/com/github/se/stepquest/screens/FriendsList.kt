@@ -1,24 +1,20 @@
 package com.github.se.stepquest.screens
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,35 +28,36 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.github.se.stepquest.R
+import com.github.se.stepquest.Routes
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
 data class Friend(val name: String, val profilePictureUrl: String, val status: Boolean)
 
 @Composable
-fun FriendsListDialog(onDismiss: () -> Unit, friendsList: List<Friend>) {
+fun FriendsListScreen(friendsList: List<Friend>, navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
-  Dialog(onDismissRequest = { onDismiss() }) {
     if (showAddFriendScreen) {
       AddFriendScreen(
-          onDismiss = { showAddFriendScreen = false }, onSecondScreenDismiss = onDismiss)
+          onDismiss = { showAddFriendScreen = false })
     } else {
       Surface(
           color = Color.White,
-          border = BorderStroke(1.dp, Color.Black),
-          shape = RoundedCornerShape(8.dp),
-          modifier = Modifier.padding(16.dp)) {
+          modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally) {
                   Row(
                       modifier = Modifier.fillMaxWidth(),
-                      horizontalArrangement = Arrangement.End,
+                      horizontalArrangement = Arrangement.Start,
                       verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)) {
-                          Icon(Icons.Default.Close, contentDescription = "Close")
-                        }
+                      Text(
+                          text = "Back",
+                          fontSize = 20.sp,
+                          modifier = Modifier.clickable { navigationActions.navigateTo(
+                              TopLevelDestination(Routes.FriendsListScreen.routName)) })
                       }
                   Text(text = "Friends", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                   Spacer(modifier = Modifier.height(16.dp))
@@ -70,11 +67,14 @@ fun FriendsListDialog(onDismiss: () -> Unit, friendsList: List<Friend>) {
                       colors = ButtonDefaults.buttonColors(blueThemeColor)) {
                         Text(text = "Add Friends", color = Color.White)
                       }
-                  LazyColumn { items(friendsList) { friend -> FriendItem(friend = friend) } }
+                LazyColumn {
+                    items(friendsList) { friend ->
+                        FriendItem(friend = friend)
+                    }
+                }
                 }
           }
     }
-  }
 }
 
 @Composable

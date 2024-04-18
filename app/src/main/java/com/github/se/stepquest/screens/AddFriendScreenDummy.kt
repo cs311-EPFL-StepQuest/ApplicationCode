@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.R
 
 @Composable
-fun AddFriendScreen(onDismiss: () -> Unit, onSecondScreenDismiss: () -> Unit) {
+fun AddFriendScreen(onDismiss: () -> Unit) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var searchQuery by remember { mutableStateOf("") }
   Surface(
@@ -55,7 +55,6 @@ fun AddFriendScreen(onDismiss: () -> Unit, onSecondScreenDismiss: () -> Unit) {
                     IconButton(
                         onClick = {
                           onDismiss()
-                          onSecondScreenDismiss()
                         },
                         modifier = Modifier.padding(8.dp)) {
                           Icon(Icons.Default.Close, contentDescription = "Close")
