@@ -32,16 +32,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.github.se.stepquest.ui.theme.StepQuestTheme
+import com.github.se.stepquest.screens.Friend
+import com.github.se.stepquest.screens.FriendsListScreen
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.github.se.stepquest.screens.Friend
-import com.github.se.stepquest.screens.FriendsListScreen
-import com.github.se.stepquest.ui.navigation.NavigationActions
-import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
 val fakeFriendsList =
     listOf(
