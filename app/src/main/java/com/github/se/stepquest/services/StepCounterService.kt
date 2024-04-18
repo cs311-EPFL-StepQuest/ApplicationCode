@@ -15,12 +15,12 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.Date
 
-class StepCounterService() : Service(), SensorEventListener {
-
-  private lateinit var sensorManager: SensorManager
-  private var stepSensor: Sensor? = null
-  private lateinit var firebaseAuth: FirebaseAuth
-  private lateinit var database: FirebaseDatabase
+class StepCounterService(
+    private var sensorManager: SensorManager? = null,
+    private var stepSensor: Sensor? = null,
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+) : Service(), SensorEventListener {
 
   override fun onBind(intent: Intent?): IBinder? {
     return null
@@ -29,17 +29,19 @@ class StepCounterService() : Service(), SensorEventListener {
   override fun onCreate() {
     super.onCreate()
 
-    sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-    stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
-    firebaseAuth = FirebaseAuth.getInstance()
-    database = FirebaseDatabase.getInstance()
+    if (sensorManager == null) {
+      sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+    }
+    if (stepSensor == null) {
+      stepSensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+    }
 
-    sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+    sensorManager!!.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    sensorManager.unregisterListener(this)
+    sensorManager!!.unregisterListener(this)
   }
 
   override fun onSensorChanged(event: SensorEvent?) {
