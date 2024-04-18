@@ -36,7 +36,7 @@ import com.github.se.stepquest.R
 val dummyUserList = listOf("Alice", "Bob", "Charlie", "Charles")
 
 @Composable
-fun AddFriendScreen(onDismiss: () -> Unit, onSecondScreenDismiss: () -> Unit) {
+fun AddFriendScreen(onDismiss: () -> Unit) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var searchQuery by remember { mutableStateOf("") }
   val searchResults = dummyUserList.filter { it.startsWith(searchQuery, ignoreCase = true) }
@@ -58,14 +58,9 @@ fun AddFriendScreen(onDismiss: () -> Unit, onSecondScreenDismiss: () -> Unit) {
                         fontSize = 20.sp,
                         modifier = Modifier.clickable { onDismiss() })
                     Spacer(modifier = Modifier.weight(0.3f))
-                    IconButton(
-                        onClick = {
-                          onDismiss()
-                          onSecondScreenDismiss()
-                        },
-                        modifier = Modifier.padding(8.dp)) {
-                          Icon(Icons.Default.Close, contentDescription = "Close")
-                        }
+                    IconButton(onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)) {
+                      Icon(Icons.Default.Close, contentDescription = "Close")
+                    }
                   }
               Text(
                   text = "Friends",

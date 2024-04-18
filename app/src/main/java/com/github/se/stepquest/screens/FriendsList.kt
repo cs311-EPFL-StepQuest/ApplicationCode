@@ -41,7 +41,7 @@ fun FriendsListScreen(friendsList: List<Friend>, navigationActions: NavigationAc
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
   if (showAddFriendScreen) {
-    // dialog add friends
+    AddFriendScreen(onDismiss = { showAddFriendScreen = false })
   } else {
     Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
       Column(
@@ -64,10 +64,7 @@ fun FriendsListScreen(friendsList: List<Friend>, navigationActions: NavigationAc
             Text(text = "Friends", fontWeight = FontWeight.Bold, fontSize = 40.sp)
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = {
-                  navigationActions.navigateTo(
-                      TopLevelDestination(Routes.FriendsListScreen.routName))
-                },
+                onClick = { showAddFriendScreen = true },
                 colors = ButtonDefaults.buttonColors(blueThemeColor),
                 modifier =
                     Modifier.fillMaxWidth()
