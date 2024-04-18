@@ -120,12 +120,18 @@ fun UserItem(name: String) {
                     }
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth()) {
-              Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                Text(text = name, color = Color.White, fontSize = 20.sp)
-                if (isExpanded) {
-                  Icon(imageVector = Icons.Default.Close, contentDescription = "Close", modifier = Modifier.clickable { isExpanded = false }, tint = Color.White)
-                }
-              }
+              Row(
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  modifier = Modifier.fillMaxWidth()) {
+                    Text(text = name, color = Color.White, fontSize = 20.sp)
+                    if (isExpanded) {
+                      Icon(
+                          imageVector = Icons.Default.Close,
+                          contentDescription = "Close",
+                          modifier = Modifier.clickable { isExpanded = false },
+                          tint = Color.White)
+                    }
+                  }
               if (isExpanded) {
                 Spacer(modifier = Modifier.height(2.dp))
 
