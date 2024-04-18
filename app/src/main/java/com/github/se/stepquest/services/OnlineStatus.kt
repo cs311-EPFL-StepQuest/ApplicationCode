@@ -18,6 +18,7 @@ fun setOnline() {
       object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
           userStatusRef.setValue(true)
+          userStatusRef.onDisconnect().setValue(false)
         }
 
         override fun onCancelled(error: DatabaseError) {
