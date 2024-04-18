@@ -75,7 +75,7 @@ fun AppNavigationHost(
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
         composable(Routes.MapScreen.routName) { Map() }
-        composable(Routes.ProgressionScreen.routName) { ProgressionPage() }
+        composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository()) }
         composable(Routes.ProfileScreen.routName) { ProfilePageLayout(navigationActions) }
         composable(Routes.FriendsListScreen.routName) {
           FriendsListScreen(
