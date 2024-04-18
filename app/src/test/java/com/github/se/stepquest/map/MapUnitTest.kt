@@ -3,8 +3,6 @@ package com.github.se.stepquest.map
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
-
-
 class MapUnitTest {
   @Test fun map() {}
 
@@ -24,5 +22,4 @@ class MapUnitTest {
   }
 
   @Test fun initMap() {}
-
 }

@@ -1,51 +1,33 @@
 package com.github.se.stepquest.map
 
+import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.test.performClick
+import androidx.core.content.PermissionChecker
+import androidx.lifecycle.MutableLiveData
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.stepquest.ui.theme.StepQuestTheme
+import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
+import io.mockk.Called
+import io.mockk.every
+import io.mockk.junit4.MockKRule
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import android.Manifest
-import android.app.Application
-import android.renderscript.Allocation
-import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultRegistry
-import androidx.activity.result.ActivityResultRegistryOwner
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.test.performClick
-import androidx.core.content.PermissionChecker
-import androidx.fragment.app.FragmentActivity
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.rule.ActivityTestRule
-import androidx.test.rule.GrantPermissionRule
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
-import com.kaspersky.components.kautomator.common.Environment
-import io.mockk.Called
-import io.mockk.confirmVerified
-import io.mockk.every
-import io.mockk.junit4.MockKRule
-import io.mockk.mockk
-import io.mockk.mockkConstructor
-import io.mockk.mockkObject
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
-import io.mockk.verify
-import org.robolectric.shadows.ShadowApplication
-
 
 @RunWith(AndroidJUnit4::class)
 class MapTest {
@@ -59,7 +41,8 @@ class MapTest {
   private lateinit var locationViewModel: LocationViewModel
   private lateinit var context: Context
   private lateinit var launcherMultiplePermissions: ActivityResultLauncher<Array<String>>
-  val permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+  val permissions =
+      arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 
   @Before
   fun setup() {
@@ -77,14 +60,13 @@ class MapTest {
     composeTestRule.onNodeWithTag("createRouteButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createRouteButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("createRouteButton").performClick()
-
   }
-
 
   @Test
   fun locationPermission_grated() {
     mockkStatic(PermissionChecker::class)
-    every { PermissionChecker.checkSelfPermission(any(), any()) } returns PermissionChecker.PERMISSION_GRANTED
+    every { PermissionChecker.checkSelfPermission(any(), any()) } returns
+        PermissionChecker.PERMISSION_GRANTED
 
     locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
 
@@ -94,7 +76,8 @@ class MapTest {
   @Test
   fun locationPermission_denied() {
     mockkStatic(PermissionChecker::class)
-    every { PermissionChecker.checkSelfPermission(any(), any()) } returns PermissionChecker.PERMISSION_DENIED
+    every { PermissionChecker.checkSelfPermission(any(), any()) } returns
+        PermissionChecker.PERMISSION_DENIED
 
     locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
 
@@ -102,12 +85,45 @@ class MapTest {
   }
 
   @Test
-  fun testUpdateMap() {
-    // Mock GoogleMap
+  fun testUpdateMap_singlelocation() {
+    // Mock the GoogleMap object
     val googleMap = mockk<GoogleMap>()
 
-    // Call the function to be tested
+    // Mock allocation data
+    vm._allocations = MutableLiveData(listOf(LocationDetails(0.0, 0.0)))
+
+    // Mock the addMarker method to return a mock object
+    every { googleMap.addMarker(any<MarkerOptions>()) } returns mockk()
+    // Mock the moveCamera method to return a mock object
+    mockkStatic(CameraUpdateFactory::class)
+    val cameraUpdateMock = mockk<CameraUpdate>()
+    every { CameraUpdateFactory.newLatLngZoom(any(), any()) } returns cameraUpdateMock
+    every { googleMap.moveCamera(any()) } returns mockk()
+
+    // Call the function to test
     updateMap(googleMap, vm)
+
+    // Verify that the appropriate GoogleMap methods are called
+    verify {
+      googleMap.addMarker(any())
+      googleMap.moveCamera(any())
+    }
   }
 
+  @Test
+  fun testUpdateMap_multiplelocation() {
+    // Mock the GoogleMap object
+    val googleMap = mockk<GoogleMap>()
+
+    // Mock allocation data
+    vm._allocations = MutableLiveData(listOf(LocationDetails(0.0, 0.0), LocationDetails(15.0, 3.0)))
+    // Mock the addPolyline method to return a mock object
+    every { googleMap.addPolyline(any<PolylineOptions>()) } returns mockk()
+
+    // Call the function to test
+    updateMap(googleMap, vm)
+
+    // Verify that the appropriate GoogleMap methods are called
+    verify { googleMap.addPolyline(any()) }
+  }
 }

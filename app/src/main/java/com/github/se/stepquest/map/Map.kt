@@ -3,7 +3,6 @@ package com.github.se.stepquest.map
 
 import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -29,7 +28,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -58,7 +56,7 @@ fun Map(locationViewModel: LocationViewModel) {
         }
       }
   val permissions =
-        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+      arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 
   val map = remember { mutableStateOf<GoogleMap?>(null) }
 
@@ -86,7 +84,9 @@ fun Map(locationViewModel: LocationViewModel) {
 
     // Button for creating a route
     FloatingActionButton(
-        onClick = { locationPermission(locationViewModel, context, launcherMultiplePermissions,permissions) },
+        onClick = {
+          locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
+        },
         modifier =
             Modifier.padding(16.dp).align(Alignment.BottomStart).testTag("createRouteButton")) {
           Image(
@@ -99,7 +99,7 @@ fun Map(locationViewModel: LocationViewModel) {
 
 fun updateMap(googleMap: GoogleMap, locationViewModel: LocationViewModel) {
   val allocations = locationViewModel.getAllocations() ?: return
-  //    println("all locations in map: $allocations")
+  println("all locations in map: $allocations")
   if (allocations.size == 1) {
     // Add marker for the only allocation
     googleMap.addMarker(MarkerOptions().position(allocations.first().toLatLng()))
@@ -138,7 +138,7 @@ fun locationPermission(
     permissions: Array<String>
 ) {
   if (permissions.all {
-          PermissionChecker.checkSelfPermission(context, it) == PermissionChecker.PERMISSION_GRANTED
+    PermissionChecker.checkSelfPermission(context, it) == PermissionChecker.PERMISSION_GRANTED
   }) {
     println("Permission successful")
     // Get the location

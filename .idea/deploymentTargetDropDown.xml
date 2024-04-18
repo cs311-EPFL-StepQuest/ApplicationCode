@@ -8,10 +8,10 @@
       <entry key="app">
         <State />
       </entry>
-      <entry key="locationPermission()">
+      <entry key="testUpdateMap()">
         <State />
       </entry>
-      <entry key="map()">
+      <entry key="testUpdateMap_multiplelocation()">
         <State />
       </entry>
     </value>
