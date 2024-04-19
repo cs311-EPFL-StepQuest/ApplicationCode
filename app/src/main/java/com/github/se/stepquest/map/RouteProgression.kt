@@ -37,12 +37,15 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: Int) {
   var routeName by rememberSaveable { mutableStateOf("") }
-  var reward by rememberSaveable { mutableIntStateOf(0) }
+    var routeID by rememberSaveable { mutableStateOf("") }
+    var reward by rememberSaveable { mutableIntStateOf(0) }
   var extraKilometers by rememberSaveable { mutableIntStateOf(0) }
   var extraCheckpoints by rememberSaveable { mutableIntStateOf(0) }
 
@@ -151,7 +154,7 @@ fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: 
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                   Button(
                       onClick = {
-                        saveRoute(onDismiss, routeName, routeLength, numCheckpoints, reward)
+                        saveRoute(onDismiss, routeName, routeID, routeLength, numCheckpoints, reward)
                       },
                       colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
                       modifier = Modifier.height(35.dp).width(140.dp)) {
@@ -166,10 +169,26 @@ fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: 
 fun saveRoute(
     onDismiss: () -> Unit,
     routeName: String,
+    routeID: String,
     routeLength: Float,
     numCheckpoints: Int,
     reward: Int
 ) {
-  // Save route to database
-  onDismiss()
+    // Generate an unique routeID (for testing purposes)
+
+
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val userId = firebaseAuth.currentUser?.uid
+    val database = FirebaseDatabase.getInstance()
+    val route = database.reference.child("users").child(userId!!).child("routes")
+    val routeID2 = route.push().key!!
+
+    // Save routeName, routeID, routeLength, numCheckpoints, reward to database under the routeID
+    route.child(routeID2).child("routeName").setValue(routeName)
+    route.child(routeID2).child("routeLength").setValue(routeLength)
+    route.child(routeID2).child("numCheckpoints").setValue(numCheckpoints)
+    route.child(routeID2).child("reward").setValue(reward)
+
+    onDismiss()
+
 }
