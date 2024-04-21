@@ -106,7 +106,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
 
         // New user button
         Button(
-            onClick = { println("User creation screen to be implemented") },
+            onClick = { navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName)) },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
             shape = RoundedCornerShape(8.dp)) {

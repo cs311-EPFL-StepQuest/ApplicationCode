@@ -27,6 +27,7 @@ import com.github.se.stepquest.screens.Friend
 import com.github.se.stepquest.screens.FriendsListScreen
 import com.github.se.stepquest.screens.HomeScreen
 import com.github.se.stepquest.screens.LoginScreen
+import com.github.se.stepquest.screens.NewPlayerScreen
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
@@ -72,6 +73,7 @@ fun AppNavigationHost(
       navController = navigationController,
       startDestination = startDestination) {
         composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions) }
+        composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions)}
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
         composable(Routes.MapScreen.routName) { Map() }
