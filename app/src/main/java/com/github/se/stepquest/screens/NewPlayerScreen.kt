@@ -107,7 +107,12 @@ fun NewPlayerScreen(navigationActions: NavigationActions, context: Context) {
     ) {
         TextField(
             value = usernamePlayer,
-            onValueChange = { usernamePlayer = it },
+            onValueChange = { newInput ->
+                // Remove spaces from the input
+                val filteredInput = newInput.replace("\\s".toRegex(), "")
+                // Limit the input to 25 characters
+                usernamePlayer = filteredInput.take(25)
+            },
             label = { Text("Username") },
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
