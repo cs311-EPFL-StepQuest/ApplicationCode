@@ -1,6 +1,7 @@
 package com.github.se.stepquest.screens
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Canvas
@@ -38,10 +39,8 @@ import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
 @Composable
-fun LoginScreen(navigationActions: NavigationActions) {
+fun LoginScreen(navigationActions: NavigationActions, context: Context) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-
-  val context = LocalContext.current
 
   fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 

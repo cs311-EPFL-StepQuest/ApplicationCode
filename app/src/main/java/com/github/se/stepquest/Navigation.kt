@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -68,12 +69,13 @@ fun AppNavigationHost(
     startDestination: String = Routes.LoginScreen.routName
 ) {
   val navigationActions = remember(navigationController) { NavigationActions(navigationController) }
+    val context = LocalContext.current
   NavHost(
       modifier = modifier,
       navController = navigationController,
       startDestination = startDestination) {
-        composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions) }
-        composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions)}
+        composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions, context) }
+        composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context)}
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
         composable(Routes.MapScreen.routName) { Map() }
