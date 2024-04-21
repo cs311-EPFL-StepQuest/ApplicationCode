@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -13,7 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.R
 import com.google.maps.android.compose.GoogleMap
 
@@ -37,9 +42,7 @@ fun Map() {
                       .offset(y = (-96).dp)
                       .size(48.dp)) {
                 Box(
-                    modifier =
-                        Modifier.size(48.dp) // Adjust the size of the icon container
-                            .background(Color.Blue, CircleShape), // Blue background
+                    modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
                     contentAlignment = Alignment.Center) {
                       Icon(
                           painter = painterResource(R.drawable.map_marker),
@@ -52,16 +55,16 @@ fun Map() {
       floatingActionButton = {
         if (showDialog) {
           AlertDialog(
+              shape = RoundedCornerShape(16.dp),
               onDismissRequest = { showDialog = false },
               title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                  Text("New Checkpoint", modifier = Modifier.weight(1f)) // Title "New Checkpoint"
+                  Text(
+                      "New Checkpoint",
+                      style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
+                      modifier = Modifier.weight(1f))
                   IconButton(onClick = { showDialog = false }, modifier = Modifier.size(36.dp)) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Close",
-                        tint = Color.Black // Black cancel button
-                        )
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.Black)
                   }
                 }
               },
@@ -69,41 +72,42 @@ fun Map() {
                 Column(modifier = Modifier.padding(16.dp)) {
                   Text(
                       "Checkpoint name",
-                      modifier = Modifier.padding(bottom = 8.dp)) // Prompt "Checkpoint name"
+                      style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+                      modifier = Modifier.padding(bottom = 8.dp))
                   TextField(
                       value = checkpointTitle,
+                      shape = RoundedCornerShape(8.dp),
                       onValueChange = { checkpointTitle = it },
-                      label = { Text("Title") },
+                      label = { Text("Name:") },
                       modifier = Modifier.fillMaxWidth())
                 }
               },
               confirmButton = {
-                Box(
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .height(48.dp) // Set the height of the button
-                    ) {
-                      Button(
-                          onClick = {
-                            // Here you can handle adding the checkpoint to the map
-                            val title = checkpointTitle
-                            showDialog = false
-                          },
-                          modifier =
-                              Modifier.fillMaxWidth()
-                                  .width(50.dp) // Set the width of the button
-                                  .align(Alignment.Center)) {
-                            Text("Confirm", color = Color.White) // Blue confirm button
+                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp)) {
+                  Button(
+                      onClick = {
+                        // ADD HERE CODE FOR ADDING CHECKPOINTS, INPUT TITLE STORED IN title
+                        val title = checkpointTitle
+                        showDialog = false
+                      },
+                      shape = RoundedCornerShape(12.dp),
+                      colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff00b3ff)),
+                      modifier = Modifier.width(150.dp).align(Alignment.Center)) {
+                        Text(
+                            "Confirm",
+                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
+                            color = Color.White)
                       }
-                    }
+                }
               },
-              dismissButton = {
-                // Empty composable to maintain space for dismiss button
-                Spacer(modifier = Modifier.height(36.dp))
-              },
-              modifier = Modifier.width(300.dp) // Set width of the AlertDialog
-              )
+              dismissButton = { Spacer(modifier = Modifier.height(36.dp)) },
+              modifier = Modifier.width(300.dp))
         }
       })
+}
+
+@Preview
+@Composable
+fun MyComposablePreview() {
+  Map() // Call your composable function here
 }

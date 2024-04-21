@@ -48,7 +48,7 @@ class MapKtTest {
 
     composeTestRule.onNodeWithText("New Checkpoint").assertExists()
     composeTestRule.onNodeWithText("Checkpoint name").assertExists()
-    composeTestRule.onNodeWithText("Title").assertExists()
+    composeTestRule.onNodeWithText("Name:").assertExists()
   }
 
   @Test
