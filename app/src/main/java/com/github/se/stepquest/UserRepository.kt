@@ -45,10 +45,24 @@ class IUserRepository : UserRepository {
   }
 }
 
-class TestUserRepository : UserRepository {
+class TestUserRepository1 : UserRepository {
   private val uid = "testuid"
   private val dailyStepsMade = 2500
   private val weeklyStepsMade = 6500
+
+  override fun getUid(): String {
+    return this.uid
+  }
+
+  override fun getSteps(): List<Int> {
+    return listOf(dailyStepsMade, weeklyStepsMade)
+  }
+}
+
+class TestUserRepository2 : UserRepository {
+  private val uid = "testuid"
+  private val dailyStepsMade = 6000
+  private val weeklyStepsMade = 17500
 
   override fun getUid(): String {
     return this.uid

@@ -152,7 +152,8 @@ fun SetDailyGoalAchievedDialog(onConfirm: () -> Unit) {
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = "Congratulations! You reached your daily step goal!",
-                    textAlign = TextAlign.Center)
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.testTag("Achieved goal message"))
                 Spacer(modifier = Modifier.height(15.dp))
                 Text(text = "You receive 100 XP", textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(20.dp))
@@ -160,7 +161,7 @@ fun SetDailyGoalAchievedDialog(onConfirm: () -> Unit) {
                     onClick = { onConfirm() },
                     colors = ButtonDefaults.buttonColors(blueThemeColor),
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.padding(horizontal = 4.dp)) {
+                    modifier = Modifier.padding(horizontal = 4.dp).testTag("Confirm button")) {
                       Text(text = "Confirm")
                     }
               }
