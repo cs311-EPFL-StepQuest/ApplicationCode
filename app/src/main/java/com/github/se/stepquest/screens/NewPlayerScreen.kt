@@ -13,6 +13,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,22 +40,18 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 
 fun addUsername(username: String, firebaseAuth: FirebaseAuth, database: FirebaseDatabase) {
   val userId = firebaseAuth.currentUser?.uid
-    var pair = Pair(userId, "")
   if (userId != null) {
     val databaseRef = database.reference
     databaseRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
           override fun onDataChange(dataSnapshot: DataSnapshot) {
-              pair = Pair(userId, username)
             databaseRef.child("users").child(userId).child("username").setValue(username)
-            databaseRef
-                .child("global")
-                .child("usernames")
-                .child(username)
-                .setValue(pair)
+            val usernamesRef = databaseRef.child("usernames").child(username)
+            usernamesRef.setValue(userId)
           }
 
           override fun onCancelled(databaseError: DatabaseError) {
@@ -63,16 +61,45 @@ fun addUsername(username: String, firebaseAuth: FirebaseAuth, database: Firebase
   }
 }
 
-fun checkIfNewPlayer() {}
+fun checkIfNewPlayer(
+    firebaseAuth: FirebaseAuth,
+    database: FirebaseDatabase,
+    callback: (Boolean) -> Unit
+) {
+  val userId = firebaseAuth.currentUser?.uid
+  if (userId != null) {
+    val databaseRef = database.reference
+    databaseRef
+        .child("users")
+        .child(userId)
+        .child("username")
+        .addListenerForSingleValueEvent(
+            object : ValueEventListener {
+              override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val username = dataSnapshot.getValue(String::class.java)
+                val isNewPlayer = username == null
+                callback(isNewPlayer)
+              }
+
+              override fun onCancelled(databaseError: DatabaseError) {
+                // Handle cancellation
+              }
+            })
+  } else {
+    callback(false)
+  }
+}
 
 fun usernameIsAvailable(): Boolean {
-    return true
+  return true
 }
 
 @Composable
 fun NewPlayerScreen(navigationActions: NavigationActions, context: Context) {
 
   var usernamePlayer by remember { mutableStateOf("") }
+
+  var isUsernameAvailable by remember { mutableStateOf(true) }
 
   val blueThemeColor = colorResource(id = R.color.blueTheme)
 
@@ -106,44 +133,82 @@ fun NewPlayerScreen(navigationActions: NavigationActions, context: Context) {
           .setIsSmartLockEnabled(false)
           .build()
 
-  Column(
-      modifier = Modifier.fillMaxSize().padding(16.dp),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        TextField(
-            value = usernamePlayer,
-            onValueChange = { newInput ->
-              // Remove spaces from the input
-              val filteredInput = newInput.replace("\\s".toRegex(), "")
-              // Limit the input to 25 characters
-              usernamePlayer = filteredInput.take(25)
-            },
-            label = { Text("Username") },
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions =
-                KeyboardActions(
-                    onDone = {
-                      signInLauncher.launch(signInIntent)
-                      val firebaseAuth = FirebaseAuth.getInstance()
-                      val database = FirebaseDatabase.getInstance()
-                      addUsername(usernamePlayer, firebaseAuth, database)
-                    }),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth())
+  val firebaseAuth = FirebaseAuth.getInstance()
+  val database = FirebaseDatabase.getInstance()
+  var isLoading by remember { mutableStateOf(true) }
+  var isNewPlayer by remember { mutableStateOf(false) }
+  LaunchedEffect(key1 = Unit) {
+    checkIfNewPlayer(firebaseAuth, database) { result ->
+      isNewPlayer = result
+      isLoading = false
+    }
+  }
+  if (isLoading) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally) {
+          Text(
+              text = "Waiting for database...",
+              modifier = Modifier.padding(32.dp),
+              fontWeight = FontWeight.Bold)
+        }
+  } else {
+    if (isNewPlayer) {
+      Column(
+          modifier = Modifier.fillMaxSize().padding(16.dp),
+          verticalArrangement = Arrangement.Center,
+          horizontalAlignment = Alignment.CenterHorizontally) {
+            TextField(
+                value = usernamePlayer,
+                onValueChange = { newInput ->
+                  // Remove spaces from the input
+                  val filteredInput = newInput.replace("\\s".toRegex(), "")
+                  // Limit the input to 25 characters
+                  usernamePlayer = filteredInput.take(25)
+                },
+                label = { Text("Username") },
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = {
+                          addUsername(usernamePlayer, firebaseAuth, database)
+                          signInLauncher.launch(signInIntent)
+                        }),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-              signInLauncher.launch(signInIntent)
-              val firebaseAuth = FirebaseAuth.getInstance()
-              val database = FirebaseDatabase.getInstance()
-              addUsername(usernamePlayer, firebaseAuth, database)
-            },
-            colors = ButtonDefaults.buttonColors(blueThemeColor),
-            modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
-            shape = RoundedCornerShape(8.dp)) {
-              Text(text = "Sign in", color = Color.White, fontSize = 24.sp)
-            }
-      }
+            Button(
+                onClick = {
+                  signInLauncher.launch(signInIntent)
+                  addUsername(usernamePlayer, firebaseAuth, database)
+                },
+                colors = ButtonDefaults.buttonColors(blueThemeColor),
+                modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
+                shape = RoundedCornerShape(8.dp)) {
+                  Text(text = "Sign in", color = Color.White, fontSize = 24.sp)
+                }
+          }
+    } else {
+      Column(
+          modifier = Modifier.fillMaxSize().padding(16.dp),
+          verticalArrangement = Arrangement.Center,
+          horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "You already have an account.",
+                fontSize = 24.sp,
+                modifier = Modifier.padding(bottom = 16.dp))
+
+            Button(
+                onClick = { signInLauncher.launch(signInIntent) },
+                colors = ButtonDefaults.buttonColors(blueThemeColor),
+                modifier = Modifier.fillMaxWidth().height(72.dp),
+                shape = RoundedCornerShape(8.dp)) {
+                  Text(text = "Log in", color = Color.White, fontSize = 24.sp)
+                }
+          }
+    }
+  }
 }
