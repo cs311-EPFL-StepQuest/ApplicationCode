@@ -2,21 +2,13 @@ package com.github.se.stepquest
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.github.se.stepquest.ui.theme.StepQuestTheme
 import org.junit.Rule
+import org.junit.Test
 
 class SetStepGoalsDialogTest {
 
   @get:Rule val composeTestRule = createComposeRule()
-  /*
-  @Test
-  fun dialog_opens_correctly() {
-    composeTestRule.setContent { StepQuestTheme { ProgressionPage() } }
-    // Click on the "Set new step goals" button
-    composeTestRule.onNodeWithText("Set a new step goal").performClick()
-
-    // Check if "Daily steps" from the dialog box is here to see if it opened
-    composeTestRule.onNodeWithText("Daily steps").assertIsDisplayed()
-  }
 
   @Test
   fun dialog_ui_elements_displayed_correctly() {
@@ -163,5 +155,5 @@ class SetStepGoalsDialogTest {
 
     // Verify that the correct weekly step goal is calculated and passed to the callback
     assert(weeklyStepGoal == 36750)
-  }*/
+  }
 }

@@ -24,7 +24,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.github.se.stepquest.map.LocationViewModel
 import com.github.se.stepquest.map.Map
+import com.github.se.stepquest.screens.Friend
+import com.github.se.stepquest.screens.FriendsListScreen
 import com.github.se.stepquest.screens.HomeScreen
+import com.github.se.stepquest.screens.LoginScreen
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
@@ -71,12 +74,23 @@ fun AppNavigationHost(
       modifier = modifier,
       navController = navigationController,
       startDestination = startDestination) {
-        composable(Routes.LoginScreen.routName) { LoginPage(navigationActions) }
+        composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions) }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
         composable(Routes.MapScreen.routName) { Map(locationviewModel) }
         composable(Routes.ProgressionScreen.routName) { ProgressionPage() }
-        composable(Routes.ProfileScreen.routName) { ProfilePageLayout() }
+        composable(Routes.ProfileScreen.routName) { ProfilePageLayout(navigationActions) }
+        composable(Routes.FriendsListScreen.routName) {
+          FriendsListScreen(
+              friendsList =
+                  listOf(
+                      Friend("Alice", "https://example.com/alice.jpg", true),
+                      Friend("Bob", "https://example.com/bob.jpg", false),
+                      Friend("Charlie", "https://example.com/charlie.jpg", true),
+                      Friend("David", "https://example.com/david.jpg", false),
+                  ),
+              navigationActions = navigationActions)
+        }
       }
 }
 

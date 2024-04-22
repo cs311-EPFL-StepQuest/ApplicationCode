@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -67,6 +68,7 @@ class MapTest {
     composeTestRule.setContent { StepQuestTheme { Map(vm) } }
     composeTestRule.onNodeWithTag("MapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("GoogleMap").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("GoogleMap").assertExists()
     composeTestRule.onNodeWithTag("createRouteButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createRouteButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("createRouteButton").performClick()
@@ -136,5 +138,45 @@ class MapTest {
 
     // Verify that the appropriate GoogleMap methods are called
     verify { googleMap.addPolyline(any()) }
+  }
+
+
+  @Test
+  fun testInitialUIState() {
+    composeTestRule.setContent { Map(vm) }
+
+    composeTestRule.onNodeWithTag("GoogleMap").assertExists()
+    composeTestRule.onNodeWithContentDescription("Add checkpoint").assertExists()
+  }
+
+  @Test
+  fun testDialogVisibility() {
+    composeTestRule.setContent { Map(vm) }
+
+    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
+
+    composeTestRule.onNodeWithText("New Checkpoint").assertExists()
+  }
+
+  @Test
+  fun testDialogContents() {
+    composeTestRule.setContent { Map(vm) }
+
+    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
+
+    composeTestRule.onNodeWithText("New Checkpoint").assertExists()
+    composeTestRule.onNodeWithText("Checkpoint name").assertExists()
+    composeTestRule.onNodeWithText("Name:").assertExists()
+  }
+
+  @Test
+  fun testDialogDismissal() {
+    composeTestRule.setContent { Map(vm) }
+
+    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
+
+    composeTestRule.onNodeWithContentDescription("Close").performClick()
+
+    composeTestRule.onNodeWithText("New Checkpoint").assertDoesNotExist()
   }
 }
