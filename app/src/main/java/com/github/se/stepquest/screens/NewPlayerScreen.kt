@@ -41,17 +41,19 @@ import com.google.firebase.database.ValueEventListener
 
 fun addUsername(username: String, firebaseAuth: FirebaseAuth, database: FirebaseDatabase) {
   val userId = firebaseAuth.currentUser?.uid
+    var pair = Pair(userId, "")
   if (userId != null) {
     val databaseRef = database.reference
     databaseRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
           override fun onDataChange(dataSnapshot: DataSnapshot) {
+              pair = Pair(userId, username)
             databaseRef.child("users").child(userId).child("username").setValue(username)
             databaseRef
                 .child("global")
                 .child("usernames")
                 .child(username)
-                .setValue(username, userId)
+                .setValue(pair)
           }
 
           override fun onCancelled(databaseError: DatabaseError) {
