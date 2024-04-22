@@ -13,6 +13,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import java.util.Timer
+import java.util.TimerTask
 
 fun addUsername(username: String, firebaseAuth: FirebaseAuth, database: FirebaseDatabase) {
   val userId = firebaseAuth.currentUser?.uid
@@ -90,8 +93,19 @@ fun checkIfNewPlayer(
   }
 }
 
-fun usernameIsAvailable(): Boolean {
-  return true
+fun usernameIsAvailable(username: String, database: FirebaseDatabase, callback: (Boolean) -> Unit) {
+  val usernamesRef = database.reference.child("usernames").child(username)
+  usernamesRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+          val isAvailable = !snapshot.exists()
+          callback(isAvailable)
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+          callback(false)
+        }
+      })
 }
 
 @Composable
@@ -137,11 +151,28 @@ fun NewPlayerScreen(navigationActions: NavigationActions, context: Context) {
   val database = FirebaseDatabase.getInstance()
   var isLoading by remember { mutableStateOf(true) }
   var isNewPlayer by remember { mutableStateOf(false) }
+
   LaunchedEffect(key1 = Unit) {
     checkIfNewPlayer(firebaseAuth, database) { result ->
       isNewPlayer = result
       isLoading = false
     }
+  }
+
+  DisposableEffect(usernamePlayer) {
+    val timer = Timer()
+    val delay = 200L
+
+    val task =
+        object : TimerTask() {
+          override fun run() {
+            usernameIsAvailable(usernamePlayer, database) { result -> isUsernameAvailable = result }
+          }
+        }
+
+    timer.schedule(task, delay, delay)
+
+    onDispose { timer.cancel() }
   }
   if (isLoading) {
     Column(
@@ -172,24 +203,34 @@ fun NewPlayerScreen(navigationActions: NavigationActions, context: Context) {
                 keyboardActions =
                     KeyboardActions(
                         onDone = {
-                          addUsername(usernamePlayer, firebaseAuth, database)
-                          signInLauncher.launch(signInIntent)
+                          if (isUsernameAvailable) {
+                            addUsername(usernamePlayer, firebaseAuth, database)
+                            signInLauncher.launch(signInIntent)
+                          }
                         }),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                  signInLauncher.launch(signInIntent)
-                  addUsername(usernamePlayer, firebaseAuth, database)
-                },
-                colors = ButtonDefaults.buttonColors(blueThemeColor),
-                modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
-                shape = RoundedCornerShape(8.dp)) {
-                  Text(text = "Sign in", color = Color.White, fontSize = 24.sp)
-                }
+            if (isUsernameAvailable) {
+              Button(
+                  onClick = {
+                    signInLauncher.launch(signInIntent)
+                    addUsername(usernamePlayer, firebaseAuth, database)
+                  },
+                  colors = ButtonDefaults.buttonColors(blueThemeColor),
+                  modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
+                  shape = RoundedCornerShape(8.dp)) {
+                    Text(text = "Sign in", color = Color.White, fontSize = 24.sp)
+                  }
+            } else {
+              Text(
+                  text = "Username is not available",
+                  color = Color.Red,
+                  fontSize = 14.sp,
+                  modifier = Modifier.padding(vertical = 8.dp))
+            }
           }
     } else {
       Column(
