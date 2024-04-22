@@ -59,8 +59,8 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
   val database = FirebaseDatabase.getInstance()
   var totalStepsMade by remember { mutableStateOf(0) }
   val stepsRef = database.reference.child("users").child(userId!!).child("totalSteps")
-    var username by remember { mutableStateOf("No name") }
-    val usernameRef = database.reference.child("users").child(userId).child("username")
+  var username by remember { mutableStateOf("No name") }
+  val usernameRef = database.reference.child("users").child(userId).child("username")
   stepsRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -72,15 +72,16 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
         }
       })
 
-    usernameRef.addListenerForSingleValueEvent(object : ValueEventListener {
+  usernameRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-            username = dataSnapshot.getValue(String::class.java) ?: "No name"
+          username = dataSnapshot.getValue(String::class.java) ?: "No name"
         }
 
         override fun onCancelled(databaseError: DatabaseError) {
-            // add code when failing to access database
+          // add code when failing to access database
         }
-    })
+      })
   var showDialog by remember { mutableStateOf(false) }
   Column(
       modifier = Modifier.padding(32.dp).fillMaxSize(),
@@ -105,11 +106,11 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
         painter = painterResource(id = R.drawable.dummypfp),
         contentDescription = "Profile Picture",
         modifier = Modifier.size(200.dp))*/
-          Text(
-              text = username,
-              fontWeight = FontWeight.Bold,
-              fontSize = 26.sp,
-          )
+        Text(
+            text = username,
+            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp,
+        )
         Text(
             text = "Total Steps: $totalStepsMade",
             fontSize = 24.sp,

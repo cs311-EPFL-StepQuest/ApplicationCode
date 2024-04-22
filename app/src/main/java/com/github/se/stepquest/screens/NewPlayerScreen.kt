@@ -19,10 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -42,108 +39,109 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-fun addUsername(username : String, firebaseAuth : FirebaseAuth, database : FirebaseDatabase) {
-    val userId = firebaseAuth.currentUser?.uid
-    if (userId != null) {
-        val usernameRef = database.reference.child("users").child(userId).child("username")
-        usernameRef.addListenerForSingleValueEvent(
-            object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    usernameRef.setValue(username)
-                }
+fun addUsername(username: String, firebaseAuth: FirebaseAuth, database: FirebaseDatabase) {
+  val userId = firebaseAuth.currentUser?.uid
+  if (userId != null) {
+    val databaseRef = database.reference
+    databaseRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(dataSnapshot: DataSnapshot) {
+            databaseRef.child("users").child(userId).child("username").setValue(username)
+            databaseRef
+                .child("global")
+                .child("usernames")
+                .child(username)
+                .setValue(username, userId)
+          }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    // add code when failing to access database
-                }
-            })
-    }
+          override fun onCancelled(databaseError: DatabaseError) {
+            // add code when failing to access database
+          }
+        })
+  }
+}
+
+fun checkIfNewPlayer() {}
+
+fun usernameIsAvailable(): Boolean {
+    return true
 }
 
 @Composable
 fun NewPlayerScreen(navigationActions: NavigationActions, context: Context) {
 
-    var usernamePlayer by remember { mutableStateOf("") }
+  var usernamePlayer by remember { mutableStateOf("") }
 
-    val blueThemeColor = colorResource(id = R.color.blueTheme)
+  val blueThemeColor = colorResource(id = R.color.blueTheme)
 
-    val textFieldFocusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
+  fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 
-    fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+    val response = result.idpResponse
 
-        val response = result.idpResponse
-
-        if (result.resultCode == Activity.RESULT_OK) {
-            println("Sign in successful!")
-            setOnline()
-            context.startService(Intent(context, StepCounterService::class.java))
-            navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
-        } else if (response != null) {
-            throw Exception(response.error?.errorCode.toString())
-        } else {
-            throw Exception("Sign in failed")
-        }
+    if (result.resultCode == Activity.RESULT_OK) {
+      println("Sign in successful!")
+      setOnline()
+      context.startService(Intent(context, StepCounterService::class.java))
+      navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+    } else if (response != null) {
+      throw Exception(response.error?.errorCode.toString())
+    } else {
+      throw Exception("Sign in failed")
     }
+  }
 
-    val signInLauncher =
-        rememberLauncherForActivityResult(contract = FirebaseAuthUIActivityResultContract()) {
-            onSignInResult(it)
-        }
+  val signInLauncher =
+      rememberLauncherForActivityResult(contract = FirebaseAuthUIActivityResultContract()) {
+        onSignInResult(it)
+      }
 
-    val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
+  val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
 
-    val signInIntent =
-        AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .setIsSmartLockEnabled(false)
-            .build()
+  val signInIntent =
+      AuthUI.getInstance()
+          .createSignInIntentBuilder()
+          .setAvailableProviders(providers)
+          .setIsSmartLockEnabled(false)
+          .build()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+  Column(
+      modifier = Modifier.fillMaxSize().padding(16.dp),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally) {
         TextField(
             value = usernamePlayer,
             onValueChange = { newInput ->
-                // Remove spaces from the input
-                val filteredInput = newInput.replace("\\s".toRegex(), "")
-                // Limit the input to 25 characters
-                usernamePlayer = filteredInput.take(25)
+              // Remove spaces from the input
+              val filteredInput = newInput.replace("\\s".toRegex(), "")
+              // Limit the input to 25 characters
+              usernamePlayer = filteredInput.take(25)
             },
             label = { Text("Username") },
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = {
-                signInLauncher.launch(signInIntent)
-                val firebaseAuth = FirebaseAuth.getInstance()
-                val database = FirebaseDatabase.getInstance()
-                addUsername(usernamePlayer, firebaseAuth, database)
-            }),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                      signInLauncher.launch(signInIntent)
+                      val firebaseAuth = FirebaseAuth.getInstance()
+                      val database = FirebaseDatabase.getInstance()
+                      addUsername(usernamePlayer, firebaseAuth, database)
+                    }),
             singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
+            modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
-                signInLauncher.launch(signInIntent)
-                val firebaseAuth = FirebaseAuth.getInstance()
-                val database = FirebaseDatabase.getInstance()
-                addUsername(usernamePlayer, firebaseAuth, database)
-                      },
+              signInLauncher.launch(signInIntent)
+              val firebaseAuth = FirebaseAuth.getInstance()
+              val database = FirebaseDatabase.getInstance()
+              addUsername(usernamePlayer, firebaseAuth, database)
+            },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text(
-                text = "Sign in",
-                color = Color.White,
-                fontSize = 24.sp
-            )
-        }
-    }
+            shape = RoundedCornerShape(8.dp)) {
+              Text(text = "Sign in", color = Color.White, fontSize = 24.sp)
+            }
+      }
 }

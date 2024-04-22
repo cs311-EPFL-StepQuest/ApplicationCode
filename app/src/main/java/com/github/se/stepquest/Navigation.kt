@@ -69,13 +69,13 @@ fun AppNavigationHost(
     startDestination: String = Routes.LoginScreen.routName
 ) {
   val navigationActions = remember(navigationController) { NavigationActions(navigationController) }
-    val context = LocalContext.current
+  val context = LocalContext.current
   NavHost(
       modifier = modifier,
       navController = navigationController,
       startDestination = startDestination) {
         composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions, context) }
-        composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context)}
+        composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context) }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
         composable(Routes.MapScreen.routName) { Map() }

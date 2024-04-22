@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -105,7 +104,9 @@ fun LoginScreen(navigationActions: NavigationActions, context: Context) {
 
         // New user button
         Button(
-            onClick = { navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName)) },
+            onClick = {
+              navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
+            },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
             shape = RoundedCornerShape(8.dp)) {
