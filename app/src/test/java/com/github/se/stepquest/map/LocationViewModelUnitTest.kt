@@ -10,9 +10,7 @@ class LocationViewModelUnitTest {
 
   @Test fun startLocationUpdates() {}
 
-  @Test fun appendCurrentLocationToAllocations() {
-
-  }
+  @Test fun appendCurrentLocationToAllocations() {}
 
   @Test fun getAllocations() {}
 

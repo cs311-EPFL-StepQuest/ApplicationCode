@@ -2,10 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MapPreview">
-        <State />
-      </entry>
-      <entry key="Tests in 'com.github.se.stepquest.map'">
+      <entry key="All Tests">
         <State />
       </entry>
       <entry key="app">
