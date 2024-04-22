@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.github.se.stepquest.map.LocationViewModel
 import com.github.se.stepquest.map.Map
 import com.github.se.stepquest.screens.Friend
 import com.github.se.stepquest.screens.FriendsListScreen
@@ -66,7 +67,8 @@ fun BuildNavigationBar(navigationController: NavHostController) {
 fun AppNavigationHost(
     modifier: Modifier = Modifier,
     navigationController: NavHostController = rememberNavController(),
-    startDestination: String = Routes.LoginScreen.routName
+    startDestination: String = Routes.LoginScreen.routName,
+    locationviewModel: LocationViewModel = remember { LocationViewModel() }
 ) {
   val navigationActions = remember(navigationController) { NavigationActions(navigationController) }
   val context = LocalContext.current
@@ -78,7 +80,7 @@ fun AppNavigationHost(
         composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context) }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
-        composable(Routes.MapScreen.routName) { Map() }
+        composable(Routes.MapScreen.routName) { Map(locationviewModel) }
         composable(Routes.ProgressionScreen.routName) { ProgressionPage() }
         composable(Routes.ProfileScreen.routName) { ProfilePageLayout(navigationActions) }
         composable(Routes.FriendsListScreen.routName) {
