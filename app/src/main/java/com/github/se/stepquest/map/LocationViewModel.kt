@@ -1,10 +1,9 @@
 package com.github.se.stepquest.map
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.location.Location
 import android.os.Looper
-import androidx.activity.ComponentActivity
-import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import com.google.android.gms.location.*
 
@@ -13,18 +12,16 @@ data class LocationDetails(val latitude: Double, val longitude: Double)
 class LocationViewModel : ViewModel() {
   private var locationCallback: LocationCallback? = null
   private var fusedLocationClient: FusedLocationProviderClient? = null
-  val locationRequired = MutableLiveData<Boolean>()
-  val currentLocation = MutableLiveData<LocationDetails>()
-  private val _allocations = MutableLiveData<List<LocationDetails>>()
-  val locationUpdated = MutableLiveData<Boolean>()
+  var currentLocation = MutableLiveData<LocationDetails>()
+  var _allocations = MutableLiveData<List<LocationDetails>>()
+  var locationUpdated = MutableLiveData<Boolean>()
 
   init {
-    locationRequired.value = false
-    locationUpdated.value = false
+    locationUpdated.postValue(false)
   }
 
   @SuppressLint("MissingPermission")
-  fun startLocationUpdates(context: ComponentActivity) {
+  fun startLocationUpdates(context: Context) {
     if (fusedLocationClient == null) {
       fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     }
@@ -34,9 +31,17 @@ class LocationViewModel : ViewModel() {
             for (lo in p0.locations) {
               // Update UI with location data
               currentLocation.value = LocationDetails(lo.latitude, lo.longitude)
-//              println("Location in view: ${currentLocation.value}")
-              appendCurrentLocationToAllocations()
-              //              println("Allocations: ${_allocations.value}")
+
+              val updatedValues =
+                  appendCurrentLocationToAllocations(
+                      _allocations.value ?: emptyList(),
+                      currentLocation.value!!,
+                      locationUpdated.value!!)
+              if (updatedValues != null) {
+                val (updatedAllocations, updatedLocation) = updatedValues
+                _allocations.postValue(updatedAllocations)
+                locationUpdated.postValue(updatedLocation)
+              }
             }
           }
         }
@@ -54,58 +59,53 @@ class LocationViewModel : ViewModel() {
     }
   }
 
-  fun appendCurrentLocationToAllocations() {
-    val currentAllocations = _allocations.value ?: emptyList()
-    var current = currentLocation.value
+  fun appendCurrentLocationToAllocations(
+      currentAllocations: List<LocationDetails>,
+      current: LocationDetails,
+      updatelocation: Boolean
+  ): Pair<List<LocationDetails>, Boolean>? {
     val last = currentAllocations.lastOrNull()
 
     //  // Here is for testing purposes: create a faking route by adding each time 1.2 meters to the
     // previous location
-//    current=fakeRoute(current!!)
+    val current=fakeRoute(current)
 
-    if (current != null &&
-        (last == null || calculateDistance(last, current) > 1) &&
-        locationUpdated.value == false) {
-      _allocations.value = currentAllocations + current
-      locationUpdated.value = true
+    if ((last == null || calculateDistance(last, current) > 1) && !updatelocation) {
+      val alllocation = currentAllocations + current
+      val update = true
+      return Pair(alllocation, update)
     }
+    return null
   }
 
 //    // Here is for testing purposes: create a faking route by adding each time 1.2 meters to the previous location
-//    var i = 0
-//    fun fakeRoute(current: LocationDetails): LocationDetails {
-//
-//      // Calculate new latitude and longitude with a distance of 1 meter
-//      val latRadians = Math.toRadians(current.latitude)
-//      val lonRadians = Math.toRadians(current.longitude)
-//      val earthRadius = 6371000 // Earth's radius in meters
-//      val meterIncrement = 1.2*i // Increment distance in meters
-//
-//      val newLatitude = Math.toDegrees(latRadians + meterIncrement / earthRadius)
-//      val newLongitude = Math.toDegrees(lonRadians + meterIncrement / (earthRadius *
-//   Math.cos(latRadians)))
-//      i+=1
-//      println("i: $i")
-//      return LocationDetails(newLatitude, newLongitude)
-//    }
+    var i = 0
+    fun fakeRoute(current: LocationDetails): LocationDetails {
+
+      // Calculate new latitude and longitude with a distance of 1 meter
+      val latRadians = Math.toRadians(current.latitude)
+      val lonRadians = Math.toRadians(current.longitude)
+      val earthRadius = 6371000 // Earth's radius in meters
+      val meterIncrement = 1.2*i // Increment distance in meters
+
+      val newLatitude = Math.toDegrees(latRadians + meterIncrement / earthRadius)
+      val newLongitude = Math.toDegrees(lonRadians + meterIncrement / (earthRadius *
+   Math.cos(latRadians)))
+      i+=1
+      println("i: $i")
+      return LocationDetails(newLatitude, newLongitude)
+    }
 
   fun getAllocations(): List<LocationDetails>? {
-    return _allocations.value
+        return _allocations.value
   }
 
   fun cleanAllocations(){
     _allocations.value = emptyList()
   }
 
-  fun onResume(context: ComponentActivity) {
-    locationRequired.value?.let {
-      if (it) {
-        startLocationUpdates(context)
-      }
-    }
-  }
-
-  fun onPause() {
+  fun onPause() { 
+    locationUpdated.postValue(false)
     locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
   }
 
@@ -116,4 +116,14 @@ class LocationViewModel : ViewModel() {
         location1.latitude, location1.longitude, location2.latitude, location2.longitude, results)
     return results[0]
   }
+
+
+}
+
+// Function to calculate distance between two locations in meters
+fun calculateDistance(location1: LocationDetails, location2: LocationDetails): Float {
+  val results = FloatArray(1)
+  Location.distanceBetween(
+      location1.latitude, location1.longitude, location2.latitude, location2.longitude, results)
+  return results[0]
 }
