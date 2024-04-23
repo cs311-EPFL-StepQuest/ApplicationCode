@@ -116,8 +116,10 @@ fun Map(locationViewModel: LocationViewModel) {
           // Button for creating a route
           FloatingActionButton(
               onClick = {
-                locationPermission(
-                    locationViewModel, context, launcherMultiplePermissions, permissions)
+                //Beofre start creating route, make sure ap is clean and route list (allocation) is clean too
+                cleanGoogleMap(map.value!!, routeEndMarker)
+                locationViewModel.cleanAllocations()
+                locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
 
               },
               modifier =

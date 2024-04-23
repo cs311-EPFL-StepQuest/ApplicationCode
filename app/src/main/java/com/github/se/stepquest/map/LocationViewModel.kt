@@ -116,15 +116,6 @@ class LocationViewModel : ViewModel() {
 
   }
 
-  // Function to calculate distance between two locations in meters
-  private fun calculateDistance(location1: LocationDetails, location2: LocationDetails): Float {
-    val results = FloatArray(1)
-    Location.distanceBetween(
-        location1.latitude, location1.longitude, location2.latitude, location2.longitude, results)
-    return results[0]
-  }
-
-
 }
 
 // Function to calculate distance between two locations in meters
