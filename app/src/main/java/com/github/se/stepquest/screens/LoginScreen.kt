@@ -18,6 +18,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -36,6 +41,8 @@ import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.services.setOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 @Composable
 fun LoginScreen(navigationActions: NavigationActions, context: Context) {
@@ -71,6 +78,15 @@ fun LoginScreen(navigationActions: NavigationActions, context: Context) {
           .setIsSmartLockEnabled(false)
           .build()
 
+  val firebaseAuth = FirebaseAuth.getInstance()
+  val database = FirebaseDatabase.getInstance()
+  var isNewPlayer by remember { mutableStateOf(false) }
+  var showDialog by remember { mutableStateOf(false) }
+
+  LaunchedEffect(key1 = Unit) {
+    checkIfNewPlayer(firebaseAuth, database) { result -> isNewPlayer = result }
+  }
+
   Column(
       modifier = Modifier.padding(38.dp).fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -93,7 +109,13 @@ fun LoginScreen(navigationActions: NavigationActions, context: Context) {
 
         // Log in Button
         Button(
-            onClick = { signInLauncher.launch(signInIntent) },
+            onClick = {
+              if (!isNewPlayer) {
+                signInLauncher.launch(signInIntent)
+              } else {
+                showDialog = true
+              }
+            },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
             shape = RoundedCornerShape(8.dp)) {
@@ -113,4 +135,10 @@ fun LoginScreen(navigationActions: NavigationActions, context: Context) {
               Text(text = "New player", color = Color.White, fontSize = 24.sp)
             }
       }
+  if (showDialog) {
+    IsNewPlayerDialogBox(
+        onConfirm = {
+          navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
+        })
+  }
 }
