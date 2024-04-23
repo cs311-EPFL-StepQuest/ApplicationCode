@@ -104,9 +104,16 @@ class LocationViewModel : ViewModel() {
     _allocations.value = emptyList()
   }
 
-  fun onPause() { 
-    locationUpdated.postValue(false)
-    locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
+// stop update location
+  fun onPause() {
+      if (fusedLocationClient == null || locationCallback == null) {
+          return
+      }
+      else{
+          locationUpdated.postValue(false)
+          locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
+      }
+
   }
 
   // Function to calculate distance between two locations in meters

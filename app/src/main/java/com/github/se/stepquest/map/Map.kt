@@ -51,6 +51,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 
@@ -61,6 +62,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var stopCreatingRoute= false
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
+  var routeEndMarker: Marker? = null
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -116,6 +118,7 @@ fun Map(locationViewModel: LocationViewModel) {
               onClick = {
                 locationPermission(
                     locationViewModel, context, launcherMultiplePermissions, permissions)
+
               },
               modifier =
               Modifier
@@ -156,12 +159,8 @@ fun Map(locationViewModel: LocationViewModel) {
                 onClick = {
                     locationViewModel.onPause()
                     stopCreatingRoute= true
-                    updateMap(map.value!!, locationViewModel,stopCreatingRoute)
-                    // //TODO: clean all location and maps after the confirmation of the route (put this two line in the right place)
-                    println("Claen google map")
-                    map.value!!.clear()
-                    println("Claen allocations")
-                    locationViewModel.cleanAllocations()
+                    routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
+
                 },
                 modifier =
                 Modifier
@@ -242,14 +241,17 @@ fun Map(locationViewModel: LocationViewModel) {
 }
 
 
-fun updateMap(googleMap: GoogleMap, locationViewModel: LocationViewModel, stopCreatingRoute: Boolean=false) {
-    val allocations = locationViewModel.getAllocations() ?: return
+
+fun updateMap(googleMap: GoogleMap, locationViewModel: LocationViewModel, stopCreatingRoute: Boolean=false): Marker?{
+    val allocations = locationViewModel.getAllocations() ?: emptyList()
     println("all locations in map: $allocations")
+    var routeEndMarker: Marker? = null
     if (allocations.size == 1) {
         // Add marker for the start allocation
         googleMap.addMarker(MarkerOptions().position(allocations.first().toLatLng()))
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(allocations.first().toLatLng(), 20f))
-    } else {
+
+    } else if (allocations.size > 1) {
         if (!stopCreatingRoute){
 
             val lastAllocation = allocations.last()
@@ -265,8 +267,16 @@ fun updateMap(googleMap: GoogleMap, locationViewModel: LocationViewModel, stopCr
         }
         else{
             // Add marker for the end allocation
-            googleMap.addMarker(MarkerOptions().position(allocations.last().toLatLng()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
+            routeEndMarker=googleMap.addMarker(MarkerOptions().position(allocations.last().toLatLng()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
         }
+    }
+    return routeEndMarker
+}
+
+fun cleanGoogleMap(googleMap: GoogleMap, routeEndMarker: Marker? = null){
+    googleMap.clear()
+    if (routeEndMarker != null) {
+        routeEndMarker.remove()
     }
 }
 
