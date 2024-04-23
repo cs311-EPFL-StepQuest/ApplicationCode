@@ -76,6 +76,20 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    packaging {
+        resources {
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+        }
+    }
+    testOptions {
+        packagingOptions {
+            jniLibs {
+                useLegacyPackaging = true
+            }
+        }
+    }
 }
 
 dependencies {
@@ -101,7 +115,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("com.google.android.gms:play-services-auth:20.6.0")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
-    implementation("com.google.firebase:firebase-database-ktx:20.3.0")
+
+    implementation(libs.androidx.junit.ktx)
+    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -122,7 +138,7 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:3.10.0")
 
-    testImplementation("org.mockito:mockito-core:3.11.2")
+//    testImplementation("org.mockito:mockito-core:3.11.2")
     testImplementation("org.mockito:mockito-inline:2.13.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
@@ -133,9 +149,29 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-fitness:20.0.0")
 
-    testImplementation("org.mockito:mockito-core:3.12.4")
-    androidTestImplementation("org.mockito:mockito-android:3.12.4")
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+
+    implementation ("androidx.compose.runtime:runtime-livedata:1.1.1")
+    testImplementation("org.robolectric:robolectric:4.11.1")
+
+    // Dependencies for using MockK in instrumented tests
+    androidTestImplementation("io.mockk:mockk:1.13.7")
+    androidTestImplementation("io.mockk:mockk-android:1.13.7")
+    androidTestImplementation("io.mockk:mockk-agent:1.13.7")
+    androidTestImplementation("org.mockito:mockito-core:3.12.4")
+    androidTestImplementation("junit:junit: 4.13.2")
+
+    testImplementation("io.mockk:mockk:1.13.7")
+    testImplementation("io.mockk:mockk-android:1.13.7")
+    testImplementation("io.mockk:mockk-agent:1.13.7")
+    androidTestImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
+    androidTestImplementation("org.hamcrest:hamcrest:2.2")
+    androidTestImplementation("org.mockito:mockito-android:3.12.4")
+    androidTestImplementation("org.robolectric:shadows-framework:4.11.1")
 
     val nav_version = "2.7.7"
     androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")

@@ -1,9 +1,9 @@
-package com.github.se.stepquest.map
-
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.github.se.stepquest.map.RouteProgression
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -13,46 +13,59 @@ class RouteProgressionKtTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun routeProgression_displaysCorrectRouteLength() {
+  fun displayCorrectText() {
+    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+    composeTestRule.onNodeWithText("End Route").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Route name").assertExists()
+    composeTestRule.onNodeWithText("Route name").assertIsDisplayed()
+  }
+
+  @Test
+  fun displaysCorrectRouteLength() {
     val routeLength = 10f
     composeTestRule.setContent { RouteProgression({}, routeLength, 0) }
 
     composeTestRule.onNodeWithText("Route length: $routeLength km").assertExists()
+    composeTestRule.onNodeWithText("Route length: $routeLength km").assertIsDisplayed()
   }
 
   @Test
-  fun routeProgression_displaysCorrectNumberOfCheckpoints() {
+  fun displaysCorrectNumberOfCheckpoints() {
     val numCheckpoints = 5
     composeTestRule.setContent { RouteProgression({}, 0f, numCheckpoints) }
 
     composeTestRule.onNodeWithText("Number of checkpoints: $numCheckpoints").assertExists()
+    composeTestRule.onNodeWithText("Number of checkpoints: $numCheckpoints").assertIsDisplayed()
   }
 
   @Test
-  fun routeProgression_displaysCorrectReward() {
+  fun displaysCorrectReward() {
     val routeLength = 10f
     val reward = (routeLength * 100).toInt()
     composeTestRule.setContent { RouteProgression({}, routeLength, 0) }
 
     composeTestRule.onNodeWithText("Reward: $reward points").assertExists()
+    composeTestRule.onNodeWithText("Reward: $reward points").assertIsDisplayed()
   }
 
   @Test
-  fun routeProgression_displayCloseButton() {
+  fun displaysCloseButton() {
     composeTestRule.setContent { RouteProgression({}, 0f, 0) }
 
     composeTestRule.onNodeWithContentDescription("Close").assertExists()
+    composeTestRule.onNodeWithContentDescription("Close").assertIsDisplayed()
   }
 
   @Test
-  fun routeProgression_displayFinishButton() {
+  fun displaysFinishButton() {
     composeTestRule.setContent { RouteProgression({}, 0f, 0) }
 
     composeTestRule.onNodeWithText("Finish").assertExists()
+    composeTestRule.onNodeWithText("Finish").assertIsDisplayed()
   }
 
   @Test
-  fun routeProgression_dismissesDialog_onCloseButtonClick() {
+  fun dismissesDialog_onCloseButtonClick() {
     var dialogDismissed = true
     composeTestRule.setContent { RouteProgression({ dialogDismissed = false }, 0f, 0) }
 
@@ -62,12 +75,28 @@ class RouteProgressionKtTest {
   }
 
   @Test
-  fun routeProgression_dismissesDialog_onFinishButtonClick() {
+  fun dismissesDialog_onFinishButtonClick() {
     var dialogDismissed = true
     composeTestRule.setContent { RouteProgression({ dialogDismissed = false }, 0f, 0) }
 
     composeTestRule.onNodeWithText("Finish").performClick()
 
     assert(!dialogDismissed)
+  }
+
+  @Test
+  fun displaysExtraKilometersAndCheckpoints_forNextReward() {
+    var extraKilometers = 0
+    var extraCheckpoints = 0
+    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+
+    composeTestRule
+        .onNodeWithText(
+            "$extraKilometers extra kilometers or $extraCheckpoints extra checkpoints for next reward")
+        .assertExists()
+    composeTestRule
+        .onNodeWithText(
+            "$extraKilometers extra kilometers or $extraCheckpoints extra checkpoints for next reward")
+        .assertIsDisplayed()
   }
 }
