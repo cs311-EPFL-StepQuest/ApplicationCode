@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - 24-implement-a-stop-button-to-stop-the-route-creation-process
 
   pull_request:
     types:
