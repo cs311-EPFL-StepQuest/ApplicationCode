@@ -39,13 +39,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.PermissionChecker
 import com.github.se.stepquest.R
-import com.github.se.stepquest.ui.theme.StepQuestTheme
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -59,7 +57,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 @Composable
 fun Map(locationViewModel: LocationViewModel) {
   val context = LocalContext.current
-  var stopCreatingRoute= false
+  var stopCreatingRoute = false
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
@@ -86,9 +84,7 @@ fun Map(locationViewModel: LocationViewModel) {
 
   Scaffold(
       content = {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .testTag("MapScreen")) {
+        Box(modifier = Modifier.fillMaxSize().testTag("MapScreen")) {
           // Google Map
           AndroidView(
               factory = { context ->
@@ -101,9 +97,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   }
                 }
               },
-              modifier = Modifier
-                  .fillMaxSize()
-                  .testTag("GoogleMap"))
+              modifier = Modifier.fillMaxSize().testTag("GoogleMap"))
 
           LaunchedEffect(locationUpdated) {
             if (locationUpdated == true) {
@@ -116,19 +110,20 @@ fun Map(locationViewModel: LocationViewModel) {
           // Button for creating a route
           FloatingActionButton(
               onClick = {
-                //Beofre start creating route, make sure ap is clean and route list (allocation) is clean too
+                // Beofre start creating route, make sure map is clean and route list (allocation)
+                // is
+                // empty too
                 cleanGoogleMap(map.value!!, routeEndMarker)
                 locationViewModel.cleanAllocations()
-                locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
-
+                locationPermission(
+                    locationViewModel, context, launcherMultiplePermissions, permissions)
               },
               modifier =
-              Modifier
-                  .size(85.dp)
-                  .padding(16.dp)
-                  .align(Alignment.BottomEnd)
-                  .offset(y = (-204).dp)
-                  .testTag("createRouteButton")) {
+                  Modifier.size(85.dp)
+                      .padding(16.dp)
+                      .align(Alignment.BottomEnd)
+                      .offset(y = (-204).dp)
+                      .testTag("createRouteButton")) {
                 Image(
                     painter = painterResource(id = R.drawable.addbutton),
                     contentDescription = "image description",
@@ -139,15 +134,12 @@ fun Map(locationViewModel: LocationViewModel) {
           FloatingActionButton(
               onClick = { showDialog = true },
               modifier =
-              Modifier
-                  .padding(16.dp)
-                  .align(Alignment.BottomEnd)
-                  .offset(y = (-150).dp)
-                  .size(48.dp)) {
+                  Modifier.padding(16.dp)
+                      .align(Alignment.BottomEnd)
+                      .offset(y = (-150).dp)
+                      .size(48.dp)) {
                 Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(Color(0xff00b3ff), CircleShape),
+                    modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
                     contentAlignment = Alignment.Center) {
                       Icon(
                           painter = painterResource(R.drawable.map_marker),
@@ -156,31 +148,25 @@ fun Map(locationViewModel: LocationViewModel) {
                     }
               }
 
-            // Button for stopping a route
-            FloatingActionButton(
-                onClick = {
-                    locationViewModel.onPause()
-                    stopCreatingRoute= true
-                    routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
-
-                },
-                modifier =
-                Modifier
-                    .size(85.dp)
-                    .padding(16.dp)
-                    .align(Alignment.BottomEnd)
-                    .offset(y = (-90).dp)
-                    .testTag("stopRouteButton"),
-                // Set visibility based on the route state
-                content = {
-                    Image(
-                        painter = painterResource(id = R.drawable.stopbutton),
-                        contentDescription = "stop button to stop create route",
-                        contentScale = ContentScale.None
-                    )
-
-                }
-            )
+          // Button for stopping a route
+          FloatingActionButton(
+              onClick = {
+                locationViewModel.onPause()
+                stopCreatingRoute = true
+                routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
+              },
+              modifier =
+                  Modifier.size(85.dp)
+                      .padding(16.dp)
+                      .align(Alignment.BottomEnd)
+                      .offset(y = (-90).dp)
+                      .testTag("stopRouteButton"),
+              content = {
+                Image(
+                    painter = painterResource(id = R.drawable.stopbutton),
+                    contentDescription = "stop button to stop create route",
+                    contentScale = ContentScale.None)
+              })
         }
       },
       floatingActionButton = {
@@ -214,10 +200,7 @@ fun Map(locationViewModel: LocationViewModel) {
                 }
               },
               confirmButton = {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .height(48.dp)) {
+                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp)) {
                   Button(
                       onClick = {
                         // ADD HERE CODE FOR ADDING CHECKPOINTS, INPUT TITLE STORED IN title
@@ -226,9 +209,7 @@ fun Map(locationViewModel: LocationViewModel) {
                       },
                       shape = RoundedCornerShape(12.dp),
                       colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff00b3ff)),
-                      modifier = Modifier
-                          .width(150.dp)
-                          .align(Alignment.Center)) {
+                      modifier = Modifier.width(150.dp).align(Alignment.Center)) {
                         Text(
                             "Confirm",
                             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
@@ -242,44 +223,48 @@ fun Map(locationViewModel: LocationViewModel) {
       })
 }
 
+fun updateMap(
+    googleMap: GoogleMap,
+    locationViewModel: LocationViewModel,
+    stopCreatingRoute: Boolean = false
+): Marker? {
+  val allocations = locationViewModel.getAllocations() ?: emptyList()
+  println("all locations in map: $allocations")
+  var routeEndMarker: Marker? = null
+  if (allocations.size == 1) {
+    // Add marker for the start allocation
+    googleMap.addMarker(MarkerOptions().position(allocations.first().toLatLng()))
+    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(allocations.first().toLatLng(), 20f))
+  } else if (allocations.size > 1) {
+    if (!stopCreatingRoute) {
 
-
-fun updateMap(googleMap: GoogleMap, locationViewModel: LocationViewModel, stopCreatingRoute: Boolean=false): Marker?{
-    val allocations = locationViewModel.getAllocations() ?: emptyList()
-    println("all locations in map: $allocations")
-    var routeEndMarker: Marker? = null
-    if (allocations.size == 1) {
-        // Add marker for the start allocation
-        googleMap.addMarker(MarkerOptions().position(allocations.first().toLatLng()))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(allocations.first().toLatLng(), 20f))
-
-    } else if (allocations.size > 1) {
-        if (!stopCreatingRoute){
-
-            val lastAllocation = allocations.last()
-            val secondLastAllocation = allocations[allocations.size - 2]
-            val polylineOptions =
-                PolylineOptions().apply {
-                    color(Color.Blue.toArgb())
-                    width(10f)
-                    add(lastAllocation.toLatLng())
-                    add(secondLastAllocation.toLatLng())
-                }
-            googleMap.addPolyline(polylineOptions)
-        }
-        else{
-            // Add marker for the end allocation
-            routeEndMarker=googleMap.addMarker(MarkerOptions().position(allocations.last().toLatLng()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
-        }
+      val lastAllocation = allocations.last()
+      val secondLastAllocation = allocations[allocations.size - 2]
+      val polylineOptions =
+          PolylineOptions().apply {
+            color(Color.Blue.toArgb())
+            width(10f)
+            add(lastAllocation.toLatLng())
+            add(secondLastAllocation.toLatLng())
+          }
+      googleMap.addPolyline(polylineOptions)
+    } else {
+      // Add marker for the end allocation
+      routeEndMarker =
+          googleMap.addMarker(
+              MarkerOptions()
+                  .position(allocations.last().toLatLng())
+                  .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
     }
-    return routeEndMarker
+  }
+  return routeEndMarker
 }
 
-fun cleanGoogleMap(googleMap: GoogleMap, routeEndMarker: Marker? = null){
-    googleMap.clear()
-    if (routeEndMarker != null) {
-        routeEndMarker.remove()
-    }
+fun cleanGoogleMap(googleMap: GoogleMap, routeEndMarker: Marker? = null) {
+  googleMap.clear()
+  if (routeEndMarker != null) {
+    routeEndMarker.remove()
+  }
 }
 
 // Extension function to convert LocationDetails to LatLng
@@ -309,13 +294,3 @@ fun locationPermission(
     launcherMultiplePermissions.launch(permissions)
   }
 }
-
-@Preview
-@Composable
-fun MapPreview() {
-    StepQuestTheme {
-        Map(LocationViewModel())
-    }
-
-}
-

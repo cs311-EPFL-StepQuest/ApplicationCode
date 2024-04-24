@@ -1,8 +1,15 @@
 package com.github.se.stepquest.map
 
+import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.lifecycle.MutableLiveData
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.gms.location.*
 import io.mockk.junit4.MockKRule
+import io.mockk.mockk
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -21,10 +28,12 @@ class LocationViewModelTest {
 
   // Declare vm as a public variable
   private lateinit var locationViewModel: LocationViewModel
+  private lateinit var context: Context
 
   @Before
   fun setup() {
     locationViewModel = LocationViewModel()
+    context = ApplicationProvider.getApplicationContext<Context>()
   }
 
   @Test
@@ -36,8 +45,6 @@ class LocationViewModelTest {
     val result =
         locationViewModel.appendCurrentLocationToAllocations(
             allocations, currentLocation, locationUpdated)
-
-    // Then
     assertNotNull(result)
     assertEquals(allocations + currentLocation, result!!.first)
     assertEquals(true, result.second)
@@ -53,9 +60,28 @@ class LocationViewModelTest {
         locationViewModel.appendCurrentLocationToAllocations(
             allocations, currentLocation, locationUpdated)
 
-    // Then
     assertNull(result)
   }
 
-  @Test fun startLocationUpdatesTest() {}
+  @Test
+  fun cleanAllocationsTest() {
+    locationViewModel._allocations = MutableLiveData(listOf(LocationDetails(10.0, 20.0)))
+    locationViewModel.cleanAllocations()
+    runBlocking {
+      delay(1000) // Wait for 1 second (adjust time as needed)
+      val alllocation = locationViewModel.getAllocations()
+      assertNull(alllocation)
+    }
+  }
+
+  @Test
+  fun onPauseTest() {
+    locationViewModel.locationUpdated.postValue(true)
+    val locationCallback = mockk<LocationCallback>(relaxed = true)
+    var fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+    locationViewModel.fusedLocationClient = fusedLocationClient
+    locationViewModel.locationCallback = locationCallback
+    locationViewModel.onPause()
+    assert(locationViewModel.locationUpdated.value == false)
+  }
 }

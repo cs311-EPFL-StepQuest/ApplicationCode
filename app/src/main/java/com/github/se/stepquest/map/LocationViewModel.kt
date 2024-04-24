@@ -10,10 +10,10 @@ import com.google.android.gms.location.*
 data class LocationDetails(val latitude: Double, val longitude: Double)
 
 class LocationViewModel : ViewModel() {
-  private var locationCallback: LocationCallback? = null
-  private var fusedLocationClient: FusedLocationProviderClient? = null
+  var locationCallback: LocationCallback? = null
+  var fusedLocationClient: FusedLocationProviderClient? = null
   var currentLocation = MutableLiveData<LocationDetails>()
-  var _allocations = MutableLiveData<List<LocationDetails>>()
+  var _allocations = MutableLiveData<List<LocationDetails>?>()
   var locationUpdated = MutableLiveData<Boolean>()
 
   init {
@@ -66,10 +66,6 @@ class LocationViewModel : ViewModel() {
   ): Pair<List<LocationDetails>, Boolean>? {
     val last = currentAllocations.lastOrNull()
 
-    //  // Here is for testing purposes: create a faking route by adding each time 1.2 meters to the
-    // previous location
-    val current=fakeRoute(current)
-
     if ((last == null || calculateDistance(last, current) > 1) && !updatelocation) {
       val alllocation = currentAllocations + current
       val update = true
@@ -78,44 +74,23 @@ class LocationViewModel : ViewModel() {
     return null
   }
 
-//    // Here is for testing purposes: create a faking route by adding each time 1.2 meters to the previous location
-    var i = 0
-    fun fakeRoute(current: LocationDetails): LocationDetails {
-
-      // Calculate new latitude and longitude with a distance of 1 meter
-      val latRadians = Math.toRadians(current.latitude)
-      val lonRadians = Math.toRadians(current.longitude)
-      val earthRadius = 6371000 // Earth's radius in meters
-      val meterIncrement = 1.2*i // Increment distance in meters
-
-      val newLatitude = Math.toDegrees(latRadians + meterIncrement / earthRadius)
-      val newLongitude = Math.toDegrees(lonRadians + meterIncrement / (earthRadius *
-   Math.cos(latRadians)))
-      i+=1
-      println("i: $i")
-      return LocationDetails(newLatitude, newLongitude)
-    }
-
   fun getAllocations(): List<LocationDetails>? {
-        return _allocations.value
+    return _allocations.value
   }
 
-  fun cleanAllocations(){
-    _allocations.value = emptyList()
+  fun cleanAllocations() {
+    _allocations.postValue(null)
   }
 
-// stop update location
+  // stop update location
   fun onPause() {
-      if (fusedLocationClient == null || locationCallback == null) {
-          return
-      }
-      else{
-          locationUpdated.postValue(false)
-          locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
-      }
-
+    if (fusedLocationClient == null || locationCallback == null) {
+      return
+    } else {
+      locationUpdated.postValue(false)
+      locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
+    }
   }
-
 }
 
 // Function to calculate distance between two locations in meters
