@@ -61,7 +61,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
-  val storeroute= StoreRoute()
+  val storeroute = StoreRoute()
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
