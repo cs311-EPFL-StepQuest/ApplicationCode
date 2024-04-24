@@ -61,6 +61,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
+  val storeroute= StoreRoute()
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -154,6 +155,7 @@ fun Map(locationViewModel: LocationViewModel) {
                 locationViewModel.onPause()
                 stopCreatingRoute = true
                 routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
+                storeroute.addRoute(locationViewModel.getAllocations(), emptyList())
               },
               modifier =
                   Modifier.size(85.dp)
