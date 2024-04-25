@@ -32,7 +32,6 @@ fun DatabaseLoadingScreen(navigationActions: NavigationActions, context: Context
   val database = FirebaseDatabase.getInstance()
   var isNewPlayer by remember { mutableStateOf(false) }
   val userId = firebaseAuth.currentUser?.uid
-  println(userId)
   if (userId != null) {
     val databaseRef = database.reference
     databaseRef

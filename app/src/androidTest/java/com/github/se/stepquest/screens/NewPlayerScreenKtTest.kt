@@ -48,22 +48,6 @@ class NewPlayerScreenTest {
     composeTestRule.setContent { NewPlayerScreen(navigationActions = mockk(), context = mockk()) }
 
     composeTestRule.onNodeWithText("Username").assertExists()
+    composeTestRule.onNodeWithText("Sign in").assertExists()
   }
-
-  /*@Test
-  fun givenExistingPlayer_whenScreenDisplayed_thenLogInButtonDisplayed() {
-    every {
-      database.reference.child(any()).child(any()).addListenerForSingleValueEvent(any())
-    } answers
-        {
-          val callback = arg<ValueEventListener>(1)
-          callback.onDataChange(
-              mockk { every { getValue(String::class.java) } returns "existingUsername" })
-        }
-
-    composeTestRule.setContent { NewPlayerScreen(navigationActions = mockk(), context = mockk()) }
-
-    composeTestRule.onNodeWithText("You already have an account.").assertExists()
-    composeTestRule.onNodeWithText("Log in").assertExists()
-  }*/
 }

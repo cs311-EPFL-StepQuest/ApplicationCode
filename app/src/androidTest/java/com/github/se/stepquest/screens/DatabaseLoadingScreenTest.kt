@@ -33,11 +33,4 @@ class DatabaseLoadingScreenTest {
 
     composeTestRule.onNodeWithText("Waiting for database...").assertIsDisplayed()
   }
-
-  /*@Test
-  fun navigationIfNewPlayer() {
-      composeTestRule.setContent {
-          DatabaseLoadingScreen(navigationActions, context)
-      }
-  }*/
 }
