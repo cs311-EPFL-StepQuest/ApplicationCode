@@ -2,7 +2,11 @@ package com.github.se.stepquest.map
 // Map.kt
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.graphics.BitmapFactory
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -30,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -39,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -51,10 +58,29 @@ import com.google.android.gms.maps.model.PolylineOptions
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun Map(locationViewModel: LocationViewModel) {
+  val context = LocalContext.current
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
 
-  val context = LocalContext.current
+  // Get image and photo intent
+  var image = remember { mutableStateOf<ImageBitmap?>(null) }
+  var photoFile = getPhotoFile(context)
+  val fileProvider =
+      FileProvider.getUriForFile(context, "com.github.se.stepquest.map.fileprovider", photoFile)
+  val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+  takePicture.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
+  val resultLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result
+        ->
+        if (result.resultCode == Activity.RESULT_OK) {
+          // val imageBitmap = result.data?.extras?.get("data") as Bitmap
+          // image.value = imageBitmap.asImageBitmap()
+          val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
+          image.value = takenImage.asImageBitmap()
+        }
+      }
+  var isPictureTaken by remember { mutableStateOf(false) }
+
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
           permissionsMap ->
@@ -136,6 +162,12 @@ fun Map(locationViewModel: LocationViewModel) {
                           tint = Color.Red)
                     }
               }
+          if (isPictureTaken && image.value != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+              Image(
+                  bitmap = image.value!!, modifier = Modifier.size(500.dp), contentDescription = "")
+            }
+          }
         }
       },
       floatingActionButton = {
@@ -166,6 +198,27 @@ fun Map(locationViewModel: LocationViewModel) {
                       onValueChange = { checkpointTitle = it },
                       label = { Text("Name:") },
                       modifier = Modifier.fillMaxWidth())
+                  Spacer(modifier = Modifier.height(36.dp))
+                  Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "Take a picture",
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp))
+                  }
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  // Button to take picture
+                  Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    IconButton(
+                        onClick = {
+                          resultLauncher.launch(takePicture)
+                          isPictureTaken = true
+                        }) {
+                          Icon(
+                              painterResource(R.drawable.camera_icon),
+                              contentDescription = "camera_icon",
+                              modifier = Modifier.size(60.dp))
+                        }
+                  }
                 }
               },
               confirmButton = {
