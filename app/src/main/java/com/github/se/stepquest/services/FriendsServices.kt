@@ -38,7 +38,7 @@ fun addFriend(friend: Friend) {
                   // Handle success if needed
                 }
                 .addOnFailureListener {
-                    // Handle failure if needed
+                  // Handle failure if needed
                 }
           }
 
@@ -68,6 +68,7 @@ fun sendFriendRequest(currentUsername: String, friendName: String) {
                 override fun onDataChange(requestsSnapshot: DataSnapshot) {
                   val pendingRequests =
                       requestsSnapshot.getValue<List<String>>()?.toMutableList() ?: mutableListOf()
+                  if (currentUsername in pendingRequests) return
                   pendingRequests.add(currentUsername)
                   friendRequestsRef.setValue(pendingRequests)
                 }
