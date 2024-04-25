@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.R
+import com.github.se.stepquest.services.sendFriendRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -97,7 +98,9 @@ fun AddFriendScreen(onDismiss: () -> Unit) {
               if (searchQuery.isNotBlank() && !loading.value) {
                 if (searchResults.value.isNotEmpty()) {
                   LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(searchResults.value) { UserItem(name = it) }
+                    items(searchResults.value) {
+                      UserItem(currentUser = username.value!!, name = it)
+                    }
                   }
                 } else {
                   Text(
@@ -113,7 +116,7 @@ fun AddFriendScreen(onDismiss: () -> Unit) {
 }
 
 @Composable
-fun UserItem(name: String) {
+fun UserItem(currentUser: String, name: String) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var isExpanded by remember { mutableStateOf(false) }
 
@@ -151,7 +154,11 @@ fun UserItem(name: String) {
                     text = "Send a friend request",
                     color = Color.White,
                     modifier =
-                        Modifier.clickable { /* TODO: send friend request */}.padding(end = 16.dp))
+                        Modifier.clickable {
+                              sendFriendRequest(currentUser, name)
+                              isExpanded = false
+                            }
+                            .padding(end = 16.dp))
               }
             }
       }
