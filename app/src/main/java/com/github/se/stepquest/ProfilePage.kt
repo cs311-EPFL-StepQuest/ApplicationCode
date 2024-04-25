@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -30,10 +31,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.stepquest.screens.Friend
 import com.github.se.stepquest.screens.FriendsListScreen
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 val fakeFriendsList =
     listOf(
@@ -46,8 +53,36 @@ val fakeFriendsList =
 @Composable
 fun ProfilePageLayout(navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
+  val firebaseAuth = FirebaseAuth.getInstance()
+  val userId = firebaseAuth.currentUser?.uid
+  val profilePictureURL = firebaseAuth.currentUser?.photoUrl
+  val database = FirebaseDatabase.getInstance()
+  var totalStepsMade by remember { mutableStateOf(0) }
+  val stepsRef = database.reference.child("users").child(userId!!).child("totalSteps")
+  var username by remember { mutableStateOf("No name") }
+  val usernameRef = database.reference.child("users").child(userId).child("username")
+  stepsRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+          // add code when failing to access database
+        }
+      })
+
+  usernameRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          username = dataSnapshot.getValue(String::class.java) ?: "No name"
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+          // add code when failing to access database
+        }
+      })
   var showDialog by remember { mutableStateOf(false) }
-  // val user = Firebase.auth.currentUser
   Column(
       modifier = Modifier.padding(32.dp).fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -60,25 +95,24 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
               modifier = Modifier.size(30.dp))
         }
         Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 40.sp)
-        /*user?.let {
-            val photoUrl = it.photoUrl
-            Image(
-                painter =
-                rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = photoUrl).apply(block = fun ImageRequest.Builder.() {
-                        crossfade(true)
-                    }).build()
-                ),
-                contentDescription = "Profile Picture",
-                modifier = Modifier.size(200.dp)
-            )
-        }*/
-        Image(
-            painter = painterResource(id = R.drawable.dummypfp),
-            contentDescription = "Profile Picture",
-            modifier = Modifier.size(200.dp))
+        profilePictureURL?.let { uri ->
+          Image(
+              painter = rememberAsyncImagePainter(uri),
+              contentDescription = "Profile Picture",
+              modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        /*Image(
+        painter = painterResource(id = R.drawable.dummypfp),
+        contentDescription = "Profile Picture",
+        modifier = Modifier.size(200.dp))*/
         Text(
-            text = "Total Steps: 1000", // Replace with actual total steps
+            text = username,
+            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp,
+        )
+        Text(
+            text = "Total Steps: $totalStepsMade",
             fontSize = 24.sp,
             modifier = Modifier.padding(top = 16.dp))
         ClickableText(
