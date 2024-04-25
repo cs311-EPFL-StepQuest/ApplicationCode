@@ -21,6 +21,6 @@ class LoginScreenTest {
 
     // Button is displayed and clickable
     composeTestRule.onNodeWithText("Authenticate").assertExists("The login button doesn't exist?!")
-    composeTestRule.onNodeWithText("Log in").assertHasClickAction()
+    composeTestRule.onNodeWithText("Authenticate").assertHasClickAction()
   }
 }
