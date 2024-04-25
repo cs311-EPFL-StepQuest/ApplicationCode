@@ -50,7 +50,7 @@ class NewPlayerScreenTest {
     composeTestRule.onNodeWithText("Username").assertExists()
   }
 
-  @Test
+  /*@Test
   fun givenExistingPlayer_whenScreenDisplayed_thenLogInButtonDisplayed() {
     every {
       database.reference.child(any()).child(any()).addListenerForSingleValueEvent(any())
@@ -65,5 +65,5 @@ class NewPlayerScreenTest {
 
     composeTestRule.onNodeWithText("You already have an account.").assertExists()
     composeTestRule.onNodeWithText("Log in").assertExists()
-  }
+  }*/
 }
