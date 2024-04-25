@@ -1,7 +1,6 @@
 package com.github.se.stepquest.screens
 
 import android.app.Activity
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +16,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -32,7 +32,6 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
-import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.services.setOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
@@ -41,8 +40,6 @@ import com.github.se.stepquest.ui.navigation.TopLevelDestination
 fun LoginScreen(navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
 
-  val context = LocalContext.current
-
   fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 
     val response = result.idpResponse
@@ -50,8 +47,7 @@ fun LoginScreen(navigationActions: NavigationActions) {
     if (result.resultCode == Activity.RESULT_OK) {
       println("Sign in successful!")
       setOnline()
-      context.startService(Intent(context, StepCounterService::class.java))
-      navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+      navigationActions.navigateTo(TopLevelDestination(Routes.DatabaseLoadingScreen.routName))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
     } else {
@@ -93,24 +89,12 @@ fun LoginScreen(navigationActions: NavigationActions) {
 
         Spacer(modifier = Modifier.height(150.dp))
 
-        // Log in Button
         Button(
             onClick = { signInLauncher.launch(signInIntent) },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
             shape = RoundedCornerShape(8.dp)) {
-              Text(text = "Log in", color = Color.White, fontSize = 24.sp)
-            }
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        // New user button
-        Button(
-            onClick = { println("User creation screen to be implemented") },
-            colors = ButtonDefaults.buttonColors(blueThemeColor),
-            modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
-            shape = RoundedCornerShape(8.dp)) {
-              Text(text = "New player", color = Color.White, fontSize = 24.sp)
+              Text(text = "Authenticate", color = Color.White, fontSize = 24.sp)
             }
       }
 }
