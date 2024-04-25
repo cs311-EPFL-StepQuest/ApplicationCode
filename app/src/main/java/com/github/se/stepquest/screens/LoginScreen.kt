@@ -1,8 +1,6 @@
 package com.github.se.stepquest.screens
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,15 +32,12 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
-import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.services.setOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 
 @Composable
-fun LoginScreen(navigationActions: NavigationActions, context: Context) {
+fun LoginScreen(navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
 
   fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
@@ -55,8 +47,7 @@ fun LoginScreen(navigationActions: NavigationActions, context: Context) {
     if (result.resultCode == Activity.RESULT_OK) {
       println("Sign in successful!")
       setOnline()
-      context.startService(Intent(context, StepCounterService::class.java))
-      navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+      navigationActions.navigateTo(TopLevelDestination(Routes.DatabaseLoadingScreen.routName))
     } else if (response != null) {
       throw Exception(response.error?.errorCode.toString())
     } else {
@@ -78,15 +69,6 @@ fun LoginScreen(navigationActions: NavigationActions, context: Context) {
           .setIsSmartLockEnabled(false)
           .build()
 
-  val firebaseAuth = FirebaseAuth.getInstance()
-  val database = FirebaseDatabase.getInstance()
-  var isNewPlayer by remember { mutableStateOf(false) }
-  var showDialog by remember { mutableStateOf(false) }
-
-  LaunchedEffect(key1 = Unit) {
-    checkIfNewPlayer(firebaseAuth, database) { result -> isNewPlayer = result }
-  }
-
   Column(
       modifier = Modifier.padding(38.dp).fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -107,38 +89,12 @@ fun LoginScreen(navigationActions: NavigationActions, context: Context) {
 
         Spacer(modifier = Modifier.height(150.dp))
 
-        // Log in Button
         Button(
-            onClick = {
-              if (!isNewPlayer) {
-                signInLauncher.launch(signInIntent)
-              } else {
-                showDialog = true
-              }
-            },
+            onClick = { signInLauncher.launch(signInIntent) },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
             modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
             shape = RoundedCornerShape(8.dp)) {
-              Text(text = "Log in", color = Color.White, fontSize = 24.sp)
-            }
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        // New user button
-        Button(
-            onClick = {
-              navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
-            },
-            colors = ButtonDefaults.buttonColors(blueThemeColor),
-            modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
-            shape = RoundedCornerShape(8.dp)) {
-              Text(text = "New player", color = Color.White, fontSize = 24.sp)
+              Text(text = "Authenticate", color = Color.White, fontSize = 24.sp)
             }
       }
-  if (showDialog) {
-    IsNewPlayerDialogBox(
-        onConfirm = {
-          navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
-        })
-  }
 }

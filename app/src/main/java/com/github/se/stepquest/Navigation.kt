@@ -25,6 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.github.se.stepquest.map.LocationViewModel
 import com.github.se.stepquest.map.Map
+import com.github.se.stepquest.screens.DatabaseLoadingScreen
 import com.github.se.stepquest.screens.Friend
 import com.github.se.stepquest.screens.FriendsListScreen
 import com.github.se.stepquest.screens.HomeScreen
@@ -76,7 +77,10 @@ fun AppNavigationHost(
       modifier = modifier,
       navController = navigationController,
       startDestination = startDestination) {
-        composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions, context) }
+        composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions) }
+        composable(Routes.DatabaseLoadingScreen.routName) {
+          DatabaseLoadingScreen(navigationActions, context)
+        }
         composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context) }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
