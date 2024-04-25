@@ -155,7 +155,8 @@ fun Map(locationViewModel: LocationViewModel) {
                 locationViewModel.onPause()
                 stopCreatingRoute = true
                 routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
-                storeroute.addRoute(locationViewModel.getAllocations(), emptyList())
+                storeroute.addRoute(
+                    storeroute.getUserid(), locationViewModel.getAllocations(), emptyList())
               },
               modifier =
                   Modifier.size(85.dp)

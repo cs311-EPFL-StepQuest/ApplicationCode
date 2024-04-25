@@ -23,14 +23,15 @@ class StoreRoute {
       val userid: String
   )
 
-  fun addRoute(route: List<LocationDetails>?, checkpoints: List<String>?) {
-    val userId = firebaseAuth.currentUser?.uid
+  fun getUserid(): String? {
+    return firebaseAuth.currentUser?.uid
+  }
+
+  fun addRoute(userId: String?, route: List<LocationDetails>?, checkpoints: List<String>?) {
     if (userId != null) {
       val newroute = Route(route, checkpoints)
       val globalroute = GlobalRoute(route, checkpoints, userId)
-      // Generate a unique route ID
       val routeId = database.reference.child("routes").push().key.toString()
-      println("Route ID: $routeId")
       val globalRouteRef = database.reference.child("routes").child(routeId)
       val routeRef =
           database.reference.child("users").child(userId).child("new_route").child(routeId)
