@@ -66,6 +66,7 @@ fun Map(locationViewModel: LocationViewModel) {
     var checkpointTitle by remember { mutableStateOf("") }
 
     // Instantiate all necessary variables to take pictures
+    val currentImage = remember { mutableStateOf<ImageBitmap?>(null) }
     val images = remember {MutableStateFlow<List<ImageBitmap>>(emptyList())}
     var photoFile = getPhotoFile(context)
     val fileProvider =
@@ -77,7 +78,7 @@ fun Map(locationViewModel: LocationViewModel) {
             ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
-                images.value += takenImage.asImageBitmap()
+                currentImage.value = takenImage.asImageBitmap()
             }
         }
     var isPictureTaken by remember { mutableStateOf(false) }
@@ -207,7 +208,6 @@ fun Map(locationViewModel: LocationViewModel) {
                                     onClick = {
                                         isPictureTaken = true
                                         resultLauncher.launch(takePicture)
-
                                     }) {
                                     Icon(
                                         painterResource(R.drawable.camera_icon),
@@ -222,6 +222,10 @@ fun Map(locationViewModel: LocationViewModel) {
                             Button(
                                 onClick = {
                                     // ADD HERE CODE FOR ADDING CHECKPOINTS, INPUT TITLE STORED IN title
+
+                                    // Add the image to the list of images
+                                    images.value += currentImage.value!!
+
                                     val title = checkpointTitle
                                     showDialog = false
                                 },
