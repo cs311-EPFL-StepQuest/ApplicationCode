@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - 62-store-the-newly-created-route-in-the-database
+      - 62-store-the-newly-created-route-to-the-database
 
   pull_request:
     types:
