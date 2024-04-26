@@ -13,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -50,7 +52,9 @@ import com.github.se.stepquest.R
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.compose.MapUiSettings
@@ -58,8 +62,10 @@ import com.google.maps.android.compose.MapUiSettings
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun Map(locationViewModel: LocationViewModel) {
+  var stopCreatingRoute = false
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
+  var routeEndMarker: Marker? = null
 
   var uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = false)) }
   var showProgression by remember { mutableStateOf(false) }
@@ -68,6 +74,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
 
   val context = LocalContext.current
+
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
           permissionsMap ->
@@ -75,7 +82,6 @@ fun Map(locationViewModel: LocationViewModel) {
         println("launcherMultiplePermissions")
         if (areGranted) {
           println("Permission Granted")
-          locationViewModel.locationRequired.value = true
           locationViewModel.startLocationUpdates(context as ComponentActivity)
           Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
         } else {
@@ -117,6 +123,11 @@ fun Map(locationViewModel: LocationViewModel) {
           // Button for creating a route
           FloatingActionButton(
               onClick = {
+                // Beofre start creating route, make sure map is clean and route list (allocation)
+                // is
+                // empty too
+                cleanGoogleMap(map.value!!, routeEndMarker)
+                locationViewModel.cleanAllocations()
                 locationPermission(
                     locationViewModel, context, launcherMultiplePermissions, permissions)
               },
@@ -124,7 +135,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   Modifier.size(85.dp)
                       .padding(16.dp)
                       .align(Alignment.BottomEnd)
-                      .offset(y = (-150).dp)
+                      .offset(y = (-204).dp)
                       .testTag("createRouteButton")) {
                 Image(
                     painter = painterResource(id = R.drawable.addbutton),
@@ -138,7 +149,7 @@ fun Map(locationViewModel: LocationViewModel) {
               modifier =
                   Modifier.padding(16.dp)
                       .align(Alignment.BottomEnd)
-                      .offset(y = (-96).dp)
+                      .offset(y = (-150).dp)
                       .size(48.dp)) {
                 Box(
                     modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
@@ -149,6 +160,22 @@ fun Map(locationViewModel: LocationViewModel) {
                           tint = Color.Red)
                     }
               }
+
+          // Button for stopping a route
+          FloatingActionButton(
+              onClick = { showProgression = true },
+              modifier =
+                  Modifier.size(85.dp)
+                      .padding(16.dp)
+                      .align(Alignment.BottomEnd)
+                      .offset(y = (-90).dp)
+                      .testTag("stopRouteButton"),
+              content = {
+                Image(
+                    painter = painterResource(id = R.drawable.stopbutton),
+                    contentDescription = "stop button to stop create route",
+                    contentScale = ContentScale.None)
+              })
         }
       },
       floatingActionButton = {
@@ -189,6 +216,7 @@ fun Map(locationViewModel: LocationViewModel) {
                         val title = checkpointTitle
                         showDialog = false
                       },
+                      enabled = checkpointTitle.isNotEmpty(),
                       shape = RoundedCornerShape(12.dp),
                       colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff00b3ff)),
                       modifier = Modifier.width(150.dp).align(Alignment.Center)) {
@@ -204,42 +232,61 @@ fun Map(locationViewModel: LocationViewModel) {
         }
       })
 
-  // Button to open route progression
-  Box(
-      modifier = Modifier.fillMaxSize().padding(bottom = 20.dp, end = 15.dp),
-      contentAlignment = Alignment.BottomEnd) {
-        IconButton(onClick = { showProgression = true }, modifier = Modifier.size(60.dp)) {
-          Image(
-              painter = painterResource(R.drawable.end_route),
-              contentDescription = "endRoute",
-          )
-        }
-      }
-
   // Open the progression screen
   if (showProgression) {
-    RouteProgression(onDismiss = { showProgression = false }, routeLength, numCheckpoints)
+    RouteProgression(
+        onDismiss = {
+          showProgression = false
+          locationViewModel.onPause()
+          stopCreatingRoute = true
+          routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
+        },
+        routeLength,
+        numCheckpoints)
   }
 }
 
-fun updateMap(googleMap: GoogleMap, locationViewModel: LocationViewModel) {
-  val allocations = locationViewModel.getAllocations() ?: return
+fun updateMap(
+    googleMap: GoogleMap,
+    locationViewModel: LocationViewModel,
+    stopCreatingRoute: Boolean = false
+): Marker? {
+  val allocations = locationViewModel.getAllocations() ?: emptyList()
+  println("all locations in map: $allocations")
+  var routeEndMarker: Marker? = null
   if (allocations.size == 1) {
-    // Add marker for the only allocation
+    // Add marker for the start allocation
     googleMap.addMarker(MarkerOptions().position(allocations.first().toLatLng()))
     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(allocations.first().toLatLng(), 20f))
-  } else {
-    // Draw polyline connecting the last two allocations
-    val lastAllocation = allocations.last()
-    val secondLastAllocation = allocations[allocations.size - 2]
-    val polylineOptions =
-        PolylineOptions().apply {
-          color(android.graphics.Color.BLUE)
-          width(10f)
-          add(lastAllocation.toLatLng())
-          add(secondLastAllocation.toLatLng())
-        }
-    googleMap.addPolyline(polylineOptions)
+  } else if (allocations.size > 1) {
+    if (!stopCreatingRoute) {
+
+      val lastAllocation = allocations.last()
+      val secondLastAllocation = allocations[allocations.size - 2]
+      val polylineOptions =
+          PolylineOptions().apply {
+            color(Color.Blue.toArgb())
+            width(10f)
+            add(lastAllocation.toLatLng())
+            add(secondLastAllocation.toLatLng())
+          }
+      googleMap.addPolyline(polylineOptions)
+    } else {
+      // Add marker for the end allocation
+      routeEndMarker =
+          googleMap.addMarker(
+              MarkerOptions()
+                  .position(allocations.last().toLatLng())
+                  .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
+    }
+  }
+  return routeEndMarker
+}
+
+fun cleanGoogleMap(googleMap: GoogleMap, routeEndMarker: Marker? = null) {
+  googleMap.clear()
+  if (routeEndMarker != null) {
+    routeEndMarker.remove()
   }
 }
 

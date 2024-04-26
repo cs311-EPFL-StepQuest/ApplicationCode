@@ -155,6 +155,7 @@ fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: 
                         saveRoute(
                             onDismiss, routeName, routeID, routeLength, numCheckpoints, reward)
                       },
+                      enabled = routeName.isNotEmpty(),
                       colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
                       modifier = Modifier.height(35.dp).width(140.dp)) {
                         Text(text = "Finish", fontSize = 16.sp, modifier = Modifier.padding(0.dp))
