@@ -20,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,14 +34,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.R
-
-val dummyUserList = listOf("Alice", "Bob", "Charlie", "Charles")
+import com.github.se.stepquest.services.sendFriendRequest
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 @Composable
 fun AddFriendScreen(onDismiss: () -> Unit) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var searchQuery by remember { mutableStateOf("") }
-  val searchResults = dummyUserList.filter { it.startsWith(searchQuery, ignoreCase = true) }
+  val searchResults = remember { mutableStateOf<List<String>>(emptyList()) }
+  val database = FirebaseDatabase.getInstance()
+  val loading = remember { mutableStateOf(false) }
+  val username = remember { mutableStateOf<String?>(null) }
+
+  // Retrieve current user's username
+  LaunchedEffect(Unit) { getCurrentUser(database.reference) { username.value = it } }
 
   Surface(
       color = Color.White,
@@ -75,14 +88,19 @@ fun AddFriendScreen(onDismiss: () -> Unit) {
               Spacer(modifier = Modifier.height(16.dp))
               TextField(
                   value = searchQuery,
-                  onValueChange = { searchQuery = it },
+                  onValueChange = {
+                    searchQuery = it
+                    dbUserSearch(database, it, searchResults, loading, username.value)
+                  },
                   placeholder = { Text("Search for friends") },
                   modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
               Spacer(modifier = Modifier.height(16.dp))
-              if (searchQuery.isNotBlank()) {
-                if (searchResults.isNotEmpty()) {
+              if (searchQuery.isNotBlank() && !loading.value) {
+                if (searchResults.value.isNotEmpty()) {
                   LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(searchResults) { UserItem(name = it) }
+                    items(searchResults.value) {
+                      UserItem(currentUser = username.value!!, name = it)
+                    }
                   }
                 } else {
                   Text(
@@ -90,13 +108,15 @@ fun AddFriendScreen(onDismiss: () -> Unit) {
                       color = Color.Red,
                       modifier = Modifier.padding(horizontal = 16.dp))
                 }
+              } else if (loading.value) {
+                Text(text = "Loading users...", modifier = Modifier.padding(horizontal = 16.dp))
               }
             }
       }
 }
 
 @Composable
-fun UserItem(name: String) {
+fun UserItem(currentUser: String, name: String) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var isExpanded by remember { mutableStateOf(false) }
 
@@ -134,8 +154,72 @@ fun UserItem(name: String) {
                     text = "Send a friend request",
                     color = Color.White,
                     modifier =
-                        Modifier.clickable { /* TODO: send friend request */}.padding(end = 16.dp))
+                        Modifier.clickable {
+                              sendFriendRequest(currentUser, name)
+                              isExpanded = false
+                            }
+                            .padding(end = 16.dp))
               }
             }
       }
+}
+
+private fun dbUserSearch(
+    database: FirebaseDatabase,
+    query: String,
+    searchResults: MutableState<List<String>>,
+    loading: MutableState<Boolean>,
+    currentUser: String?
+) {
+
+  val lowercaseQuery = query.lowercase()
+  loading.value = true
+
+  val usersRef = database.reference.child("usernames")
+
+  usersRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+          val results = mutableListOf<String>()
+          snapshot.children.forEach { userSnapshot ->
+            val username = userSnapshot.key?.lowercase()
+            if (username?.startsWith(lowercaseQuery) == true &&
+                username != currentUser?.lowercase()) {
+              results.add(userSnapshot.key!!)
+            }
+          }
+
+          searchResults.value = results
+          loading.value = false
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+          loading.value = false
+
+          // Add code when failing to access database
+        }
+      })
+}
+
+// Helper function to get current username
+private fun getCurrentUser(database: DatabaseReference, callback: (String?) -> Unit) {
+  val userId = FirebaseAuth.getInstance().currentUser?.uid
+  userId?.let { uid ->
+    database
+        .child("users")
+        .child(uid)
+        .child("username")
+        .addListenerForSingleValueEvent(
+            object : ValueEventListener {
+              override fun onDataChange(snapshot: DataSnapshot) {
+                val username = snapshot.getValue(String::class.java)
+                callback(username)
+              }
+
+              override fun onCancelled(error: DatabaseError) {
+                // Handle error
+                callback(null)
+              }
+            })
+  } ?: callback(null)
 }
