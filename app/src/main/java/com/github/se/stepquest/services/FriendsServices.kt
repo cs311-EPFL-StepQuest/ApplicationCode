@@ -37,7 +37,7 @@ fun addFriend(friend: Friend) {
                 .addOnSuccessListener {
                   // Handle success if needed
                 }
-                .addOnFailureListener { e ->
+                .addOnFailureListener {
                   // Handle failure if needed
                 }
           }
@@ -47,4 +47,40 @@ fun addFriend(friend: Friend) {
           }
         })
   }
+}
+
+fun sendFriendRequest(currentUsername: String, friendName: String) {
+
+  val database = FirebaseDatabase.getInstance()
+
+  // Retrieve the new friend's uid
+  val usernamesRef = database.reference.child("usernames")
+  usernamesRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+          val uid = snapshot.child(friendName).getValue(String::class.java) ?: return
+
+          // Send the friend request
+          val friendRequestsRef =
+              database.reference.child("users").child(uid).child("pendingFriendRequests")
+          friendRequestsRef.addListenerForSingleValueEvent(
+              object : ValueEventListener {
+                override fun onDataChange(requestsSnapshot: DataSnapshot) {
+                  val pendingRequests =
+                      requestsSnapshot.getValue<List<String>>()?.toMutableList() ?: mutableListOf()
+                  if (currentUsername in pendingRequests) return
+                  pendingRequests.add(currentUsername)
+                  friendRequestsRef.setValue(pendingRequests)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                  // Handle access failure
+                }
+              })
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+          // Handle access failure
+        }
+      })
 }

@@ -2,13 +2,29 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="TestpreeStopCreateRoute()">
+      <entry key="DatabaseLoadingScreenTest">
         <State />
       </entry>
-      <entry key="Tests in 'com.github.se.stepquest.map'">
-        <State />
+      <entry key="MainActivity">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\santh\.android\avd\Pixel_8_Pro_API_34_2.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-04-25T08:20:10.821762600Z" />
+        </State>
       </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="navigationIfNotNewPlayer()">
         <State />
       </entry>
     </value>
