@@ -94,7 +94,6 @@ class RouteProgressionKtTest {
         .assertIsDisplayed()
   }
 
-
   @Test
   fun finishButtonIsDisabled_whenRouteNameIsEmpty() {
     composeTestRule.setContent { RouteProgression({}, 0f, 0) }

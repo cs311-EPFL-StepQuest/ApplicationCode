@@ -30,7 +30,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -40,12 +39,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MapTest {
 
-  @get:Rule
-  val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
-  @get:Rule
-  val mockkRule = MockKRule(this)
+  @get:Rule val mockkRule = MockKRule(this)
 
   // Declare vm as a public variable
   private lateinit var vm: LocationViewModel
@@ -53,7 +50,7 @@ class MapTest {
   private lateinit var context: Context
   private lateinit var launcherMultiplePermissions: ActivityResultLauncher<Array<String>>
   val permissions =
-    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+      arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 
   @Before
   fun setup() {
@@ -79,7 +76,7 @@ class MapTest {
   fun locationPermission_grated() {
     mockkStatic(PermissionChecker::class)
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
-            PermissionChecker.PERMISSION_GRANTED
+        PermissionChecker.PERMISSION_GRANTED
 
     locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
 
@@ -90,7 +87,7 @@ class MapTest {
   fun locationPermission_denied() {
     mockkStatic(PermissionChecker::class)
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
-            PermissionChecker.PERMISSION_DENIED
+        PermissionChecker.PERMISSION_DENIED
 
     locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
 
@@ -238,5 +235,3 @@ class MapTest {
     composeTestRule.onNodeWithTag("createRouteButton").performClick()
   }
 }
-
-
