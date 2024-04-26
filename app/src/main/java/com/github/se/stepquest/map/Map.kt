@@ -173,7 +173,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   Button(
                       onClick = {
                         // ADD HERE CODE FOR ADDING CHECKPOINTS, INPUT TITLE STORED IN title
-                        val title = checkpointTitle
+                        locationViewModel.addNewCheckpoint(checkpointTitle)
                         showDialog = false
                       },
                       shape = RoundedCornerShape(12.dp),

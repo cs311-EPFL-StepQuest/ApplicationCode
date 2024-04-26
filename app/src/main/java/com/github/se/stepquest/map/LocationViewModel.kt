@@ -16,6 +16,7 @@ class LocationViewModel : ViewModel() {
   var currentLocation = MutableLiveData<LocationDetails>()
   var _allocations = MutableLiveData<List<LocationDetails>>()
   var locationUpdated = MutableLiveData<Boolean>()
+  var checkpoints = MutableLiveData<List<Checkpoint>>()
 
   init {
     locationRequired.postValue(false)
@@ -78,6 +79,10 @@ class LocationViewModel : ViewModel() {
 
   open fun getAllocations(): List<LocationDetails>? {
     return _allocations.value
+  }
+
+  fun addNewCheckpoint(name: String) {
+    checkpoints.postValue(listOf(Checkpoint(name, currentLocation.value!!)))
   }
 }
 

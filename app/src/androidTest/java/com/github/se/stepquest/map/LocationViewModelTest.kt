@@ -1,8 +1,11 @@
 package com.github.se.stepquest.map
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.mockk.MockKAnnotations
 import io.mockk.junit4.MockKRule
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -22,9 +25,12 @@ class LocationViewModelTest {
   // Declare vm as a public variable
   private lateinit var locationViewModel: LocationViewModel
 
+  private val observerCheckpoints = mockk<Observer<in List<Checkpoint>>>()
+
   @Before
   fun setup() {
     locationViewModel = LocationViewModel()
+    MockKAnnotations.init(this)
   }
 
   @Test
@@ -58,4 +64,24 @@ class LocationViewModelTest {
   }
 
   @Test fun startLocationUpdatesTest() {}
+
+  /*@Test
+  fun test_addNewCheckpoint() = runBlockingTest {
+    // Mock data
+    val viewModel = LocationViewModel()
+    viewModel.checkpoints.observeForever(observerCheckpoints)
+
+    val name = "Test Checkpoint"
+    val location = LocationDetails(1.0, 2.0)
+
+    // Call the function
+    viewModel.addNewCheckpoint(name)
+
+    // Verify if the checkpoint was added
+    val checkpoints = viewModel.checkpoints.value
+    assertEquals(1, checkpoints?.size)
+    assertEquals(name, checkpoints?.get(0)?.name)
+    assertEquals(location.latitude, checkpoints?.get(0)?.location?.latitude)
+    assertEquals(location.longitude, checkpoints?.get(0)?.location?.longitude)
+  }*/
 }
