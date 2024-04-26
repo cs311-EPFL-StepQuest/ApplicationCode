@@ -40,9 +40,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MapTest {
 
-  @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule
+  val composeTestRule = createComposeRule()
+
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
-  @get:Rule val mockkRule = MockKRule(this)
+  @get:Rule
+  val mockkRule = MockKRule(this)
 
   // Declare vm as a public variable
   private lateinit var vm: LocationViewModel
@@ -50,7 +53,7 @@ class MapTest {
   private lateinit var context: Context
   private lateinit var launcherMultiplePermissions: ActivityResultLauncher<Array<String>>
   val permissions =
-      arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 
   @Before
   fun setup() {
@@ -76,7 +79,7 @@ class MapTest {
   fun locationPermission_grated() {
     mockkStatic(PermissionChecker::class)
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
-        PermissionChecker.PERMISSION_GRANTED
+            PermissionChecker.PERMISSION_GRANTED
 
     locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
 
@@ -87,7 +90,7 @@ class MapTest {
   fun locationPermission_denied() {
     mockkStatic(PermissionChecker::class)
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
-        PermissionChecker.PERMISSION_DENIED
+            PermissionChecker.PERMISSION_DENIED
 
     locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
 
@@ -199,23 +202,15 @@ class MapTest {
   @Test
   fun map_displaysEndRouteButton() {
     composeTestRule.setContent { Map(vm) }
-    composeTestRule.onNodeWithContentDescription("endRoute").assertExists()
+    composeTestRule.onNodeWithTag("stopRouteButton").assertExists()
   }
 
   @Test
-  fun map_opensRouteProgression_onEndRouteButtonClick() {
+  fun map_opensRouteProgression_onStopRouteButtonClick() {
     var showProgression = false
     composeTestRule.setContent { Map(vm).apply { showProgression = true } }
-    composeTestRule.onNodeWithContentDescription("endRoute").performClick()
+    composeTestRule.onNodeWithTag("stopRouteButton").performClick()
     assertTrue(showProgression)
-  }
-
-  @Test
-  fun map_closesRouteProgression_onDismiss() {
-    var showProgression = true
-    composeTestRule.setContent { Map(vm).apply { showProgression = false } }
-    composeTestRule.onNodeWithContentDescription("endRoute").performClick()
-    assertFalse(showProgression)
   }
 
   @Test
@@ -242,10 +237,6 @@ class MapTest {
     composeTestRule.setContent { StepQuestTheme { Map(vm) } }
     composeTestRule.onNodeWithTag("createRouteButton").performClick()
   }
-
-  @Test
-  fun TestpreeStopCreateRoute() {
-    composeTestRule.setContent { StepQuestTheme { Map(vm) } }
-    composeTestRule.onNodeWithTag("stopRouteButton").performClick()
-  }
 }
+
+

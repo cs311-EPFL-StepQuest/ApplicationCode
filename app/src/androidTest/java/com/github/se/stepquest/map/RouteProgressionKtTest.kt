@@ -1,8 +1,12 @@
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import com.github.se.stepquest.map.RouteProgression
 import org.junit.Assert.*
 import org.junit.Rule
@@ -75,16 +79,6 @@ class RouteProgressionKtTest {
   }
 
   @Test
-  fun dismissesDialog_onFinishButtonClick() {
-    var dialogDismissed = true
-    composeTestRule.setContent { RouteProgression({ dialogDismissed = false }, 0f, 0) }
-
-    composeTestRule.onNodeWithText("Finish").performClick()
-
-    assert(!dialogDismissed)
-  }
-
-  @Test
   fun displaysExtraKilometersAndCheckpoints_forNextReward() {
     var extraKilometers = 0
     var extraCheckpoints = 0
@@ -98,5 +92,31 @@ class RouteProgressionKtTest {
         .onNodeWithText(
             "$extraKilometers extra kilometers or $extraCheckpoints extra checkpoints for next reward")
         .assertIsDisplayed()
+  }
+
+
+  @Test
+  fun finishButtonIsDisabled_whenRouteNameIsEmpty() {
+    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+
+    composeTestRule.onNodeWithText("Finish").assertIsNotEnabled()
+  }
+
+  @Test
+  fun finishButtonIsEnabled_whenRouteNameIsNotEmpty() {
+    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+
+    composeTestRule.onNodeWithText("Route name").performTextInput("Test Route")
+
+    composeTestRule.onNodeWithText("Finish").assertIsEnabled()
+  }
+
+  @Test
+  fun finishButtonIsDisabled_whenRouteNameIsCleared() {
+    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+
+    composeTestRule.onNodeWithText("Route name").performTextInput("Test Route")
+    composeTestRule.onNodeWithText("Test Route").performTextReplacement("")
+    composeTestRule.onNodeWithText("Finish").assertIsNotEnabled()
   }
 }
