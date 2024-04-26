@@ -207,6 +207,7 @@ fun Map(locationViewModel: LocationViewModel) {
                         val title = checkpointTitle
                         showDialog = false
                       },
+                      enabled = checkpointTitle.isNotEmpty(),
                       shape = RoundedCornerShape(12.dp),
                       colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff00b3ff)),
                       modifier = Modifier.width(150.dp).align(Alignment.Center)) {
