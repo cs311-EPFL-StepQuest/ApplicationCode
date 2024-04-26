@@ -10,15 +10,13 @@ import com.google.android.gms.location.*
 data class LocationDetails(val latitude: Double, val longitude: Double)
 
 class LocationViewModel : ViewModel() {
-  private var locationCallback: LocationCallback? = null
-  private var fusedLocationClient: FusedLocationProviderClient? = null
-  val locationRequired = MutableLiveData<Boolean>()
+  var locationCallback: LocationCallback? = null
+  var fusedLocationClient: FusedLocationProviderClient? = null
   var currentLocation = MutableLiveData<LocationDetails>()
-  var _allocations = MutableLiveData<List<LocationDetails>>()
+  var _allocations = MutableLiveData<List<LocationDetails>?>()
   var locationUpdated = MutableLiveData<Boolean>()
 
   init {
-    locationRequired.postValue(false)
     locationUpdated.postValue(false)
   }
 
@@ -76,8 +74,22 @@ class LocationViewModel : ViewModel() {
     return null
   }
 
-  open fun getAllocations(): List<LocationDetails>? {
+  fun getAllocations(): List<LocationDetails>? {
     return _allocations.value
+  }
+
+  fun cleanAllocations() {
+    _allocations.postValue(null)
+  }
+
+  // stop update location
+  fun onPause() {
+    if (fusedLocationClient == null || locationCallback == null) {
+      return
+    } else {
+      locationUpdated.postValue(false)
+      locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
+    }
   }
 }
 
