@@ -48,6 +48,10 @@ fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: 
   var extraCheckpoints by rememberSaveable { mutableIntStateOf(0) }
 
   reward = (routeLength * 100).toInt()
+  // Create a unique routeID (might find a better way)
+  routeID = "route_${System.currentTimeMillis()}"
+  extraKilometers = (routeLength / 10).toInt()
+  extraCheckpoints = (numCheckpoints / 5).toInt()
 
   Dialog(onDismissRequest = { onDismiss() }) {
     Surface(
@@ -174,18 +178,6 @@ fun saveRoute(
     numCheckpoints: Int,
     reward: Int
 ) {
-  /*
-      val firebaseAuth = FirebaseAuth.getInstance()
-      val userId = firebaseAuth.currentUser?.uid
-      val database = FirebaseDatabase.getInstance()
-      val route = database.reference.child("users").child(userId!!).child("routes")
-      val routeID2 = route.push().key!!
-
-      // Save routeName, routeID, routeLength, numCheckpoints, reward to database under the routeID
-      route.child(routeID2).child("routeName").setValue(routeName)
-      route.child(routeID2).child("routeLength").setValue(routeLength)
-      route.child(routeID2).child("numCheckpoints").setValue(numCheckpoints)
-      route.child(routeID2).child("reward").setValue(reward)
-  */
+  // Save route to database
   onDismiss()
 }
