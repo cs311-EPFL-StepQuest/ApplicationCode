@@ -64,7 +64,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.maps.android.compose.MapUiSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
@@ -92,9 +91,21 @@ fun Map(locationViewModel: LocationViewModel) {
           currentImage.value = takenImage.asImageBitmap()
         }
       }
-  var isPictureTaken by remember { mutableStateOf(false) }
+  // Launch camera permissions
+  val launcherCameraPermissions =
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+          permissionsMap ->
+        val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
+        println("launcherMultiplePermissions")
+        if (areGranted) {
+          println("Permission Granted")
+          Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+        } else {
+          println("Permission Denied")
+          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+      }
 
-  var uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = false)) }
   var showProgression by remember { mutableStateOf(false) }
 
   var routeLength by rememberSaveable { mutableFloatStateOf(0f) }
@@ -249,10 +260,9 @@ fun Map(locationViewModel: LocationViewModel) {
                           if (PermissionChecker.checkSelfPermission(
                               context, Manifest.permission.CAMERA) ==
                               PermissionChecker.PERMISSION_GRANTED) {
-                            isPictureTaken = true
                             resultLauncher.launch(takePicture)
                           } else {
-                            launcherMultiplePermissions.launch(arrayOf(Manifest.permission.CAMERA))
+                            launcherCameraPermissions.launch(arrayOf(Manifest.permission.CAMERA))
                           }
                         }) {
                           Icon(
