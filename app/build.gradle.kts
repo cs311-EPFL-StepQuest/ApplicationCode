@@ -148,6 +148,7 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx:20.3.0")
     implementation("com.google.firebase:firebase-firestore:24.10.0")
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
+    testImplementation("com.google.firebase:firebase-auth:7.2.0")
     implementation("com.google.android.play:core-ktx:1.7.0")
 
     implementation("com.google.android.gms:play-services-fitness:20.0.0")
