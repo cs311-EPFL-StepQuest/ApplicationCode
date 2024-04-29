@@ -5,8 +5,8 @@ plugins {
     id ("org.jetbrains.kotlin.android")
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
+    id("jacoco")
     id("org.sonarqube") version "4.4.1.3373"
-
 }
 
 sonar {
@@ -181,7 +181,7 @@ dependencies {
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
-    mustRunAfter("testDebugUnitTest", "connectedDebugAndroidTest")
+    mustRunAfter("testDebugUnitTest", "connectedCheck")
 
     reports {
         xml.required = true
