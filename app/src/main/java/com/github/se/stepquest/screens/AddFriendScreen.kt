@@ -92,7 +92,7 @@ fun AddFriendScreen(onDismiss: () -> Unit) {
                     searchQuery = it
                     dbUserSearch(database, it, searchResults, loading, username.value)
                   },
-                  placeholder = { Text("Search for friends") },
+                  placeholder = { Text("Enter your friend's username") },
                   modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
               Spacer(modifier = Modifier.height(16.dp))
               if (searchQuery.isNotBlank() && !loading.value) {
