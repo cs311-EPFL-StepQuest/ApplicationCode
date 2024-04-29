@@ -40,12 +40,19 @@ import androidx.compose.ui.window.Dialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: Int) {
+fun RouteProgression(
+    stopRoute: () -> Unit,
+    closeProgression: () -> Unit,
+    locations: List<LocationDetails>,
+    numCheckpoints: Int
+) {
   var routeName by rememberSaveable { mutableStateOf("") }
   var routeID by rememberSaveable { mutableStateOf("") }
   var reward by rememberSaveable { mutableIntStateOf(0) }
   var extraKilometers by rememberSaveable { mutableIntStateOf(0) }
   var extraCheckpoints by rememberSaveable { mutableIntStateOf(0) }
+  // Save and round routeLength to two decimal places
+  val routeLength = String.format("%.2f", calculateRouteLength(locations) / 100f).toFloat()
 
   reward = (routeLength * 100).toInt()
   // Create a unique routeID (might find a better way)
@@ -53,7 +60,7 @@ fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: 
   extraKilometers = (routeLength / 10).toInt()
   extraCheckpoints = (numCheckpoints / 5).toInt()
 
-  Dialog(onDismissRequest = { onDismiss() }) {
+  Dialog(onDismissRequest = { closeProgression() }) {
     Surface(
         color = Color.White,
         border = BorderStroke(1.dp, Color.Black),
@@ -73,9 +80,10 @@ fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: 
                           }
                       // "X" button to close window
                       Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                        IconButton(onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)) {
-                          Icon(Icons.Default.Close, contentDescription = "Close")
-                        }
+                        IconButton(
+                            onClick = { closeProgression() }, modifier = Modifier.padding(8.dp)) {
+                              Icon(Icons.Default.Close, contentDescription = "Close")
+                            }
                       }
                     }
                 // Input field for route name
@@ -157,7 +165,7 @@ fun RouteProgression(onDismiss: () -> Unit, routeLength: Float, numCheckpoints: 
                   Button(
                       onClick = {
                         saveRoute(
-                            onDismiss, routeName, routeID, routeLength, numCheckpoints, reward)
+                            stopRoute, routeName, routeID, routeLength, numCheckpoints, reward)
                       },
                       enabled = routeName.isNotEmpty(),
                       colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
@@ -180,4 +188,12 @@ fun saveRoute(
 ) {
   // Save route to database
   onDismiss()
+}
+
+fun calculateRouteLength(locations: List<LocationDetails>): Float {
+  var routeLength = 0f
+  for (i in 0 until locations.size - 1) {
+    routeLength += calculateDistance(locations[i], locations[i + 1])
+  }
+  return routeLength
 }
