@@ -161,4 +161,40 @@ class RouteProgressionKtTest {
 
     assertEquals(0f, result, 0.001f)
   }
+
+  @Test
+  fun finishButton_onClick_callsSaveRoute() {
+    var isSaveRouteCalled = false
+
+    // Mock the saveRoute function to update the flag when called
+    val mockSaveRoute: (() -> Unit, String, String, Float, Int, Int) -> Unit = { _, _, _, _, _, _ ->
+      isSaveRouteCalled = true
+    }
+
+    val stopRoute = {} // Define stopRoute as an empty lambda function
+    val routeName = "Test Route" // Define routeName as a string
+    val routeID = "Test ID" // Define routeID as a string
+    val routeLength = 10f // Define routeLength as a float
+    val numCheckpoints = 5 // Define numCheckpoints as an integer
+    val reward = 500 // Define reward as an integer
+
+    composeTestRule.setContent {
+      RouteProgression(
+          stopRoute = {
+            mockSaveRoute(stopRoute, routeName, routeID, routeLength, numCheckpoints, reward)
+          },
+          {},
+          0f,
+          0)
+    }
+
+    // Input text into the text field
+    composeTestRule.onNodeWithText("Route name").performTextInput(routeName)
+
+    // Perform a click on the "Finish" button
+    composeTestRule.onNodeWithText("Finish").performClick()
+
+    // Check if the saveRoute function was called
+    assertTrue(isSaveRouteCalled)
+  }
 }

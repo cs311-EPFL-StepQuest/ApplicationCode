@@ -240,4 +240,19 @@ class MapTest {
     composeTestRule.setContent { StepQuestTheme { Map(vm) } }
     composeTestRule.onNodeWithTag("stopRouteButton").performClick()
   }
+
+  @Test
+  fun testInitMap() {
+    // Mock the GoogleMap object
+    val googleMap = mockk<GoogleMap>(relaxed = true)
+
+    // Call the function to test
+    initMap(googleMap)
+
+    // Verify that the appropriate GoogleMap methods are called
+    verify {
+      googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)
+      googleMap.uiSettings.isZoomControlsEnabled = true
+    }
+  }
 }
