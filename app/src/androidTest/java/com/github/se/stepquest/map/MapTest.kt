@@ -30,6 +30,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,6 +40,7 @@ import org.junit.runner.RunWith
 class MapTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
 
@@ -195,6 +197,20 @@ class MapTest {
   }
 
   @Test
+  fun map_displaysEndRouteButton() {
+    composeTestRule.setContent { Map(vm) }
+    composeTestRule.onNodeWithTag("stopRouteButton").assertExists()
+  }
+
+  @Test
+  fun map_opensRouteProgression_onStopRouteButtonClick() {
+    var showProgression = false
+    composeTestRule.setContent { Map(vm).apply { showProgression = true } }
+    composeTestRule.onNodeWithTag("stopRouteButton").performClick()
+    assertTrue(showProgression)
+  }
+
+  @Test
   fun testCleanGoogleMap_withoutrouteEndMarker() {
     val googleMap = mockk<GoogleMap>()
     every { googleMap.clear() } just Runs
@@ -217,11 +233,5 @@ class MapTest {
   fun TestpressStartCreateRoute() {
     composeTestRule.setContent { StepQuestTheme { Map(vm) } }
     composeTestRule.onNodeWithTag("createRouteButton").performClick()
-  }
-
-  @Test
-  fun TestpreeStopCreateRoute() {
-    composeTestRule.setContent { StepQuestTheme { Map(vm) } }
-    composeTestRule.onNodeWithTag("stopRouteButton").performClick()
   }
 }
