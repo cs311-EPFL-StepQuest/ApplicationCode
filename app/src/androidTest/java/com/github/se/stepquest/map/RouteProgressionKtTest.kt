@@ -37,7 +37,7 @@ class RouteProgressionKtTest {
   @Test
   fun displaysCorrectNumberOfCheckpoints() {
     val numCheckpoints = 5
-    composeTestRule.setContent { RouteProgression({}, {},0f, numCheckpoints) }
+    composeTestRule.setContent { RouteProgression({}, {}, 0f, numCheckpoints) }
 
     composeTestRule.onNodeWithText("Number of checkpoints: $numCheckpoints").assertExists()
     composeTestRule.onNodeWithText("Number of checkpoints: $numCheckpoints").assertIsDisplayed()
