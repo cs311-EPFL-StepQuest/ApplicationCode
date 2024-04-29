@@ -64,12 +64,13 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import kotlinx.coroutines.flow.MutableStateFlow
 import com.google.maps.android.compose.MapUiSettings
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun Map(locationViewModel: LocationViewModel) {
+  val context = LocalContext.current
   var stopCreatingRoute = false
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
@@ -98,8 +99,6 @@ fun Map(locationViewModel: LocationViewModel) {
 
   var routeLength by rememberSaveable { mutableFloatStateOf(0f) }
   var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
-
-  val context = LocalContext.current
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
