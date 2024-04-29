@@ -2,10 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MainActivity">
-        <State />
-      </entry>
-      <entry key="ProfilePageLayoutTest">
+      <entry key="StoreRouteTest">
         <State />
       </entry>
       <entry key="app">
@@ -23,9 +20,6 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-04-29T05:08:33.094809600Z" />
         </State>
-      </entry>
-      <entry key="firebase_access_tests_for_profile()">
-        <State />
       </entry>
     </value>
   </component>
