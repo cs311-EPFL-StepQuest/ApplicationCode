@@ -7,7 +7,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
+import com.github.se.stepquest.map.LocationDetails
 import com.github.se.stepquest.map.RouteProgression
+import com.github.se.stepquest.map.calculateRouteLength
 import com.github.se.stepquest.map.saveRoute
 import org.junit.Assert.*
 import org.junit.Rule
@@ -140,5 +142,23 @@ class RouteProgressionKtTest {
 
     // Check that the variable's value has changed
     assertTrue(isOnDismissCalled)
+  }
+
+  @Test
+  fun calculateRouteLength_returnsZeroForSingleLocation() {
+    val locations = listOf(LocationDetails(0.0, 0.0))
+
+    val result = calculateRouteLength(locations)
+
+    assertEquals(0f, result, 0.001f)
+  }
+
+  @Test
+  fun calculateRouteLength_returnsZeroForEmptyList() {
+    val locations = emptyList<LocationDetails>()
+
+    val result = calculateRouteLength(locations)
+
+    assertEquals(0f, result, 0.001f)
   }
 }

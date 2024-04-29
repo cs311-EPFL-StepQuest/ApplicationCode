@@ -295,11 +295,7 @@ fun Map(locationViewModel: LocationViewModel) {
 
   // Open the progression screen
   if (showProgression) {
-    val routeLength =
-        String.format(
-                "%.2f",
-                calculateRouteLength(locationViewModel.getAllocations() ?: emptyList()) / 100f)
-            .toFloat()
+    val routeLength = calculateRouteLength(locationViewModel.getAllocations() ?: emptyList())
 
     RouteProgression(
         stopRoute = {

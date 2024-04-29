@@ -194,5 +194,5 @@ fun calculateRouteLength(locations: List<LocationDetails>): Float {
   for (i in 0 until locations.size - 1) {
     routeLength += calculateDistance(locations[i], locations[i + 1])
   }
-  return routeLength
+  return String.format("%.2f", routeLength / 1000f).toFloat()
 }
