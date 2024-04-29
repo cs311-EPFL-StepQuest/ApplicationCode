@@ -5,8 +5,8 @@ plugins {
     id ("org.jetbrains.kotlin.android")
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
+    id("jacoco")
     id("org.sonarqube") version "4.4.1.3373"
-
 }
 
 sonar {
@@ -14,6 +14,9 @@ sonar {
         property("sonar.projectKey", "cs311-EPFL-StepQuest_ApplicationCode")
         property("sonar.organization", "cs311-epfl-stepquest")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.junit.reportPaths", "${project.layout.buildDirectory.get()}/test-results/testDebugunitTest/")
+        property("sonar.androidLint.reportPaths", "${project.layout.buildDirectory.get()}/reports/lint-results-debug.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
 
@@ -117,7 +120,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
 
     implementation(libs.androidx.junit.ktx)
-    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
+//    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -143,7 +146,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
     implementation("com.google.firebase:firebase-database-ktx:20.3.0")
+    androidTestImplementation("com.google.firebase:firebase-database-ktx:20.3.0")
     implementation("com.google.firebase:firebase-firestore:24.10.0")
+    androidTestImplementation("com.google.firebase:firebase-firestore:24.10.0")
+
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
     implementation("com.google.android.play:core-ktx:1.7.0")
 
@@ -178,10 +184,21 @@ dependencies {
 
     val nav_version = "2.7.7"
     androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
+    implementation("androidx.compose.material:material-icons-extended:1.5.1")
+
+    val cameraxVersion = "1.3.0-rc01"
+
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-video:$cameraxVersion")
+
+    implementation("androidx.camera:camera-view:$cameraxVersion")
+    implementation("androidx.camera:camera-extensions:$cameraxVersion")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
-    mustRunAfter("testDebugUnitTest", "connectedDebugAndroidTest")
+    mustRunAfter("testDebugUnitTest", "connectedCheck")
 
     reports {
         xml.required = true

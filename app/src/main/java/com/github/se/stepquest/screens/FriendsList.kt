@@ -29,17 +29,43 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
-
-data class Friend(val name: String, val profilePictureUrl: String, val status: Boolean)
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 
 @Composable
-fun FriendsListScreen(friendsList: List<Friend>, navigationActions: NavigationActions) {
+fun FriendsListScreen(
+    navigationActions: NavigationActions,
+    testCurrentFriendsList: List<Friend> = emptyList()
+) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
+  var currentFriendsList: MutableList<Friend> = testCurrentFriendsList.toMutableList()
+  val firebaseAuth = FirebaseAuth.getInstance()
+  val database = FirebaseDatabase.getInstance()
+  val userId = firebaseAuth.currentUser?.uid
+  if (userId != null && currentFriendsList.isEmpty()) {
+    val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
+    friendsListRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(dataSnapshot: DataSnapshot) {
+            currentFriendsList =
+                dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
+          }
+
+          override fun onCancelled(databaseError: DatabaseError) {
+            // add code when failing to access database
+          }
+        })
+  }
   if (showAddFriendScreen) {
     AddFriendScreen(onDismiss = { showAddFriendScreen = false })
   } else {
@@ -76,7 +102,11 @@ fun FriendsListScreen(friendsList: List<Friend>, navigationActions: NavigationAc
                       text = "Add Friends", fontSize = 24.sp, color = Color.White)
                 }
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn { items(friendsList) { friend -> FriendItem(friend = friend) } }
+            if (currentFriendsList.isEmpty()) {
+              Text(text = "No friends yet", fontWeight = FontWeight.Bold, fontSize = 24.sp)
+            } else {
+              LazyColumn { items(currentFriendsList) { friend -> FriendItem(friend = friend) } }
+            }
           }
     }
   }
