@@ -62,7 +62,6 @@ import com.google.maps.android.compose.MapUiSettings
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun Map(locationViewModel: LocationViewModel) {
-  val context = LocalContext.current
   var stopCreatingRoute = false
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
@@ -165,14 +164,7 @@ fun Map(locationViewModel: LocationViewModel) {
 
           // Button for stopping a route
           FloatingActionButton(
-              onClick = {
-                showProgression = true
-                locationViewModel.onPause()
-                stopCreatingRoute = true
-                routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
-                storeroute.addRoute(
-                    storeroute.getUserid(), locationViewModel.getAllocations(), emptyList())
-              },
+              onClick = { showProgression = true },
               modifier =
                   Modifier.size(85.dp)
                       .padding(16.dp)
@@ -249,6 +241,8 @@ fun Map(locationViewModel: LocationViewModel) {
           locationViewModel.onPause()
           stopCreatingRoute = true
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
+          storeroute.addRoute(
+              storeroute.getUserid(), locationViewModel.getAllocations(), emptyList())
         },
         routeLength,
         numCheckpoints)
