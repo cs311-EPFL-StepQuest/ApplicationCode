@@ -43,7 +43,7 @@ import androidx.compose.ui.window.Dialog
 fun RouteProgression(
     stopRoute: () -> Unit,
     closeProgression: () -> Unit,
-    locations: List<LocationDetails>,
+    routeLength: Float,
     numCheckpoints: Int
 ) {
   var routeName by rememberSaveable { mutableStateOf("") }
@@ -52,7 +52,6 @@ fun RouteProgression(
   var extraKilometers by rememberSaveable { mutableIntStateOf(0) }
   var extraCheckpoints by rememberSaveable { mutableIntStateOf(0) }
   // Save and round routeLength to two decimal places
-  val routeLength = String.format("%.2f", calculateRouteLength(locations) / 100f).toFloat()
 
   reward = (routeLength * 100).toInt()
   // Create a unique routeID (might find a better way)

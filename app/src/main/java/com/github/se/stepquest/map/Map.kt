@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,8 +94,6 @@ fun Map(locationViewModel: LocationViewModel) {
       }
 
   var showProgression by remember { mutableStateOf(false) }
-
-  var routeLength by rememberSaveable { mutableFloatStateOf(0f) }
   var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
 
   val launcherMultiplePermissions =
@@ -298,6 +295,12 @@ fun Map(locationViewModel: LocationViewModel) {
 
   // Open the progression screen
   if (showProgression) {
+    val routeLength =
+        String.format(
+                "%.2f",
+                calculateRouteLength(locationViewModel.getAllocations() ?: emptyList()) / 100f)
+            .toFloat()
+
     RouteProgression(
         stopRoute = {
           showProgression = false
@@ -308,7 +311,7 @@ fun Map(locationViewModel: LocationViewModel) {
               storeRoute.getUserid(), locationViewModel.getAllocations(), emptyList())
         },
         closeProgression = { showProgression = false },
-        locationViewModel.getAllocations() ?: emptyList(),
+        routeLength,
         numCheckpoints)
   }
 }

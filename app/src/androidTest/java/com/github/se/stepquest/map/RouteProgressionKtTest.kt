@@ -19,7 +19,7 @@ class RouteProgressionKtTest {
 
   @Test
   fun displayCorrectText() {
-    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+    composeTestRule.setContent { RouteProgression({}, {}, 0f, 0) }
     composeTestRule.onNodeWithText("End Route").assertIsDisplayed()
     composeTestRule.onNodeWithText("Route name").assertExists()
     composeTestRule.onNodeWithText("Route name").assertIsDisplayed()
@@ -28,7 +28,7 @@ class RouteProgressionKtTest {
   @Test
   fun displaysCorrectRouteLength() {
     val routeLength = 10f
-    composeTestRule.setContent { RouteProgression({}, routeLength, 0) }
+    composeTestRule.setContent { RouteProgression({}, {}, routeLength, 0) }
 
     composeTestRule.onNodeWithText("Route length: $routeLength km").assertExists()
     composeTestRule.onNodeWithText("Route length: $routeLength km").assertIsDisplayed()
@@ -37,7 +37,7 @@ class RouteProgressionKtTest {
   @Test
   fun displaysCorrectNumberOfCheckpoints() {
     val numCheckpoints = 5
-    composeTestRule.setContent { RouteProgression({}, 0f, numCheckpoints) }
+    composeTestRule.setContent { RouteProgression({}, {},0f, numCheckpoints) }
 
     composeTestRule.onNodeWithText("Number of checkpoints: $numCheckpoints").assertExists()
     composeTestRule.onNodeWithText("Number of checkpoints: $numCheckpoints").assertIsDisplayed()
@@ -47,7 +47,7 @@ class RouteProgressionKtTest {
   fun displaysCorrectReward() {
     val routeLength = 10f
     val reward = (routeLength * 100).toInt()
-    composeTestRule.setContent { RouteProgression({}, routeLength, 0) }
+    composeTestRule.setContent { RouteProgression({}, {}, routeLength, 0) }
 
     composeTestRule.onNodeWithText("Reward: $reward points").assertExists()
     composeTestRule.onNodeWithText("Reward: $reward points").assertIsDisplayed()
@@ -55,7 +55,7 @@ class RouteProgressionKtTest {
 
   @Test
   fun displaysCloseButton() {
-    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+    composeTestRule.setContent { RouteProgression({}, {}, 0f, 0) }
 
     composeTestRule.onNodeWithContentDescription("Close").assertExists()
     composeTestRule.onNodeWithContentDescription("Close").assertIsDisplayed()
@@ -63,7 +63,7 @@ class RouteProgressionKtTest {
 
   @Test
   fun displaysFinishButton() {
-    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+    composeTestRule.setContent { RouteProgression({}, {}, 0f, 0) }
 
     composeTestRule.onNodeWithText("Finish").assertExists()
     composeTestRule.onNodeWithText("Finish").assertIsDisplayed()
@@ -72,7 +72,7 @@ class RouteProgressionKtTest {
   @Test
   fun dismissesDialog_onCloseButtonClick() {
     var dialogDismissed = true
-    composeTestRule.setContent { RouteProgression({ dialogDismissed = false }, 0f, 0) }
+    composeTestRule.setContent { RouteProgression({}, { dialogDismissed = false }, 0f, 0) }
 
     composeTestRule.onNodeWithContentDescription("Close").performClick()
 
@@ -83,7 +83,7 @@ class RouteProgressionKtTest {
   fun displaysExtraKilometersAndCheckpoints_forNextReward() {
     var extraKilometers = 0
     var extraCheckpoints = 0
-    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+    composeTestRule.setContent { RouteProgression({}, {}, 0f, 0) }
 
     composeTestRule
         .onNodeWithText(
@@ -97,14 +97,14 @@ class RouteProgressionKtTest {
 
   @Test
   fun finishButtonIsDisabled_whenRouteNameIsEmpty() {
-    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+    composeTestRule.setContent { RouteProgression({}, {}, 0f, 0) }
 
     composeTestRule.onNodeWithText("Finish").assertIsNotEnabled()
   }
 
   @Test
   fun finishButtonIsEnabled_whenRouteNameIsNotEmpty() {
-    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+    composeTestRule.setContent { RouteProgression({}, {}, 0f, 0) }
 
     composeTestRule.onNodeWithText("Route name").performTextInput("Test Route")
 
@@ -113,7 +113,7 @@ class RouteProgressionKtTest {
 
   @Test
   fun finishButtonIsDisabled_whenRouteNameIsCleared() {
-    composeTestRule.setContent { RouteProgression({}, 0f, 0) }
+    composeTestRule.setContent { RouteProgression({}, {}, 0f, 0) }
 
     composeTestRule.onNodeWithText("Route name").performTextInput("Test Route")
     composeTestRule.onNodeWithText("Test Route").performTextReplacement("")
