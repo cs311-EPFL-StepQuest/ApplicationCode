@@ -43,35 +43,38 @@ import com.google.firebase.database.ValueEventListener
 @Composable
 fun ProfilePageLayout(navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
+  var totalStepsMade by remember { mutableStateOf(0) }
+  var username by remember { mutableStateOf("No name") }
   val firebaseAuth = FirebaseAuth.getInstance()
+  val database = FirebaseDatabase.getInstance()
   val userId = firebaseAuth.currentUser?.uid
   val profilePictureURL = firebaseAuth.currentUser?.photoUrl
-  val database = FirebaseDatabase.getInstance()
-  var totalStepsMade by remember { mutableStateOf(0) }
-  val stepsRef = database.reference.child("users").child(userId!!).child("totalSteps")
-  var username by remember { mutableStateOf("No name") }
-  val usernameRef = database.reference.child("users").child(userId).child("username")
-  stepsRef.addListenerForSingleValueEvent(
-      object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-          totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
-        }
+  if (userId != null) {
+    val databaseRef = database.reference.child("users")
+    val stepsRef = databaseRef.child(userId!!).child("totalSteps")
+    stepsRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(dataSnapshot: DataSnapshot) {
+            totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
+          }
 
-        override fun onCancelled(databaseError: DatabaseError) {
-          // add code when failing to access database
-        }
-      })
+          override fun onCancelled(databaseError: DatabaseError) {
+            // add code when failing to access database
+          }
+        })
+    val usernameRef = databaseRef.child(userId).child("username")
 
-  usernameRef.addListenerForSingleValueEvent(
-      object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-          username = dataSnapshot.getValue(String::class.java) ?: "No name"
-        }
+    usernameRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(dataSnapshot: DataSnapshot) {
+            username = dataSnapshot.getValue(String::class.java) ?: "No name"
+          }
 
-        override fun onCancelled(databaseError: DatabaseError) {
-          // add code when failing to access database
-        }
-      })
+          override fun onCancelled(databaseError: DatabaseError) {
+            // add code when failing to access database
+          }
+        })
+  }
   var showDialog by remember { mutableStateOf(false) }
   Column(
       modifier = Modifier.padding(32.dp).fillMaxSize(),
@@ -82,7 +85,8 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
           Image(
               painter = painterResource(id = R.drawable.settings),
               contentDescription = "Settings",
-              modifier = Modifier.size(30.dp))
+              modifier = Modifier.size(30.dp),
+          )
         }
         Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 40.sp)
         profilePictureURL?.let { uri ->
@@ -92,10 +96,6 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
               modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
         }
         Spacer(modifier = Modifier.height(16.dp))
-        /*Image(
-        painter = painterResource(id = R.drawable.dummypfp),
-        contentDescription = "Profile Picture",
-        modifier = Modifier.size(200.dp))*/
         Text(
             text = username,
             fontWeight = FontWeight.Bold,

@@ -2,10 +2,10 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="FriendsListKtTest">
+      <entry key="MainActivity">
         <State />
       </entry>
-      <entry key="MainActivity">
+      <entry key="ProfilePageLayoutTest">
         <State />
       </entry>
       <entry key="app">
