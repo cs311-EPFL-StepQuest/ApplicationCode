@@ -66,6 +66,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
+  val storeroute = StoreRoute()
 
   var uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = false)) }
   var showProgression by remember { mutableStateOf(false) }
@@ -240,6 +241,8 @@ fun Map(locationViewModel: LocationViewModel) {
           locationViewModel.onPause()
           stopCreatingRoute = true
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
+          storeroute.addRoute(
+              storeroute.getUserid(), locationViewModel.getAllocations(), emptyList())
         },
         routeLength,
         numCheckpoints)

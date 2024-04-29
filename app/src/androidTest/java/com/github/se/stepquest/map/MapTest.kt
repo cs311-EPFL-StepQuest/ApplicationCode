@@ -234,4 +234,10 @@ class MapTest {
     composeTestRule.setContent { StepQuestTheme { Map(vm) } }
     composeTestRule.onNodeWithTag("createRouteButton").performClick()
   }
+
+  @Test
+  fun TestpreeStopCreateRoute() {
+    composeTestRule.setContent { StepQuestTheme { Map(vm) } }
+    composeTestRule.onNodeWithTag("stopRouteButton").performClick()
+  }
 }

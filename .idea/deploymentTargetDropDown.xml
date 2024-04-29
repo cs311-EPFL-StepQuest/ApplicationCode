@@ -2,12 +2,6 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="FriendsListKtTest">
-        <State />
-      </entry>
-      <entry key="MainActivity">
-        <State />
-      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -23,6 +17,9 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-04-29T05:08:33.094809600Z" />
         </State>
+      </entry>
+      <entry key="testAddRoute()">
+        <State />
       </entry>
     </value>
   </component>
