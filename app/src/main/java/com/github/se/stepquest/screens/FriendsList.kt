@@ -42,7 +42,10 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
 
 @Composable
-fun FriendsListScreen(navigationActions: NavigationActions, testCurrentFriendsList: List<Friend> = emptyList()) {
+fun FriendsListScreen(
+    navigationActions: NavigationActions,
+    testCurrentFriendsList: List<Friend> = emptyList()
+) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
   var currentFriendsList: MutableList<Friend> = testCurrentFriendsList.toMutableList()
