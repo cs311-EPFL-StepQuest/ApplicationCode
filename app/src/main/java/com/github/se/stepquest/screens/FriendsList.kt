@@ -42,14 +42,14 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
 
 @Composable
-fun FriendsListScreen(navigationActions: NavigationActions) {
+fun FriendsListScreen(navigationActions: NavigationActions, testCurrentFriendsList: List<Friend> = emptyList()) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
-  var currentFriendsList: MutableList<Friend> = mutableListOf()
+  var currentFriendsList: MutableList<Friend> = testCurrentFriendsList.toMutableList()
   val firebaseAuth = FirebaseAuth.getInstance()
   val database = FirebaseDatabase.getInstance()
   val userId = firebaseAuth.currentUser?.uid
-  if (userId != null) {
+  if (userId != null && currentFriendsList.isEmpty()) {
     val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
     friendsListRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
