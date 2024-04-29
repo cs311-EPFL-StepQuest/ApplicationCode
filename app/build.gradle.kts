@@ -14,6 +14,9 @@ sonar {
         property("sonar.projectKey", "cs311-EPFL-StepQuest_ApplicationCode")
         property("sonar.organization", "cs311-epfl-stepquest")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.junit.reportPaths", "${project.layout.buildDirectory.get()}/test-results/testDebugunitTest/")
+        property("sonar.androidLint.reportPaths", "${project.layout.buildDirectory.get()}/reports/lint-results-debug.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
 
