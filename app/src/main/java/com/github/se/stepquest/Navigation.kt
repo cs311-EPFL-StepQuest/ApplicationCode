@@ -84,8 +84,8 @@ fun AppNavigationHost(
         composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context) }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
+        composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository()) }
         composable(Routes.MapScreen.routName) { Map(locationviewModel) }
-        composable(Routes.ProgressionScreen.routName) { ProgressionPage() }
         composable(Routes.ProfileScreen.routName) { ProfilePageLayout(navigationActions) }
         composable(Routes.FriendsListScreen.routName) {
           FriendsListScreen(
