@@ -1,5 +1,6 @@
 package com.github.se.stepquest.map
 // Map.kt
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,19 +16,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.runtime.*
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +57,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.maps.android.compose.MapUiSettings
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -62,6 +68,14 @@ fun Map(locationViewModel: LocationViewModel) {
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
   val storeroute = StoreRoute()
+
+  var uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = false)) }
+  var showProgression by remember { mutableStateOf(false) }
+
+  var routeLength by rememberSaveable { mutableFloatStateOf(0f) }
+  var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
+
+  val context = LocalContext.current
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -152,6 +166,7 @@ fun Map(locationViewModel: LocationViewModel) {
           // Button for stopping a route
           FloatingActionButton(
               onClick = {
+                showProgression = true
                 locationViewModel.onPause()
                 stopCreatingRoute = true
                 routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
@@ -210,6 +225,7 @@ fun Map(locationViewModel: LocationViewModel) {
                         val title = checkpointTitle
                         showDialog = false
                       },
+                      enabled = checkpointTitle.isNotEmpty(),
                       shape = RoundedCornerShape(12.dp),
                       colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff00b3ff)),
                       modifier = Modifier.width(150.dp).align(Alignment.Center)) {
@@ -224,6 +240,19 @@ fun Map(locationViewModel: LocationViewModel) {
               modifier = Modifier.width(300.dp))
         }
       })
+
+  // Open the progression screen
+  if (showProgression) {
+    RouteProgression(
+        onDismiss = {
+          showProgression = false
+          locationViewModel.onPause()
+          stopCreatingRoute = true
+          routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
+        },
+        routeLength,
+        numCheckpoints)
+  }
 }
 
 fun updateMap(

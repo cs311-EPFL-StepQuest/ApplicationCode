@@ -5,8 +5,8 @@ plugins {
     id ("org.jetbrains.kotlin.android")
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("com.google.gms.google-services")
+    id("jacoco")
     id("org.sonarqube") version "4.4.1.3373"
-
 }
 
 sonar {
@@ -14,6 +14,9 @@ sonar {
         property("sonar.projectKey", "cs311-EPFL-StepQuest_ApplicationCode")
         property("sonar.organization", "cs311-epfl-stepquest")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.junit.reportPaths", "${project.layout.buildDirectory.get()}/test-results/testDebugunitTest/")
+        property("sonar.androidLint.reportPaths", "${project.layout.buildDirectory.get()}/reports/lint-results-debug.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
 
@@ -184,7 +187,7 @@ dependencies {
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
-    mustRunAfter("testDebugUnitTest", "connectedDebugAndroidTest")
+    mustRunAfter("testDebugUnitTest", "connectedCheck")
 
     reports {
         xml.required = true
