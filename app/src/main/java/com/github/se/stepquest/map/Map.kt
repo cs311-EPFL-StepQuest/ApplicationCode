@@ -226,7 +226,7 @@ fun Map(locationViewModel: LocationViewModel) {
                 onValueChange = { allroutes = it },
                 textStyle =
                     TextStyle(
-                        fontSize = 15.sp,
+                        fontSize = 25.sp,
                         fontWeight = FontWeight(300),
                         color = Color.Black,
                     ),
@@ -235,13 +235,13 @@ fun Map(locationViewModel: LocationViewModel) {
                         .background(Color.White, shape = RoundedCornerShape(15.dp))
                         .padding(horizontal = 12.dp)
                         .width(200.dp)
-                        .height(25.dp)
+                        .height(40.dp)
                         .offset(y = 3.dp)
                         .testTag("SearchBarTextField"))
             IconButton(
                 onClick = {},
                 modifier =
-                    Modifier.align(Alignment.CenterEnd).testTag("SearchCleanButton").size(15.dp)) {
+                    Modifier.align(Alignment.CenterEnd).testTag("SearchCleanButton").size(25.dp)) {
                   androidx.compose.material3.Icon(
                       painter = painterResource(com.github.se.stepquest.R.drawable.clear),
                       contentDescription = "Clear search",
@@ -251,9 +251,9 @@ fun Map(locationViewModel: LocationViewModel) {
                 onClick = {},
                 modifier =
                     Modifier.align(Alignment.CenterEnd)
-                        .offset(x = 30.dp)
+                        .offset(x = 45.dp)
                         .background(Color.White, shape = CircleShape)
-                        .size(25.dp)
+                        .size(35.dp)
                         .testTag("SearchButton")) {
                   androidx.compose.material3.Icon(
                       painter = painterResource(com.github.se.stepquest.R.drawable.search_route),
