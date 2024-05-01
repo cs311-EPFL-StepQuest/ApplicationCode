@@ -3,7 +3,11 @@ package com.github.se.stepquest.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.graphics.BitmapFactory
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,6 +41,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -57,24 +64,53 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.maps.android.compose.MapUiSettings
+import kotlinx.coroutines.flow.MutableStateFlow
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun Map(locationViewModel: LocationViewModel) {
+  val context = LocalContext.current
   var stopCreatingRoute = false
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
   val storeroute = StoreRoute()
 
-  var uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = false)) }
+  // Instantiate all necessary variables to take pictures
+  val currentImage = remember { mutableStateOf<ImageBitmap?>(null) }
+  val images = remember { MutableStateFlow<List<ImageBitmap>>(emptyList()) }
+  var photoFile = getPhotoFile(context)
+  val fileProvider =
+      FileProvider.getUriForFile(context, "com.github.se.stepquest.map.fileprovider", photoFile)
+  val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+  takePicture.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
+  val resultLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result
+        ->
+        if (result.resultCode == Activity.RESULT_OK) {
+          val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
+          currentImage.value = takenImage.asImageBitmap()
+        }
+      }
+  // Launch camera permissions
+  val launcherCameraPermissions =
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+          permissionsMap ->
+        val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
+        println("launcherMultiplePermissions")
+        if (areGranted) {
+          println("Permission Granted")
+          Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+        } else {
+          println("Permission Denied")
+          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+      }
+
   var showProgression by remember { mutableStateOf(false) }
 
   var routeLength by rememberSaveable { mutableFloatStateOf(0f) }
   var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
-
-  val context = LocalContext.current
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -91,7 +127,10 @@ fun Map(locationViewModel: LocationViewModel) {
         }
       }
   val permissions =
-      arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+      arrayOf(
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+          Manifest.permission.ACCESS_FINE_LOCATION,
+          Manifest.permission.CAMERA)
 
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
@@ -207,6 +246,32 @@ fun Map(locationViewModel: LocationViewModel) {
                       onValueChange = { checkpointTitle = it },
                       label = { Text("Name:") },
                       modifier = Modifier.fillMaxWidth())
+                  Spacer(modifier = Modifier.height(36.dp))
+                  Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "Take a picture",
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp))
+                  }
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  // Button to take picture
+                  Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    IconButton(
+                        onClick = {
+                          if (PermissionChecker.checkSelfPermission(
+                              context, Manifest.permission.CAMERA) ==
+                              PermissionChecker.PERMISSION_GRANTED) {
+                            resultLauncher.launch(takePicture)
+                          } else {
+                            launcherCameraPermissions.launch(arrayOf(Manifest.permission.CAMERA))
+                          }
+                        }) {
+                          Icon(
+                              painterResource(R.drawable.camera_icon),
+                              contentDescription = "camera_icon",
+                              modifier = Modifier.size(60.dp))
+                        }
+                  }
                 }
               },
               confirmButton = {
@@ -214,6 +279,10 @@ fun Map(locationViewModel: LocationViewModel) {
                   Button(
                       onClick = {
                         // ADD HERE CODE FOR ADDING CHECKPOINTS, INPUT TITLE STORED IN title
+
+                        // Add the image to the list of images
+                        images.value += currentImage.value!!
+
                         val title = checkpointTitle
                         showDialog = false
                       },
