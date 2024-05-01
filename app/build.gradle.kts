@@ -177,6 +177,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.7")
     testImplementation("io.mockk:mockk-android:1.13.7")
     testImplementation("io.mockk:mockk-agent:1.13.7")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     androidTestImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     androidTestImplementation("org.hamcrest:hamcrest:2.2")
     androidTestImplementation("org.mockito:mockito-android:3.12.4")
