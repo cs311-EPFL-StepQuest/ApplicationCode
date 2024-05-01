@@ -86,7 +86,7 @@ class StepCounterService() : Service(), SensorEventListener {
             }
           })
 
-      //Store weekly steps
+      // Store weekly steps
       val calendar = Calendar.getInstance()
       // Set the calendar to the current date
       calendar.time = d
@@ -105,27 +105,27 @@ class StepCounterService() : Service(), SensorEventListener {
 
       val stepsRefWeek = database.reference.child("users").child(userId).child("weeklySteps")
       stepsRefWeek.addListenerForSingleValueEvent(
-        object : ValueEventListener {
-          override fun onDataChange(dataSnapshot: DataSnapshot) {
-            if (!dataSnapshot.hasChild(current_period)) {
-              stepsRefWeek.child(current_period).setValue(newSteps)
-              // Clean all other weeks data
-              for (child in dataSnapshot.children) {
+          object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+              if (!dataSnapshot.hasChild(current_period)) {
+                stepsRefWeek.child(current_period).setValue(newSteps)
+                // Clean all other weeks data
+                for (child in dataSnapshot.children) {
                   if (child.key != current_period) {
-                  stepsRefWeek.child(child.key!!).removeValue()
+                    stepsRefWeek.child(child.key!!).removeValue()
                   }
+                }
+              } else {
+                val currentSteps = dataSnapshot.child(current_period).getValue(Int::class.java) ?: 0
+                val totalSteps = currentSteps + newSteps
+                stepsRefWeek.child(current_period).setValue(totalSteps)
               }
-            } else {
-              val currentSteps = dataSnapshot.child(current_period).getValue(Int::class.java) ?: 0
-              val totalSteps = currentSteps + newSteps
-              stepsRefWeek.child(current_period).setValue(totalSteps)
             }
-          }
 
-          override fun onCancelled(databaseError: DatabaseError) {
-            // add code when failing to access database
-          }
-        })
+            override fun onCancelled(databaseError: DatabaseError) {
+              // add code when failing to access database
+            }
+          })
     }
   }
 }
