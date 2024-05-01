@@ -36,7 +36,7 @@ class StepCounterService() : Service(), SensorEventListener {
     stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
     firebaseAuth = FirebaseAuth.getInstance()
     database = FirebaseDatabase.getInstance()
-    cleanUpOldSteps(firebaseAuth.currentUser?.uid ?: "")
+    cleanUpOldSteps(firebaseAuth.currentUser?.uid!!)
 
     sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
   }
