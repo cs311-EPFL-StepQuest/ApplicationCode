@@ -84,3 +84,26 @@ fun sendFriendRequest(currentUsername: String, friendName: String) {
         }
       })
 }
+
+fun deletePendingFriendRequest(friendName: String) {
+
+  val database = FirebaseDatabase.getInstance()
+  val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+  val pendingRequestsRef =
+      database.reference.child("users").child(userId).child("pendingFriendRequests")
+  pendingRequestsRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(requestsSnapshot: DataSnapshot) {
+          val pendingRequests =
+              requestsSnapshot.getValue<List<String>>()?.toMutableList() ?: mutableListOf()
+          if (friendName !in pendingRequests) return
+          pendingRequests.remove(friendName)
+          pendingRequestsRef.setValue(pendingRequests)
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+          // Handle access failure
+        }
+      })
+}
