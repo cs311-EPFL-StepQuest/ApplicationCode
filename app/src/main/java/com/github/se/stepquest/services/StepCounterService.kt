@@ -38,6 +38,8 @@ class StepCounterService() : Service(), SensorEventListener {
     database = FirebaseDatabase.getInstance()
 
     sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+    //Fake step count for testing
+    saveStepCountToDatabase(1)
   }
 
   override fun onDestroy() {
@@ -85,36 +87,41 @@ class StepCounterService() : Service(), SensorEventListener {
               // add code when failing to access database
             }
           })
+
       //Store weekly steps
       val calendar = Calendar.getInstance()
-
       // Set the calendar to the current date
       calendar.time = d
-
       // Find the start of the week (Monday)
       calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
       val startOfWeek = calendar.time
-
       // Find the end of the week (Sunday)
       calendar.add(Calendar.DAY_OF_WEEK, 6)
       val endOfWeek = calendar.time
-
       // Format the dates
       val dateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
       val startFormatted = dateFormat.format(startOfWeek)
       val endFormatted = dateFormat.format(endOfWeek)
-
       // Combine formatted dates
-      val period = "$startFormatted - $endFormatted"
-      println("Week period: $period")
+      val current_period = "$startFormatted - $endFormatted"
 
-      val stepsRefWeek = database.reference.child("users").child(userId).child("weeklySteps $period")
+      val stepsRefWeek = database.reference.child("users").child(userId).child("weeklySteps")
       stepsRefWeek.addListenerForSingleValueEvent(
         object : ValueEventListener {
           override fun onDataChange(dataSnapshot: DataSnapshot) {
-            val currentSteps = dataSnapshot.getValue(Int::class.java) ?: 0
-            val totalSteps = currentSteps + newSteps
-            stepsRefWeek.setValue(totalSteps)
+            if (!dataSnapshot.hasChild(current_period)) {
+              stepsRefWeek.child(current_period).setValue(newSteps)
+              // Clean all other weeks data
+              for (child in dataSnapshot.children) {
+                  if (child.key != current_period) {
+                  stepsRefWeek.child(child.key!!).removeValue()
+                  }
+              }
+            } else {
+              val currentSteps = dataSnapshot.child(current_period).getValue(Int::class.java) ?: 0
+              val totalSteps = currentSteps + newSteps
+              stepsRefWeek.child(current_period).setValue(totalSteps)
+            }
           }
 
           override fun onCancelled(databaseError: DatabaseError) {
