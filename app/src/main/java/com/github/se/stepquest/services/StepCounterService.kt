@@ -38,8 +38,6 @@ class StepCounterService() : Service(), SensorEventListener {
     database = FirebaseDatabase.getInstance()
 
     sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
-    //Fake step count for testing
-    saveStepCountToDatabase(1)
   }
 
   override fun onDestroy() {
