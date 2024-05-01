@@ -33,6 +33,7 @@ class StepCounterService() : Service(), SensorEventListener {
     stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
     firebaseAuth = FirebaseAuth.getInstance()
     database = FirebaseDatabase.getInstance()
+    cleanUpOldSteps(firebaseAuth.currentUser?.uid!!)
 
     sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
   }
@@ -83,5 +84,29 @@ class StepCounterService() : Service(), SensorEventListener {
             }
           })
     }
+  }
+
+  fun cleanUpOldSteps(userId: String) {
+    //clean up old daily steps
+    val userRef = database.reference.child("users").child(userId)
+    val d = Date()
+    val s: CharSequence = DateFormat.format("MMMM d, yyyy ", d.getTime())
+
+    userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+      override fun onDataChange(dataSnapshot: DataSnapshot) {
+        for (child in dataSnapshot.children) {
+            val nodeName = child.key
+            println("nodeName: $nodeName")
+            if (nodeName != null && nodeName.contains("dailySteps") && nodeName!= "dailySteps $s") {
+                println("removing $nodeName")
+              userRef.child(nodeName).removeValue()
+            }
+          }
+        }
+
+      override fun onCancelled(databaseError: DatabaseError) {
+        // Handle error
+      }
+    })
   }
 }
