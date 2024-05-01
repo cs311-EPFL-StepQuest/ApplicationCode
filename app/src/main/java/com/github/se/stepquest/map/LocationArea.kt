@@ -4,11 +4,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.getValue
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sqrt
 
-class LocationArea {
+class LocationArea{
   var firebaseAuth: FirebaseAuth
   var database: FirebaseDatabase
   private lateinit var center: LatLng
@@ -25,22 +26,26 @@ class LocationArea {
   }
 
   fun routesAroundLocation(
-      googleMap: GoogleMap,
-      selectedLocation: LocationDetails
-  ): List<StoreRoute.Route> {
+    googleMap: GoogleMap,
+    selectedLocation: LocationDetails
+  ): List<LocationDetails> {
     // Retrieve all routes from the database and check
     // if the starting point of the route is within the circle
     val routes = database.reference.child("routes")
-    val routeList = mutableListOf<StoreRoute.Route>()
+    val routeList = mutableListOf<LocationDetails>()
 
     routes.get().addOnSuccessListener { snapshot ->
-      for (route in snapshot.children) {
-        val routeData = route.getValue(StoreRoute.Route::class.java)
-        if (routeData != null) {
-          if (checkInsideArea(routeData.route?.get(0)!!)) {
+      for (routeID in snapshot.children) {
+        val routeDataSnapshot = routeID.child("route").child("0")
+        val latitude = routeDataSnapshot.child("latitude").getValue<Double>()
+        val longitude = routeDataSnapshot.child("longitude").getValue<Double>()
+        if (latitude != null && longitude != null) {
+          val routeData = LocationDetails(latitude, longitude)
+          if (checkInsideArea(routeData)) {
             routeList.add(routeData)
           }
         }
+
       }
     }
 
