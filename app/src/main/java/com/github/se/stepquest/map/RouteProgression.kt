@@ -37,6 +37,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -194,5 +195,5 @@ fun calculateRouteLength(locations: List<LocationDetails>): Float {
   for (i in 0 until locations.size - 1) {
     routeLength += calculateDistance(locations[i], locations[i + 1])
   }
-  return String.format("%.2f", routeLength / 1000f).toFloat()
+  return round(routeLength / 10f) / 100f
 }
