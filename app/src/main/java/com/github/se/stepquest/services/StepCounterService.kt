@@ -13,7 +13,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 class StepCounterService() : Service(), SensorEventListener {
 
@@ -82,6 +85,42 @@ class StepCounterService() : Service(), SensorEventListener {
               // add code when failing to access database
             }
           })
+      //Store weekly steps
+      val calendar = Calendar.getInstance()
+
+      // Set the calendar to the current date
+      calendar.time = d
+
+      // Find the start of the week (Monday)
+      calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+      val startOfWeek = calendar.time
+
+      // Find the end of the week (Sunday)
+      calendar.add(Calendar.DAY_OF_WEEK, 6)
+      val endOfWeek = calendar.time
+
+      // Format the dates
+      val dateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
+      val startFormatted = dateFormat.format(startOfWeek)
+      val endFormatted = dateFormat.format(endOfWeek)
+
+      // Combine formatted dates
+      val period = "$startFormatted - $endFormatted"
+      println("Week period: $period")
+
+      val stepsRefWeek = database.reference.child("users").child(userId).child("weeklySteps $period")
+      stepsRefWeek.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val currentSteps = dataSnapshot.getValue(Int::class.java) ?: 0
+            val totalSteps = currentSteps + newSteps
+            stepsRefWeek.setValue(totalSteps)
+          }
+
+          override fun onCancelled(databaseError: DatabaseError) {
+            // add code when failing to access database
+          }
+        })
     }
   }
 }
