@@ -8,20 +8,19 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sqrt
 
-class LocationArea(
-    var center: LatLng,
-    var radius: Double,
-) {
+class LocationArea {
   var firebaseAuth: FirebaseAuth
   var database: FirebaseDatabase
+  private lateinit var center: LatLng
+  private var radius: Double = 1000.0
 
   init {
     firebaseAuth = FirebaseAuth.getInstance()
     database = FirebaseDatabase.getInstance()
   }
 
-  fun createArea(centerLocation: LocationDetails) {
-    this.radius = 1000.0
+  fun createArea(centerLocation: LocationDetails, radius: Double = 1000.0) {
+    this.radius = radius
     this.center = LatLng(centerLocation.latitude, centerLocation.longitude)
   }
 
