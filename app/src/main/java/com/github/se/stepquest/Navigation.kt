@@ -87,7 +87,7 @@ fun AppNavigationHost(
         composable(Routes.DatabaseLoadingScreen.routName) {
           DatabaseLoadingScreen(navigationActions, context)
         }
-        composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context) }
+        composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context, userId) }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
         composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository()) }

@@ -2,6 +2,9 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="NewPlayerScreenTest">
+        <State />
+      </entry>
       <entry key="ProfilePageLayoutTest">
         <State />
       </entry>
@@ -21,10 +24,7 @@
           <timeTargetWasSelectedWithDropDown value="2024-04-29T05:08:33.094809600Z" />
         </State>
       </entry>
-      <entry key="display_profile_layout()">
-        <State />
-      </entry>
-      <entry key="testOnCreate()">
+      <entry key="givenNewPlayer_whenScreenDisplayed_thenUsernameTextFieldDisplayed()">
         <State />
       </entry>
     </value>

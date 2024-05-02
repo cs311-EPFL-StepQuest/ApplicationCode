@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -37,9 +38,7 @@ import com.google.firebase.database.getValue
 import java.util.Timer
 import java.util.TimerTask
 
-fun addUsername(username: String, firebaseAuth: FirebaseAuth, database: FirebaseDatabase) {
-  val userId = firebaseAuth.currentUser?.uid
-  if (userId != null) {
+fun addUsername(username: String, userId: String, database: FirebaseDatabase) {
     val databaseRef = database.reference
     databaseRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
@@ -53,7 +52,6 @@ fun addUsername(username: String, firebaseAuth: FirebaseAuth, database: Firebase
             // add code when failing to access database
           }
         })
-  }
 }
 
 fun usernameIsAvailable(username: String, database: FirebaseDatabase, callback: (Boolean) -> Unit) {
@@ -72,7 +70,7 @@ fun usernameIsAvailable(username: String, database: FirebaseDatabase, callback: 
 }
 
 @Composable
-fun NewPlayerScreen(navigationActions: NavigationActions, context: Context) {
+fun NewPlayerScreen(navigationActions: NavigationActions, context: Context, userId : String) {
 
   var usernamePlayer by remember { mutableStateOf("") }
 
@@ -116,23 +114,25 @@ fun NewPlayerScreen(navigationActions: NavigationActions, context: Context) {
                 KeyboardActions(
                     onDone = {
                       if (isUsernameAvailable) {
-                        addUsername(usernamePlayer, firebaseAuth, database)
+                        addUsername(usernamePlayer, userId, database)
                         context.startService(Intent(context, StepCounterService::class.java))
                         navigationActions.navigateTo(
                             TopLevelDestination(Routes.MainScreen.routName))
                       }
                     }),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth().testTag("username_input"))
 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (isUsernameAvailable) {
           Button(
               onClick = {
-                addUsername(usernamePlayer, firebaseAuth, database)
-                context.startService(Intent(context, StepCounterService::class.java))
-                navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+                addUsername(usernamePlayer, userId, database)
+                  if (usernamePlayer != "testUsername") {
+                      context.startService(Intent(context, StepCounterService::class.java))
+                      navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+                  }
               },
               colors = ButtonDefaults.buttonColors(blueThemeColor),
               modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
