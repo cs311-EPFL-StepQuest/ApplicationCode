@@ -9,6 +9,7 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.junit4.MockKRule
 import io.mockk.just
+import io.mockk.justRun
 import io.mockk.mockk
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
@@ -70,9 +71,17 @@ class LocationViewModelTest {
 
   @Test
   fun test_addNewCheckpoint() {
+    val c = mutableListOf<Checkpoint>()
+
     val lvm = mockk<LocationViewModel>(relaxed = true) {
       every { currentLocation } returns mockk() {
         every { value } returns LocationDetails(1.0, 1.0) andThen LocationDetails(2.0, 2.0)
+      }
+      every { addNewCheckpoint(any()) } re{
+        val newCheckpointList = checkpoints.value?.toMutableList() ?: mutableListOf()
+        val newCheckpoint = Checkpoint(name, currentLocation.value!!)
+        newCheckpointList.add(newCheckpoint)
+        checkpoints.value = newCheckpointList
       }
     }
 

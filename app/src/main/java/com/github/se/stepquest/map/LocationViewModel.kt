@@ -83,15 +83,11 @@ class LocationViewModel : ViewModel() {
     return _allocations.value
   }
 
-  fun addNewCheckpoint(name: String, currList: MutableList<Checkpoint>? = null): List<Checkpoint> {
-    var newCheckpointList = currList
-    if(currList == null){
-      newCheckpointList = checkpoints.value?.toMutableList() ?: mutableListOf()
-    }
+  fun addNewCheckpoint(name: String) {
+    val newCheckpointList = checkpoints.value?.toMutableList() ?: mutableListOf()
     val newCheckpoint = Checkpoint(name, currentLocation.value!!)
-    newCheckpointList!!.add(newCheckpoint)
-    checkpoints.value = newCheckpointList!!
-    return newCheckpointList
+    newCheckpointList.add(newCheckpoint)
+    checkpoints.value = newCheckpointList
   }
 }
 
