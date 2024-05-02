@@ -85,10 +85,9 @@ fun sendFriendRequest(currentUsername: String, friendName: String) {
       })
 }
 
-fun deletePendingFriendRequest(friendName: String) {
+fun deletePendingFriendRequest(friendName: String, database: FirebaseDatabase = FirebaseDatabase.getInstance(), userId: String? = FirebaseAuth.getInstance().currentUser?.uid ) {
 
-  val database = FirebaseDatabase.getInstance()
-  val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+  if (userId == null) return
 
   val pendingRequestsRef =
       database.reference.child("users").child(userId).child("pendingFriendRequests")
