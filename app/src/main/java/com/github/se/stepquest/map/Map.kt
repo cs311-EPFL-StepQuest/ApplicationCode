@@ -142,14 +142,14 @@ fun Map(locationViewModel: LocationViewModel) {
         if (showDialog) {
           AlertDialog(
               shape = RoundedCornerShape(16.dp),
-              onDismissRequest = { showDialog = false },
+              onDismissRequest = { showDialog = false; checkpointTitle = ""},
               title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                   Text(
                       "New Checkpoint",
                       style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
                       modifier = Modifier.weight(1f))
-                  IconButton(onClick = { showDialog = false }, modifier = Modifier.size(36.dp)) {
+                  IconButton(onClick = { showDialog = false; checkpointTitle = "" }, modifier = Modifier.size(36.dp)) {
                     Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.Black)
                   }
                 }
@@ -172,9 +172,9 @@ fun Map(locationViewModel: LocationViewModel) {
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp)) {
                   Button(
                       onClick = {
-                        // ADD HERE CODE FOR ADDING CHECKPOINTS, INPUT TITLE STORED IN title
                         locationViewModel.addNewCheckpoint(checkpointTitle)
                         showDialog = false
+                        checkpointTitle = ""
                       },
                       shape = RoundedCornerShape(12.dp),
                       colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff00b3ff)),

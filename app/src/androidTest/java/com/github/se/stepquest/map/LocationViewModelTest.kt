@@ -1,11 +1,16 @@
 package com.github.se.stepquest.map
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.mockk.MockKAnnotations
+import io.mockk.Runs
+import io.mockk.every
 import io.mockk.junit4.MockKRule
+import io.mockk.just
 import io.mockk.mockk
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -24,8 +29,6 @@ class LocationViewModelTest {
 
   // Declare vm as a public variable
   private lateinit var locationViewModel: LocationViewModel
-
-  private val observerCheckpoints = mockk<Observer<in List<Checkpoint>>>()
 
   @Before
   fun setup() {
@@ -65,23 +68,20 @@ class LocationViewModelTest {
 
   @Test fun startLocationUpdatesTest() {}
 
-  /*@Test
-  fun test_addNewCheckpoint() = runBlockingTest {
-    // Mock data
-    val viewModel = LocationViewModel()
-    viewModel.checkpoints.observeForever(observerCheckpoints)
+  @Test
+  fun test_addNewCheckpoint() {
+    val lvm = mockk<LocationViewModel>(relaxed = true) {
+      every { currentLocation } returns mockk() {
+        every { value } returns LocationDetails(1.0, 1.0) andThen LocationDetails(2.0, 2.0)
+      }
+    }
 
-    val name = "Test Checkpoint"
-    val location = LocationDetails(1.0, 2.0)
-
-    // Call the function
-    viewModel.addNewCheckpoint(name)
+    val list = lvm.addNewCheckpoint("testName", mutableListOf())
 
     // Verify if the checkpoint was added
-    val checkpoints = viewModel.checkpoints.value
-    assertEquals(1, checkpoints?.size)
-    assertEquals(name, checkpoints?.get(0)?.name)
-    assertEquals(location.latitude, checkpoints?.get(0)?.location?.latitude)
-    assertEquals(location.longitude, checkpoints?.get(0)?.location?.longitude)
-  }*/
+    assertEquals(1, list.size)
+    assertEquals("testName", list[0].name)
+    assertEquals(1.0, list[0].location.latitude, 1e-3)
+    assertEquals(1.0, list[0].location.longitude, 1e-3)
+  }
 }
