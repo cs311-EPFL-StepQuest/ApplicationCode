@@ -22,6 +22,7 @@ class FriendsServicesTest {
   private lateinit var database: FirebaseDatabase
   private lateinit var requestsListRef: DatabaseReference
   private lateinit var user: FirebaseUser
+
   @Test
   fun testDeletePendingRequest() {
 
