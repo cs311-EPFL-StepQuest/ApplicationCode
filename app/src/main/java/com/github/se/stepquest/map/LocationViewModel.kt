@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.*
 import com.google.android.gms.location.*
 
 data class LocationDetails(val latitude: Double, val longitude: Double)
+
 data class Checkpoint(val name: String, val location: LocationDetails)
 
 class LocationViewModel : ViewModel() {
@@ -87,7 +87,7 @@ class LocationViewModel : ViewModel() {
     val newCheckpointList = checkpoints.value?.toMutableList() ?: mutableListOf()
     val newCheckpoint = Checkpoint(name, currentLocation.value!!)
     newCheckpointList.add(newCheckpoint)
-    checkpoints.value = newCheckpointList
+    checkpoints.postValue(newCheckpointList)
   }
 }
 

@@ -1,17 +1,11 @@
 package com.github.se.stepquest.map
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.mockk.MockKAnnotations
-import io.mockk.Runs
-import io.mockk.every
 import io.mockk.junit4.MockKRule
-import io.mockk.just
-import io.mockk.justRun
-import io.mockk.mockk
-import kotlinx.coroutines.test.runBlockingTest
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -70,22 +64,26 @@ class LocationViewModelTest {
   @Test fun startLocationUpdatesTest() {}
 
   @Test
-  fun test_addNewCheckpoint() {
-    val c = mutableListOf<Checkpoint>()
+  fun testAddNewCheckpoint() {
+    val mockLocationDetails = LocationDetails(10.0, 20.0)
 
-    val lvm = mockk<LocationViewModel>(relaxed = true) {
-      every { currentLocation } returns mockk() {
-        every { value } returns LocationDetails(1.0, 1.0) andThen LocationDetails(2.0, 2.0)
-      }
-      justRun { addNewCheckpoint(any()) }
-    }
+    locationViewModel.currentLocation.postValue(mockLocationDetails)
+    locationViewModel.checkpoints.postValue(mutableListOf())
 
-    val list = lvm.addNewCheckpoint("testName")
+    // Wait to ensure the postvalue is done
+    val latch = CountDownLatch(1)
 
-    // Verify if the checkpoint was added
+    latch.await(2, TimeUnit.SECONDS)
+
+    locationViewModel.addNewCheckpoint("testName")
+
+    // Again wait to ensure postvalue in the function we are testing is done
+    latch.await(2, TimeUnit.SECONDS)
+
+    val list = locationViewModel.checkpoints.value!!
+
     assertEquals(1, list.size)
-    assertEquals("testName", list[0].name)
-    assertEquals(1.0, list[0].location.latitude, 1e-3)
-    assertEquals(1.0, list[0].location.longitude, 1e-3)
+    assert(list[0].name == "testName")
+    assert(list[0].location == mockLocationDetails)
   }
 }
