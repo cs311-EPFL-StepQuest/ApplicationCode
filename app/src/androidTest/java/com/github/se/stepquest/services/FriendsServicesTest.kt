@@ -1,56 +1,49 @@
 package com.github.se.stepquest.services
 
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class FriendsServicesTest {
-
-  @get:Rule val composeTestRule = createComposeRule()
+class FirebaseServiceTest {
 
   private lateinit var database: FirebaseDatabase
-  private lateinit var requestsListRef: DatabaseReference
+  private lateinit var requestsRef: DatabaseReference
 
   @Before
   fun setup() {
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    FirebaseApp.initializeApp(context)
 
     database = mockk(relaxed = true)
-    requestsListRef = mockk(relaxed = true)
+  }
+
+  @Test
+  fun sendFriendRequestTest() {
+
+    sendFriendRequest("currentUsername", "friendName")
+  }
+
+  @Test
+  fun deletePendingFriendRequestTest() {
+
+    requestsRef = mockk(relaxed = true)
 
     every { database.reference } returns
         mockk {
           every { child(any()) } returns
               mockk {
-                every { child(any()) } returns
-                    mockk { every { child(any()) } returns requestsListRef }
+                every { child(any()) } returns mockk { every { child(any()) } returns requestsRef }
               }
         }
-  }
 
-  @Test
-  fun testDeletePendingRequest() {
-
-    val friendsList = mutableListOf("friendName")
-
-    every { requestsListRef.addListenerForSingleValueEvent(any()) } answers
-        {
-          val listener = arg<ValueEventListener>(0)
-          listener.onDataChange(
-              mockk { every { getValue<List<String>>()?.toMutableList() } returns friendsList })
-        }
-
-    sendFriendRequest("friendName", "testUserId")
-
-    deletePendingFriendRequest("friendName", database, "testUserId")
+    deletePendingFriendRequest("friendName", database, "currentUsername")
   }
 }
