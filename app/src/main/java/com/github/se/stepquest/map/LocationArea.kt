@@ -10,10 +10,10 @@ import kotlin.math.cos
 import kotlin.math.sqrt
 
 class LocationArea {
-  var firebaseAuth: FirebaseAuth
-  var database: FirebaseDatabase
-  private lateinit var center: LatLng
-  private var radius: Double = 1000.0
+  private var firebaseAuth: FirebaseAuth
+  private var database: FirebaseDatabase
+  lateinit var center: LatLng
+  var radius: Double = 1000.0
 
   init {
     firebaseAuth = FirebaseAuth.getInstance()
