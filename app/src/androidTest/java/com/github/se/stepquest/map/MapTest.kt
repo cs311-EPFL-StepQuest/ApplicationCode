@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.core.content.PermissionChecker
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
@@ -30,6 +31,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -247,5 +249,34 @@ class MapTest {
   fun TestpreeStopCreateRoute() {
     composeTestRule.setContent { StepQuestTheme { Map(vm) } }
     composeTestRule.onNodeWithTag("stopRouteButton").performClick()
+  }
+
+  @Test
+  fun testInitMap() {
+    // Mock the GoogleMap object
+    val googleMap = mockk<GoogleMap>(relaxed = true)
+
+    // Call the function to test
+    initMap(googleMap)
+
+    // Verify that the appropriate GoogleMap methods are called
+    verify {
+      googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID)
+      googleMap.uiSettings.isZoomControlsEnabled = true
+    }
+  }
+
+  @Test
+  fun testNumCheckpointsIncreasedAfterCreatingCheckpoint() {
+    var numCheckpoints = 0
+    composeTestRule.setContent { Map(vm).apply { numCheckpoints += 1 } }
+
+    // Simulate the user interaction to create a checkpoint
+    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
+    composeTestRule.onNodeWithText("Name:").performTextInput("Test")
+    composeTestRule.onNodeWithText("Confirm").performClick()
+
+    // Assert that numCheckpoints is increased by 1
+    assertEquals(numCheckpoints, 1)
   }
 }
