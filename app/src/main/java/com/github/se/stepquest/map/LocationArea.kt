@@ -1,6 +1,5 @@
 package com.github.se.stepquest.map
 
-import android.util.Log
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -12,11 +11,11 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sqrt
 
-class LocationArea{
-  var firebaseAuth: FirebaseAuth
-  var database: FirebaseDatabase
-  private lateinit var center: LatLng
-  private var radius: Double = 1000.0
+class LocationArea {
+  private var firebaseAuth: FirebaseAuth
+  private var database: FirebaseDatabase
+  lateinit var center: LatLng
+  var radius: Double = 1000.0
 
   init {
     firebaseAuth = FirebaseAuth.getInstance()
@@ -30,10 +29,9 @@ class LocationArea{
 
   fun routesAroundLocation(
       googleMap: GoogleMap,
-      selectedLocation: LocationDetails
-  ): List<LocationDetails> {
-    // Retrieve all routes from the database and check
-    // if the starting point of the route is within the circle
+      selectedLocation: LocationDetails,
+      callback: (List<LocationDetails>) -> Unit
+  ) {
     val routes = database.reference.child("routes")
     val routeList = mutableListOf<LocationDetails>()
 
@@ -48,11 +46,9 @@ class LocationArea{
             routeList.add(routeData)
           }
         }
-
       }
+      callback(routeList)
     }
-
-    return routeList
   }
 
   fun checkInsideArea(newLocation: LocationDetails): Boolean {
@@ -64,14 +60,14 @@ class LocationArea{
   }
 
   fun drawRoutesOnMap(googleMap: GoogleMap, selectedLocation: LocationDetails) {
-    val routes = routesAroundLocation(googleMap, selectedLocation)
-    for (route in routes) {
-      googleMap.addMarker(
-          MarkerOptions()
-              .position(LatLng(route.latitude, route.longitude))
-              .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-              .title("Route")
-      )
+    routesAroundLocation(googleMap, selectedLocation) { routes ->
+      for (route in routes) {
+        googleMap.addMarker(
+            MarkerOptions()
+                .position(LatLng(route.latitude, route.longitude))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                .title("Route"))
+      }
     }
   }
 }

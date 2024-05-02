@@ -11,7 +11,8 @@ class LocationAreaTest {
 
   @Before
   fun setUp() {
-    locationArea = LocationArea(LatLng(0.0, 0.0), 1000.0)
+    locationArea = LocationArea()
+    locationArea.createArea(LocationDetails(0.0, 0.0), 1000.0)
   }
 
   @Test
@@ -36,11 +37,13 @@ class LocationAreaTest {
 
   @Test
   fun locationArea_initialization_setsCorrectValues() {
-    val center = LatLng(1.0, 1.0)
+    val center = LocationDetails(1.0, 1.0)
     val radius = 1000.0
-    val locationArea = LocationArea(center, radius)
+    val locationArea = LocationArea()
+    locationArea.createArea(center, radius)
 
-    assertEquals(center, locationArea.center)
+    assertEquals(center.latitude, locationArea.center.latitude, 0.0)
+    assertEquals(center.longitude, locationArea.center.longitude, 0.0)
     assertEquals(radius, locationArea.radius, 0.0)
   }
   /*
