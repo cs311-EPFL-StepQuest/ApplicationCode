@@ -77,15 +77,10 @@ class LocationViewModelTest {
       every { currentLocation } returns mockk() {
         every { value } returns LocationDetails(1.0, 1.0) andThen LocationDetails(2.0, 2.0)
       }
-      every { addNewCheckpoint(any()) } re{
-        val newCheckpointList = checkpoints.value?.toMutableList() ?: mutableListOf()
-        val newCheckpoint = Checkpoint(name, currentLocation.value!!)
-        newCheckpointList.add(newCheckpoint)
-        checkpoints.value = newCheckpointList
-      }
+      justRun { addNewCheckpoint(any()) }
     }
 
-    val list = lvm.addNewCheckpoint("testName", mutableListOf())
+    val list = lvm.addNewCheckpoint("testName")
 
     // Verify if the checkpoint was added
     assertEquals(1, list.size)
