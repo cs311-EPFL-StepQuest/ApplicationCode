@@ -1,3 +1,5 @@
 package com.github.se.stepquest
 
-data class Friend(val name: String, val profilePictureUrl: String, val status: Boolean)
+import android.net.Uri
+
+data class Friend(val name: String, val profilePicture: Uri?, val status: Boolean)

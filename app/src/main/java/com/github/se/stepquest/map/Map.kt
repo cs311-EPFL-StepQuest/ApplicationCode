@@ -3,7 +3,11 @@ package com.github.se.stepquest.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.graphics.BitmapFactory
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -19,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -28,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +41,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -57,24 +64,39 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.maps.android.compose.MapUiSettings
+import kotlinx.coroutines.flow.MutableStateFlow
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun Map(locationViewModel: LocationViewModel) {
+  val context = LocalContext.current
   var stopCreatingRoute = false
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
-  val storeroute = StoreRoute()
+  val storeRoute = StoreRoute()
+  var allroutes by remember { mutableStateOf("") }
 
-  var uiSettings by remember { mutableStateOf(MapUiSettings(zoomControlsEnabled = false)) }
+  // Instantiate all necessary variables to take pictures
+  val cameraActionPermission = remember { mutableStateOf(false) }
+  val currentImage = remember { mutableStateOf<ImageBitmap?>(null) }
+  val images = remember { MutableStateFlow<List<ImageBitmap>>(emptyList()) }
+  var photoFile = getPhotoFile(context)
+  val fileProvider =
+      FileProvider.getUriForFile(context, "com.github.se.stepquest.map.fileprovider", photoFile)
+  val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+  takePicture.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
+  val resultLauncher =
+      rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result
+        ->
+        if (result.resultCode == Activity.RESULT_OK) {
+          val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
+          currentImage.value = takenImage.asImageBitmap()
+        }
+      }
+
   var showProgression by remember { mutableStateOf(false) }
-
-  var routeLength by rememberSaveable { mutableFloatStateOf(0f) }
   var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
-
-  val context = LocalContext.current
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -83,7 +105,13 @@ fun Map(locationViewModel: LocationViewModel) {
         println("launcherMultiplePermissions")
         if (areGranted) {
           println("Permission Granted")
-          locationViewModel.startLocationUpdates(context as ComponentActivity)
+          // Start location update only if the permission asked comes from a map action
+          if (!cameraActionPermission.value) {
+            locationViewModel.startLocationUpdates(context as ComponentActivity)
+          } else {
+            cameraActionPermission.value = false
+            resultLauncher.launch(takePicture)
+          }
           Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
         } else {
           println("Permission Denied")
@@ -177,6 +205,49 @@ fun Map(locationViewModel: LocationViewModel) {
                     contentDescription = "stop button to stop create route",
                     contentScale = ContentScale.None)
               })
+
+          // Search bar
+          Box(Modifier.align(Alignment.TopCenter).offset(y = 16.dp).testTag("SearchBar")) {
+            BasicTextField(
+                value = allroutes,
+                onValueChange = { allroutes = it },
+                textStyle =
+                    TextStyle(
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight(300),
+                        color = Color.Black,
+                    ),
+                modifier =
+                    Modifier.align(Alignment.CenterStart)
+                        .background(Color.White, shape = RoundedCornerShape(15.dp))
+                        .padding(horizontal = 12.dp)
+                        .width(200.dp)
+                        .height(40.dp)
+                        .offset(y = 3.dp)
+                        .testTag("SearchBarTextField"))
+            IconButton(
+                onClick = {},
+                modifier =
+                    Modifier.align(Alignment.CenterEnd).testTag("SearchCleanButton").size(25.dp)) {
+                  androidx.compose.material3.Icon(
+                      painter = painterResource(com.github.se.stepquest.R.drawable.clear),
+                      contentDescription = "Clear search",
+                  )
+                }
+            IconButton(
+                onClick = {},
+                modifier =
+                    Modifier.align(Alignment.CenterEnd)
+                        .offset(x = 45.dp)
+                        .background(Color.White, shape = CircleShape)
+                        .size(35.dp)
+                        .testTag("SearchButton")) {
+                  androidx.compose.material3.Icon(
+                      painter = painterResource(com.github.se.stepquest.R.drawable.search_route),
+                      contentDescription = "Clear search",
+                  )
+                }
+          }
         }
       },
       floatingActionButton = {
@@ -207,6 +278,33 @@ fun Map(locationViewModel: LocationViewModel) {
                       onValueChange = { checkpointTitle = it },
                       label = { Text("Name:") },
                       modifier = Modifier.fillMaxWidth())
+                  Spacer(modifier = Modifier.height(36.dp))
+                  Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "Take a picture",
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp))
+                  }
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  // Button to take picture
+                  Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    IconButton(
+                        onClick = {
+                          if (PermissionChecker.checkSelfPermission(
+                              context, Manifest.permission.CAMERA) ==
+                              PermissionChecker.PERMISSION_GRANTED) {
+                            resultLauncher.launch(takePicture)
+                          } else {
+                            cameraActionPermission.value = true
+                            launcherMultiplePermissions.launch(arrayOf(Manifest.permission.CAMERA))
+                          }
+                        }) {
+                          Icon(
+                              painterResource(R.drawable.camera_icon),
+                              contentDescription = "camera_icon",
+                              modifier = Modifier.size(60.dp))
+                        }
+                  }
                 }
               },
               confirmButton = {
@@ -214,6 +312,13 @@ fun Map(locationViewModel: LocationViewModel) {
                   Button(
                       onClick = {
                         // ADD HERE CODE FOR ADDING CHECKPOINTS, INPUT TITLE STORED IN title
+
+                        // Add the image to the list of images
+                        if (currentImage.value != null) {
+                          images.value += currentImage.value!!
+                        }
+                        // Increase checkpoint number
+                        numCheckpoints++
                         val title = checkpointTitle
                         showDialog = false
                       },
@@ -235,15 +340,18 @@ fun Map(locationViewModel: LocationViewModel) {
 
   // Open the progression screen
   if (showProgression) {
+    val routeLength = calculateRouteLength(locationViewModel.getAllocations() ?: emptyList())
+
     RouteProgression(
-        onDismiss = {
+        stopRoute = {
           showProgression = false
           locationViewModel.onPause()
           stopCreatingRoute = true
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
-          storeroute.addRoute(
-              storeroute.getUserid(), locationViewModel.getAllocations(), emptyList())
+          storeRoute.addRoute(
+              storeRoute.getUserid(), locationViewModel.getAllocations(), emptyList())
         },
+        closeProgression = { showProgression = false },
         routeLength,
         numCheckpoints)
   }
