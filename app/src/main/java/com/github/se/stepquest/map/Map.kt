@@ -74,7 +74,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
-  val storeroute = StoreRoute()
+  val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
 
   // Instantiate all necessary variables to take pictures
