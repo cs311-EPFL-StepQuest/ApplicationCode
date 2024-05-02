@@ -32,6 +32,7 @@ import com.github.se.stepquest.screens.LoginScreen
 import com.github.se.stepquest.screens.NewPlayerScreen
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun BuildNavigationBar(navigationController: NavHostController) {
@@ -72,6 +73,12 @@ fun AppNavigationHost(
 ) {
   val navigationActions = remember(navigationController) { NavigationActions(navigationController) }
   val context = LocalContext.current
+  val firebaseAuth = FirebaseAuth.getInstance()
+  var userId = firebaseAuth.currentUser?.uid
+  val profilePictureUrl = firebaseAuth.currentUser?.photoUrl
+  if (userId == null) {
+    userId = "testUserId"
+  }
   NavHost(
       modifier = modifier,
       navController = navigationController,
@@ -85,7 +92,9 @@ fun AppNavigationHost(
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
         composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository()) }
         composable(Routes.MapScreen.routName) { Map(locationviewModel) }
-        composable(Routes.ProfileScreen.routName) { ProfilePageLayout(navigationActions) }
+        composable(Routes.ProfileScreen.routName) {
+          ProfilePageLayout(navigationActions, userId, profilePictureUrl)
+        }
         composable(Routes.FriendsListScreen.routName) {
           FriendsListScreen(navigationActions = navigationActions)
         }

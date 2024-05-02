@@ -1,5 +1,6 @@
 package com.github.se.stepquest
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,47 +37,41 @@ import coil.compose.rememberAsyncImagePainter
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 
 @Composable
-fun ProfilePageLayout(navigationActions: NavigationActions) {
+fun ProfilePageLayout(navigationActions: NavigationActions, userId: String, profilePicture: Uri?) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-  var totalStepsMade by remember { mutableStateOf(0) }
+  var totalStepsMade by remember { mutableIntStateOf(0) }
   var username by remember { mutableStateOf("No name") }
-  val firebaseAuth = Firebase.auth
   val database = Firebase.database
-  val userId = firebaseAuth.currentUser?.uid
-  val profilePictureURL = firebaseAuth.currentUser?.photoUrl
-  if (userId != null) {
-    val databaseRef = database.reference.child("users")
-    val stepsRef = databaseRef.child(userId).child("totalSteps")
-    stepsRef.addListenerForSingleValueEvent(
-        object : ValueEventListener {
-          override fun onDataChange(dataSnapshot: DataSnapshot) {
-            totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
-          }
+  val databaseRef = database.reference.child("users")
+  val stepsRef = databaseRef.child(userId).child("totalSteps")
+  stepsRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
+        }
 
-          override fun onCancelled(databaseError: DatabaseError) {
-            // add code when failing to access database
-          }
-        })
-    val usernameRef = databaseRef.child(userId).child("username")
+        override fun onCancelled(databaseError: DatabaseError) {
+          // add code when failing to access database
+        }
+      })
+  val usernameRef = databaseRef.child(userId).child("username")
 
-    usernameRef.addListenerForSingleValueEvent(
-        object : ValueEventListener {
-          override fun onDataChange(dataSnapshot: DataSnapshot) {
-            username = dataSnapshot.getValue(String::class.java) ?: "No name"
-          }
+  usernameRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          username = dataSnapshot.getValue(String::class.java) ?: "No name"
+        }
 
-          override fun onCancelled(databaseError: DatabaseError) {
-            // add code when failing to access database
-          }
-        })
-  }
+        override fun onCancelled(databaseError: DatabaseError) {
+          // add code when failing to access database
+        }
+      })
   var showDialog by remember { mutableStateOf(false) }
   Column(
       modifier = Modifier.padding(32.dp).fillMaxSize(),
@@ -90,12 +86,10 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
           )
         }
         Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 40.sp)
-        profilePictureURL?.let { uri ->
-          Image(
-              painter = rememberAsyncImagePainter(uri),
-              contentDescription = "Profile Picture",
-              modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
-        }
+        Image(
+            painter = rememberAsyncImagePainter(profilePicture),
+            contentDescription = "Profile Picture",
+            modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = username,

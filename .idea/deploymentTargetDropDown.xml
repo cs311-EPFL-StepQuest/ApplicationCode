@@ -2,6 +2,9 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="ProfilePageLayoutTest">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -17,6 +20,9 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-04-29T05:08:33.094809600Z" />
         </State>
+      </entry>
+      <entry key="display_profile_layout()">
+        <State />
       </entry>
       <entry key="testOnCreate()">
         <State />
