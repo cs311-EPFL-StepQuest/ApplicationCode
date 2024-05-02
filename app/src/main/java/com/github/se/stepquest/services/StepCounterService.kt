@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.IBinder
 import android.text.format.DateFormat
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -17,10 +18,12 @@ import java.util.Date
 
 class StepCounterService(
     private var sensorManager: SensorManager? = null,
-    private var stepSensor: Sensor? = null,
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val database: FirebaseDatabase = FirebaseDatabase.getInstance(),
+    private val userId: String? = firebaseAuth.currentUser?.uid
 ) : Service(), SensorEventListener {
+
+  private var stepSensor: Sensor? = null
 
   override fun onBind(intent: Intent?): IBinder? {
     return null
@@ -32,11 +35,12 @@ class StepCounterService(
     if (sensorManager == null) {
       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
     }
-    if (stepSensor == null) {
-      stepSensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
-    }
 
-    sensorManager!!.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+    stepSensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+
+    if (sensorManager != null) {
+      sensorManager!!.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+    }
   }
 
   override fun onDestroy() {
@@ -53,7 +57,7 @@ class StepCounterService(
   override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
   private fun saveStepCountToDatabase(newSteps: Int) {
-    val userId = firebaseAuth.currentUser?.uid
+
     if (userId != null) {
       val stepsRefTotal = database.reference.child("users").child(userId).child("totalSteps")
       stepsRefTotal.addListenerForSingleValueEvent(
@@ -65,7 +69,7 @@ class StepCounterService(
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-              // add code when failing to access database
+              Log.e("StepCounterService", "Database error: ${databaseError.message}")
             }
           })
 
@@ -81,7 +85,7 @@ class StepCounterService(
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-              // add code when failing to access database
+              Log.e("StepCounterService", "Database error: ${databaseError.message}")
             }
           })
     }
