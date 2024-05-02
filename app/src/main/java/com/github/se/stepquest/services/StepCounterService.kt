@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.IBinder
 import android.text.format.DateFormat
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,12 +16,14 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.Date
 
-class StepCounterService() : Service(), SensorEventListener {
+class StepCounterService(
+    private var sensorManager: SensorManager? = null,
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val database: FirebaseDatabase = FirebaseDatabase.getInstance(),
+    private val userId: String? = firebaseAuth.currentUser?.uid
+) : Service(), SensorEventListener {
 
-  private lateinit var sensorManager: SensorManager
   private var stepSensor: Sensor? = null
-  private lateinit var firebaseAuth: FirebaseAuth
-  private lateinit var database: FirebaseDatabase
 
   override fun onBind(intent: Intent?): IBinder? {
     return null
@@ -29,18 +32,20 @@ class StepCounterService() : Service(), SensorEventListener {
   override fun onCreate() {
     super.onCreate()
 
-    sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-    stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
-    firebaseAuth = FirebaseAuth.getInstance()
-    database = FirebaseDatabase.getInstance()
-    cleanUpOldSteps(firebaseAuth.currentUser?.uid!!)
+    if (sensorManager == null) {
+      sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+    }
 
-    sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+    stepSensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+
+    if (sensorManager != null) {
+      sensorManager!!.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+    }
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    sensorManager.unregisterListener(this)
+    sensorManager!!.unregisterListener(this)
   }
 
   override fun onSensorChanged(event: SensorEvent?) {
@@ -52,8 +57,9 @@ class StepCounterService() : Service(), SensorEventListener {
   override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
   private fun saveStepCountToDatabase(newSteps: Int) {
-    val userId = firebaseAuth.currentUser?.uid
+
     if (userId != null) {
+      cleanUpOldSteps(userId)
       val stepsRefTotal = database.reference.child("users").child(userId).child("totalSteps")
       stepsRefTotal.addListenerForSingleValueEvent(
           object : ValueEventListener {
@@ -64,7 +70,7 @@ class StepCounterService() : Service(), SensorEventListener {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-              // add code when failing to access database
+              Log.e("StepCounterService", "Database error: ${databaseError.message}")
             }
           })
 
@@ -80,7 +86,7 @@ class StepCounterService() : Service(), SensorEventListener {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-              // add code when failing to access database
+              Log.e("StepCounterService", "Database error: ${databaseError.message}")
             }
           })
     }
