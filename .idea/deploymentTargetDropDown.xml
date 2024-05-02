@@ -2,15 +2,6 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="StepCounterServiceTest">
-        <State />
-      </entry>
-      <entry key="DatabaseLoadingScreenTest">
-        <State />
-      </entry>
-      <entry key="FriendDialogBoxKtTest">
-        <State />
-      </entry>
       <entry key="MainActivity">
         <State>
           <targetSelectedWithDropDown>
@@ -27,6 +18,9 @@
           <timeTargetWasSelectedWithDropDown value="2024-04-30T13:37:55.907582300Z" />
         </State>
       </entry>
+      <entry key="StepCounterServiceTest">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -42,6 +36,9 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-04-29T05:08:33.094809600Z" />
         </State>
+      </entry>
+      <entry key="testOnCreate()">
+        <State />
       </entry>
     </value>
   </component>

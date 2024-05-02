@@ -31,6 +31,7 @@ class StepCounterServiceTest {
   private lateinit var stepsRefTotal: DatabaseReference
   private lateinit var stepsRefDaily: DatabaseReference
   private lateinit var event: SensorEvent
+  private lateinit var userRef: DatabaseReference
 
   private fun mockSensorEvent(): SensorEvent {
     val event = mockk<SensorEvent>()
@@ -50,27 +51,37 @@ class StepCounterServiceTest {
     stepsRefDaily = mockk(relaxed = true)
     event = mockSensorEvent()
     event.sensor = stepSensor
+      userRef = mockk(relaxed = true)
 
     every { sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) } returns stepSensor
     every { stepSensor.type } returns Sensor.TYPE_STEP_DETECTOR
 
     stepCounterService = StepCounterService(sensorManager, firebaseAuth, database, "testUserId")
 
-    every { database.reference } returns
-        mockk {
-          every { child(any()) } returns
+      every { database.reference } returns
               mockk {
-                every { child(any()) } returns
-                    mockk { every { child(any()) } returns stepsRefTotal andThen stepsRefDaily }
+                  every { child("users") } returns
+                          mockk {
+                              every { child("testUserId") } returns
+                                      userRef
+                          }
+                  every { child(any()) } returns
+                          mockk {
+                              every { child(any()) } returns
+                                      mockk { every { child(any()) } returns stepsRefTotal andThen stepsRefDaily }
+                          }
               }
-        }
     every { stepsRefTotal.setValue(any()) } returns mockk()
     every { stepsRefDaily.setValue(any()) } returns mockk()
   }
 
   @Test
   fun testOnCreate() {
-    stepCounterService.onCreate()
+      stepCounterService.onCreate()
+      every { userRef.addListenerForSingleValueEvent(any()) } answers {
+          val listener = arg<ValueEventListener>(0)
+          listener.onDataChange(mockk())
+      }
     verify {
       sensorManager.registerListener(
           stepCounterService, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)

@@ -41,6 +41,10 @@ class StepCounterService(
     if (sensorManager != null) {
       sensorManager!!.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
+
+    if (userId != null) {
+      cleanUpOldSteps(userId)
+    }
   }
 
   override fun onDestroy() {
@@ -59,7 +63,6 @@ class StepCounterService(
   private fun saveStepCountToDatabase(newSteps: Int) {
 
     if (userId != null) {
-      cleanUpOldSteps(userId)
       val stepsRefTotal = database.reference.child("users").child(userId).child("totalSteps")
       stepsRefTotal.addListenerForSingleValueEvent(
           object : ValueEventListener {
