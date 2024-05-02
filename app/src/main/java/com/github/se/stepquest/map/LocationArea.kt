@@ -9,7 +9,7 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sqrt
 
-class LocationArea{
+class LocationArea {
   var firebaseAuth: FirebaseAuth
   var database: FirebaseDatabase
   private lateinit var center: LatLng
@@ -26,8 +26,8 @@ class LocationArea{
   }
 
   fun routesAroundLocation(
-    googleMap: GoogleMap,
-    selectedLocation: LocationDetails
+      googleMap: GoogleMap,
+      selectedLocation: LocationDetails
   ): List<LocationDetails> {
     // Retrieve all routes from the database and check
     // if the starting point of the route is within the circle
@@ -45,7 +45,6 @@ class LocationArea{
             routeList.add(routeData)
           }
         }
-
       }
     }
 
