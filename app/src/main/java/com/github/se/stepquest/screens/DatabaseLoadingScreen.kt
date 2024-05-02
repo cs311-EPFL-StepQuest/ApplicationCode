@@ -27,12 +27,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 @Composable
-fun DatabaseLoadingScreen(navigationActions: NavigationActions, context: Context) {
-  val firebaseAuth = FirebaseAuth.getInstance()
+fun DatabaseLoadingScreen(navigationActions: NavigationActions, context: Context, userId : String) {
   val database = FirebaseDatabase.getInstance()
   var isNewPlayer by remember { mutableStateOf(false) }
-  val userId = firebaseAuth.currentUser?.uid
-  if (userId != null) {
     val databaseRef = database.reference
     databaseRef
         .child("users")
@@ -46,8 +43,10 @@ fun DatabaseLoadingScreen(navigationActions: NavigationActions, context: Context
                 if (isNewPlayer) {
                   navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
                 } else {
-                  context.startService(Intent(context, StepCounterService::class.java))
-                  navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+                    if (userId != "testUserId") {
+                        context.startService(Intent(context, StepCounterService::class.java))
+                        navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+                    }
                 }
               }
 
@@ -55,8 +54,7 @@ fun DatabaseLoadingScreen(navigationActions: NavigationActions, context: Context
                 // Handle cancellation
               }
             })
-  }
-  Column(
+    Column(
       modifier = Modifier.fillMaxSize(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
