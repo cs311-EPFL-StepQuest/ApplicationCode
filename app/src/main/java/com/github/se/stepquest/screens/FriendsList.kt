@@ -43,7 +43,7 @@ import com.google.firebase.database.getValue
 
 @Composable
 fun FriendsListScreen(
-    navigationActions: NavigationActions,
+    navigationActions: NavigationActions, userId : String,
     testCurrentFriendsList: List<Friend> = emptyList()
 ) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
@@ -51,14 +51,13 @@ fun FriendsListScreen(
   var showFriendProfile by remember { mutableStateOf(false) }
   var selectedFriend by remember { mutableStateOf<Friend?>(null) }
   var currentFriendsList: MutableList<Friend> = testCurrentFriendsList.toMutableList()
-  val firebaseAuth = FirebaseAuth.getInstance()
   val database = FirebaseDatabase.getInstance()
-  val userId = firebaseAuth.currentUser?.uid
-  if (userId != null && currentFriendsList.isEmpty()) {
+  if (currentFriendsList.isEmpty()) {
     val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
     friendsListRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
           override fun onDataChange(dataSnapshot: DataSnapshot) {
+
             currentFriendsList =
                 dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
           }

@@ -96,7 +96,7 @@ fun AppNavigationHost(
           ProfilePageLayout(navigationActions, userId, profilePictureUrl)
         }
         composable(Routes.FriendsListScreen.routName) {
-          FriendsListScreen(navigationActions = navigationActions)
+          FriendsListScreen(navigationActions = navigationActions, userId)
         }
       }
 }
