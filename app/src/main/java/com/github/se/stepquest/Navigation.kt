@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -22,8 +23,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.github.se.stepquest.map.LocationViewModel
 import com.github.se.stepquest.map.Map
+import com.github.se.stepquest.screens.DatabaseLoadingScreen
+import com.github.se.stepquest.screens.FriendsListScreen
 import com.github.se.stepquest.screens.HomeScreen
+import com.github.se.stepquest.screens.LoginScreen
+import com.github.se.stepquest.screens.NewPlayerScreen
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
@@ -61,19 +67,28 @@ fun BuildNavigationBar(navigationController: NavHostController) {
 fun AppNavigationHost(
     modifier: Modifier = Modifier,
     navigationController: NavHostController = rememberNavController(),
-    startDestination: String = Routes.LoginScreen.routName
+    startDestination: String = Routes.LoginScreen.routName,
+    locationviewModel: LocationViewModel = remember { LocationViewModel() }
 ) {
   val navigationActions = remember(navigationController) { NavigationActions(navigationController) }
+  val context = LocalContext.current
   NavHost(
       modifier = modifier,
       navController = navigationController,
       startDestination = startDestination) {
-        composable(Routes.LoginScreen.routName) { LoginPage(navigationActions) }
+        composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions) }
+        composable(Routes.DatabaseLoadingScreen.routName) {
+          DatabaseLoadingScreen(navigationActions, context)
+        }
+        composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context) }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
-        composable(Routes.MapScreen.routName) { Map() }
-        composable(Routes.ProgressionScreen.routName) { ProgressionPage() }
-        composable(Routes.ProfileScreen.routName) { ProfilePageLayout() }
+        composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository()) }
+        composable(Routes.MapScreen.routName) { Map(locationviewModel) }
+        composable(Routes.ProfileScreen.routName) { ProfilePageLayout(navigationActions) }
+        composable(Routes.FriendsListScreen.routName) {
+          FriendsListScreen(navigationActions = navigationActions)
+        }
       }
 }
 
