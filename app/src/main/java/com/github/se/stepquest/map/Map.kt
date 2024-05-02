@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -73,7 +74,8 @@ fun Map(locationViewModel: LocationViewModel) {
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
-  val storeRoute = StoreRoute()
+  val storeroute = StoreRoute()
+  var allroutes by remember { mutableStateOf("") }
 
   // Instantiate all necessary variables to take pictures
   val cameraActionPermission = remember { mutableStateOf(false) }
@@ -203,6 +205,49 @@ fun Map(locationViewModel: LocationViewModel) {
                     contentDescription = "stop button to stop create route",
                     contentScale = ContentScale.None)
               })
+
+          // Search bar
+          Box(Modifier.align(Alignment.TopCenter).offset(y = 16.dp).testTag("SearchBar")) {
+            BasicTextField(
+                value = allroutes,
+                onValueChange = { allroutes = it },
+                textStyle =
+                    TextStyle(
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight(300),
+                        color = Color.Black,
+                    ),
+                modifier =
+                    Modifier.align(Alignment.CenterStart)
+                        .background(Color.White, shape = RoundedCornerShape(15.dp))
+                        .padding(horizontal = 12.dp)
+                        .width(200.dp)
+                        .height(40.dp)
+                        .offset(y = 3.dp)
+                        .testTag("SearchBarTextField"))
+            IconButton(
+                onClick = {},
+                modifier =
+                    Modifier.align(Alignment.CenterEnd).testTag("SearchCleanButton").size(25.dp)) {
+                  androidx.compose.material3.Icon(
+                      painter = painterResource(com.github.se.stepquest.R.drawable.clear),
+                      contentDescription = "Clear search",
+                  )
+                }
+            IconButton(
+                onClick = {},
+                modifier =
+                    Modifier.align(Alignment.CenterEnd)
+                        .offset(x = 45.dp)
+                        .background(Color.White, shape = CircleShape)
+                        .size(35.dp)
+                        .testTag("SearchButton")) {
+                  androidx.compose.material3.Icon(
+                      painter = painterResource(com.github.se.stepquest.R.drawable.search_route),
+                      contentDescription = "Clear search",
+                  )
+                }
+          }
         }
       },
       floatingActionButton = {

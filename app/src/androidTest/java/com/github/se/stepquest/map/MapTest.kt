@@ -72,6 +72,14 @@ class MapTest {
     composeTestRule.onNodeWithTag("createRouteButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("stopRouteButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("stopRouteButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("SearchCleanButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("SearchCleanButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("SearchCleanButton").performClick()
+    composeTestRule.onNodeWithTag("SearchButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("SearchButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("SearchButton").performClick()
+    composeTestRule.onNodeWithTag("SearchBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("SearchBarTextField").assertIsDisplayed()
   }
 
   @Test

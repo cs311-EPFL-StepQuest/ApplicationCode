@@ -48,6 +48,8 @@ fun FriendsListScreen(
 ) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
+  var showFriendProfile by remember { mutableStateOf(false) }
+  var selectedFriend by remember { mutableStateOf<Friend?>(null) }
   var currentFriendsList: MutableList<Friend> = testCurrentFriendsList.toMutableList()
   val firebaseAuth = FirebaseAuth.getInstance()
   val database = FirebaseDatabase.getInstance()
@@ -68,6 +70,13 @@ fun FriendsListScreen(
   }
   if (showAddFriendScreen) {
     AddFriendScreen(onDismiss = { showAddFriendScreen = false })
+  } else if (showFriendProfile) {
+    FriendDialogBox(
+        friend = selectedFriend!!,
+        onDismiss = {
+          selectedFriend = null
+          showFriendProfile = false
+        })
   } else {
     Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
       Column(
@@ -105,7 +114,16 @@ fun FriendsListScreen(
             if (currentFriendsList.isEmpty()) {
               Text(text = "No friends yet", fontWeight = FontWeight.Bold, fontSize = 24.sp)
             } else {
-              LazyColumn { items(currentFriendsList) { friend -> FriendItem(friend = friend) } }
+              LazyColumn {
+                items(currentFriendsList) { friend ->
+                  FriendItem(
+                      friend = friend,
+                      onClick = {
+                        showFriendProfile = true
+                        selectedFriend = friend
+                      })
+                }
+              }
             }
           }
     }
@@ -113,14 +131,15 @@ fun FriendsListScreen(
 }
 
 @Composable
-fun FriendItem(friend: Friend) {
+fun FriendItem(friend: Friend, onClick: () -> Unit) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   val backgroundColor = if (friend.status) blueThemeColor else Color.Gray
   val status = if (friend.status) "ONLINE" else "OFFLINE"
   Surface(
       color = backgroundColor,
       modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth().padding(horizontal = 16.dp),
-      shape = MaterialTheme.shapes.medium) {
+      shape = MaterialTheme.shapes.medium,
+      onClick = onClick) {
         Row(
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically) {
