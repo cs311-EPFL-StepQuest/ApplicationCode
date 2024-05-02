@@ -15,6 +15,7 @@ import org.junit.runner.RunWith
 class FirebaseServiceTest {
 
   private lateinit var database: FirebaseDatabase
+
   private lateinit var requestsRef: DatabaseReference
 
   @Before
@@ -45,5 +46,11 @@ class FirebaseServiceTest {
         }
 
     deletePendingFriendRequest("friendName", database, "currentUsername")
+  }
+
+  @Test
+  fun deleteFriendTest() {
+
+    deleteFriend("currentUsername", "friendName", database, "uid")
   }
 }
