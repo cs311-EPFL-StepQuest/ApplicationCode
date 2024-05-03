@@ -101,42 +101,56 @@ private fun BuildNotification(data: NotificationData?) {
                     })
           }
         }
-      var friendName = ""
-      var currentuserName = ""
-      Firebase.database.reference.child("usernames").addListenerForSingleValueEvent(object : ValueEventListener {
-          override fun onDataChange(snapshot: DataSnapshot) {
-              friendName = snapshot.child(data.senderUuid).value.toString()
-              currentuserName = snapshot.child(data.userUuid).value.toString()
-          }
-          override fun onCancelled(error: DatabaseError) {
+    if (data.senderUuid.isNotEmpty()) {
+        var friendName = ""
+        var currentuserName = ""
+        Firebase.database.reference.child("usernames").child(data.userUuid).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                currentuserName = snapshot.child(data.userUuid).value.toString()
+            }
+            override fun onCancelled(error: DatabaseError) {
 
-          }
-      })
+            }
+        })
+        Firebase.database.reference.child("usernames").child(data.senderUuid).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                friendName = snapshot.child(data.userUuid).value.toString()
+            }
+            override fun onCancelled(error: DatabaseError) {
 
-    if (data.senderUuid.isNotEmpty())
+            }
+        })
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(20.dp, 10.dp)) {
-              Button(
-                  onClick = {
-
-                      addFriend(Friend(friendName, Uri.EMPTY, false))
-                      notificationRepository.removeNotification(data.userUuid, data.uuid)
-                            },
-                  content = { Text("Accept") },
-                  modifier = Modifier.fillMaxWidth().weight(1f).height(35.dp),
-                  colors = ButtonDefaults.buttonColors(colorResource(id = R.color.blueTheme)))
-              Box(modifier = Modifier.width(20.dp))
-              Button(
-                  onClick = {
-                    deleteFriend(currentuserName, friendName, FirebaseDatabase.getInstance(), data.uuid)
-                      notificationRepository.removeNotification(data.userUuid, data.uuid)
-                  },
-                  content = { Text("Reject") },
-                  modifier = Modifier.fillMaxWidth().weight(1f).height(35.dp),
-                  colors = ButtonDefaults.buttonColors(colorResource(id = R.color.lightGrey)))
-            }
-    Divider(color = colorResource(id = R.color.blueTheme), thickness = 1.dp)
+            modifier = Modifier.fillMaxWidth().padding(20.dp, 10.dp)
+        ) {
+            Button(
+                onClick = {
+                    addFriend(Friend(friendName, Uri.EMPTY, false))
+                    notificationRepository.removeNotification(data.userUuid, data.uuid)
+                },
+                content = { Text("Accept") },
+                modifier = Modifier.fillMaxWidth().weight(1f).height(35.dp),
+                colors = ButtonDefaults.buttonColors(colorResource(id = R.color.blueTheme))
+            )
+            Box(modifier = Modifier.width(20.dp))
+            Button(
+                onClick = {
+                    deleteFriend(
+                        currentuserName,
+                        friendName,
+                        FirebaseDatabase.getInstance(),
+                        data.uuid
+                    )
+                    notificationRepository.removeNotification(data.userUuid, data.uuid)
+                },
+                content = { Text("Reject") },
+                modifier = Modifier.fillMaxWidth().weight(1f).height(35.dp),
+                colors = ButtonDefaults.buttonColors(colorResource(id = R.color.lightGrey))
+            )
+        }
+        Divider(color = colorResource(id = R.color.blueTheme), thickness = 1.dp)
+    }
   }
 }
 
