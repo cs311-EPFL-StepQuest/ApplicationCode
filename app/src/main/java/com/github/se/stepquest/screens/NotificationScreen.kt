@@ -52,7 +52,7 @@ fun NotificationScreen() {
 //      uuid, NotificationData("Hello3", "13:55", UUID.randomUUID().toString(), uuid, "lsdiv"))
 //  notificationRepository.createNotification(
 //      uuid, NotificationData("Hello4", "13:56", UUID.randomUUID().toString(), uuid, ""))
-//  updateNotificationList()
+  updateNotificationList()
   Column(modifier = Modifier.padding(0.dp, 30.dp)) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
       Text("Notifications", fontSize = 20.sp)
