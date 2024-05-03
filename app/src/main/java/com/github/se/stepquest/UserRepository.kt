@@ -11,7 +11,7 @@ import java.util.Date
 interface UserRepository {
   fun getUid(): String?
 
-  fun getSteps(): List<Int>
+  fun getSteps(callback: (List<Int>) -> Unit)
 }
 
 class IUserRepository : UserRepository {
@@ -23,7 +23,7 @@ class IUserRepository : UserRepository {
     return this.userId
   }
 
-  override fun getSteps(): List<Int> {
+  override fun getSteps(callback: (List<Int>) -> Unit) {
     var list = listOf(0, 0)
     val d = Date()
     val s: CharSequence = DateFormat.format("MMMM d, yyyy ", d.getTime())
@@ -35,13 +35,13 @@ class IUserRepository : UserRepository {
                 listOf(
                     dataSnapshot.getValue(Int::class.java) ?: 0,
                     dataSnapshot.getValue(Int::class.java) ?: 0)
+            callback(list)
           }
 
           override fun onCancelled(databaseError: DatabaseError) {
-            // add code when failing to access database
+            callback(list)
           }
         })
-    return list
   }
 }
 
@@ -54,8 +54,8 @@ class TestUserRepository1 : UserRepository {
     return this.uid
   }
 
-  override fun getSteps(): List<Int> {
-    return listOf(dailyStepsMade, weeklyStepsMade)
+  override fun getSteps(callback: (List<Int>) -> Unit) {
+    return callback(listOf(dailyStepsMade, weeklyStepsMade))
   }
 }
 
@@ -68,7 +68,7 @@ class TestUserRepository2 : UserRepository {
     return this.uid
   }
 
-  override fun getSteps(): List<Int> {
-    return listOf(dailyStepsMade, weeklyStepsMade)
+  override fun getSteps(callback: (List<Int>) -> Unit) {
+    return callback(listOf(dailyStepsMade, weeklyStepsMade))
   }
 }
