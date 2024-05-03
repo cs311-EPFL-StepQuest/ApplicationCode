@@ -1,9 +1,7 @@
 package com.github.se.stepquest.screens
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
@@ -24,10 +22,7 @@ class AddFriendScreenTest {
   fun setUp() {
     database = mockk(relaxed = true)
     usernameRef = mockk(relaxed = true)
-    every { database.reference } returns
-            mockk {
-              every { child(any()) } returns usernameRef
-            }
+    every { database.reference } returns mockk { every { child(any()) } returns usernameRef }
   }
 
   @Test
@@ -57,10 +52,10 @@ class AddFriendScreenTest {
   @Test
   fun test_dbUserSearch() {
     every { usernameRef.addListenerForSingleValueEvent(any()) } answers
-            {
-              val listener = arg<ValueEventListener>(0)
-              listener.onDataChange(mockk())
-            }
+        {
+          val listener = arg<ValueEventListener>(0)
+          listener.onDataChange(mockk())
+        }
     composeTestRule.setContent { AddFriendScreen(onDismiss = { /* Do nothing */}, "testUserId") }
     composeTestRule.onNodeWithTag("searchField").performTextInput("user")
     composeTestRule.onNodeWithText("testUsername").assertDoesNotExist()

@@ -34,7 +34,6 @@ import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -43,7 +42,8 @@ import com.google.firebase.database.getValue
 
 @Composable
 fun FriendsListScreen(
-    navigationActions: NavigationActions, userId : String,
+    navigationActions: NavigationActions,
+    userId: String,
     testCurrentFriendsList: List<Friend> = emptyList()
 ) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)

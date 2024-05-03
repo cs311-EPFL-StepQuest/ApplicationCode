@@ -39,19 +39,19 @@ import java.util.Timer
 import java.util.TimerTask
 
 fun addUsername(username: String, userId: String, database: FirebaseDatabase) {
-    val databaseRef = database.reference
-    databaseRef.addListenerForSingleValueEvent(
-        object : ValueEventListener {
-          override fun onDataChange(dataSnapshot: DataSnapshot) {
-            databaseRef.child("users").child(userId).child("username").setValue(username)
-            val usernamesRef = databaseRef.child("usernames").child(username)
-            usernamesRef.setValue(userId)
-          }
+  val databaseRef = database.reference
+  databaseRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          databaseRef.child("users").child(userId).child("username").setValue(username)
+          val usernamesRef = databaseRef.child("usernames").child(username)
+          usernamesRef.setValue(userId)
+        }
 
-          override fun onCancelled(databaseError: DatabaseError) {
-            // add code when failing to access database
-          }
-        })
+        override fun onCancelled(databaseError: DatabaseError) {
+          // add code when failing to access database
+        }
+      })
 }
 
 fun usernameIsAvailable(username: String, database: FirebaseDatabase, callback: (Boolean) -> Unit) {
@@ -70,7 +70,7 @@ fun usernameIsAvailable(username: String, database: FirebaseDatabase, callback: 
 }
 
 @Composable
-fun NewPlayerScreen(navigationActions: NavigationActions, context: Context, userId : String) {
+fun NewPlayerScreen(navigationActions: NavigationActions, context: Context, userId: String) {
 
   var usernamePlayer by remember { mutableStateOf("") }
 
@@ -129,10 +129,10 @@ fun NewPlayerScreen(navigationActions: NavigationActions, context: Context, user
           Button(
               onClick = {
                 addUsername(usernamePlayer, userId, database)
-                  if (usernamePlayer != "testUsername") {
-                      context.startService(Intent(context, StepCounterService::class.java))
-                      navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
-                  }
+                if (usernamePlayer != "testUsername") {
+                  context.startService(Intent(context, StepCounterService::class.java))
+                  navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+                }
               },
               colors = ButtonDefaults.buttonColors(blueThemeColor),
               modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),

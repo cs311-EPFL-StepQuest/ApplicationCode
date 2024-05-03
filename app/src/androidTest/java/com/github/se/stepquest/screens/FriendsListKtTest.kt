@@ -14,7 +14,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -33,16 +32,15 @@ class FriendsListKtTest {
   fun setup() {
     navigationActions = mockk(relaxed = true)
     context = mockk(relaxed = true)
-      database = mockk(relaxed = true)
-      friendsRef = mockk(relaxed = true)
-      every { database.reference } returns
+    database = mockk(relaxed = true)
+    friendsRef = mockk(relaxed = true)
+    every { database.reference } returns
+        mockk {
+          every { child(any()) } returns
               mockk {
-                  every { child(any()) } returns
-                          mockk {
-                              every { child(any()) } returns
-                                      mockk { every { child(any()) } returns friendsRef }
-                          }
+                every { child(any()) } returns mockk { every { child(any()) } returns friendsRef }
               }
+        }
   }
 
   @Test
@@ -66,7 +64,9 @@ class FriendsListKtTest {
     composeTestRule.setContent {
       StepQuestTheme {
         FriendsListScreen(
-            navigationActions = navigationActions, "testUserId", testCurrentFriendsList = fakeFriendsList)
+            navigationActions = navigationActions,
+            "testUserId",
+            testCurrentFriendsList = fakeFriendsList)
       }
     }
 
@@ -74,29 +74,30 @@ class FriendsListKtTest {
     fakeFriendsList.forEach { friend ->
       composeTestRule.onNodeWithText(friend.name).assertIsDisplayed()
     }
-      composeTestRule.onNodeWithText("Alice").performClick()
-      composeTestRule.onNodeWithText("Alice").assertExists()
+    composeTestRule.onNodeWithText("Alice").performClick()
+    composeTestRule.onNodeWithText("Alice").assertExists()
   }
-    @Test
-    fun data_base_friends() {
-        val fakeFriendsList = mutableListOf(Friend("Alice", null, true),
-            Friend("Bob", null, false))
-        every { friendsRef.addListenerForSingleValueEvent(any()) } answers
-                {
-                    val listener = arg<ValueEventListener>(0)
-                    listener.onDataChange(mockk { every { getValue<List<Friend>>()?.toMutableList() } returns
-                            fakeFriendsList
-                    })
-                }
-        composeTestRule.setContent {
-            StepQuestTheme {
-                FriendsListScreen(
-                    navigationActions = navigationActions, "testUserId", testCurrentFriendsList = fakeFriendsList)
-            }
+
+  @Test
+  fun data_base_friends() {
+    val fakeFriendsList = mutableListOf(Friend("Alice", null, true), Friend("Bob", null, false))
+    every { friendsRef.addListenerForSingleValueEvent(any()) } answers
+        {
+          val listener = arg<ValueEventListener>(0)
+          listener.onDataChange(
+              mockk { every { getValue<List<Friend>>()?.toMutableList() } returns fakeFriendsList })
         }
-        composeTestRule.onNodeWithText("Friends").assertIsDisplayed()
-        fakeFriendsList.forEach { friend ->
-            composeTestRule.onNodeWithText(friend.name).assertIsDisplayed()
-        }
+    composeTestRule.setContent {
+      StepQuestTheme {
+        FriendsListScreen(
+            navigationActions = navigationActions,
+            "testUserId",
+            testCurrentFriendsList = fakeFriendsList)
+      }
     }
+    composeTestRule.onNodeWithText("Friends").assertIsDisplayed()
+    fakeFriendsList.forEach { friend ->
+      composeTestRule.onNodeWithText(friend.name).assertIsDisplayed()
+    }
+  }
 }

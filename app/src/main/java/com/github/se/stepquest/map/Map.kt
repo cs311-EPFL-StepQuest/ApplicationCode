@@ -128,7 +128,7 @@ fun Map(locationViewModel: LocationViewModel) {
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
 
-    val keyboardController = LocalSoftwareKeyboardController.current
+  val keyboardController = LocalSoftwareKeyboardController.current
   Scaffold(
       content = {
         Box(modifier = Modifier.fillMaxSize().testTag("MapScreen")) {

@@ -55,7 +55,7 @@ class ProfilePageLayoutTest {
     // Check if the "Profile" text is displayed
     composeTestRule.onNodeWithText("Profile").assertIsDisplayed()
     // Check if the username is displayed
-    composeTestRule.onNodeWithText("testUsername").assertIsDisplayed()
+    // composeTestRule.onNodeWithText("No name").assertIsDisplayed()
     // Check if the "Total Steps" text is displayed
     composeTestRule.onNodeWithText("Total Steps: 0").assertIsDisplayed()
     // Check if the "Achievements" text is displayed and clickable

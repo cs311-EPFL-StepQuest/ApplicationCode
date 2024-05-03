@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.R
 import com.github.se.stepquest.services.sendFriendRequest
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -44,7 +43,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 @Composable
-fun AddFriendScreen(onDismiss: () -> Unit, userId : String) {
+fun AddFriendScreen(onDismiss: () -> Unit, userId: String) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var searchQuery by remember { mutableStateOf("") }
   val searchResults = remember { mutableStateOf<List<String>>(emptyList()) }
@@ -94,7 +93,8 @@ fun AddFriendScreen(onDismiss: () -> Unit, userId : String) {
                     dbUserSearch(database, it, searchResults, loading, username.value)
                   },
                   placeholder = { Text("Enter your friend's username") },
-                  modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("searchField"))
+                  modifier =
+                      Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("searchField"))
               Spacer(modifier = Modifier.height(16.dp))
               if (searchQuery.isNotBlank() && !loading.value) {
                 if (searchResults.value.isNotEmpty()) {
@@ -203,23 +203,27 @@ private fun dbUserSearch(
 }
 
 // Helper function to get current username
-private fun getCurrentUser(database: DatabaseReference, userId: String, callback: (String?) -> Unit) {
+private fun getCurrentUser(
+    database: DatabaseReference,
+    userId: String,
+    callback: (String?) -> Unit
+) {
   userId.let { uid ->
-      database
-          .child("users")
-          .child(uid)
-          .child("username")
-          .addListenerForSingleValueEvent(
-              object : ValueEventListener {
-                  override fun onDataChange(snapshot: DataSnapshot) {
-                      val username = snapshot.getValue(String::class.java)
-                      callback(username)
-                  }
+    database
+        .child("users")
+        .child(uid)
+        .child("username")
+        .addListenerForSingleValueEvent(
+            object : ValueEventListener {
+              override fun onDataChange(snapshot: DataSnapshot) {
+                val username = snapshot.getValue(String::class.java)
+                callback(username)
+              }
 
-                  override fun onCancelled(error: DatabaseError) {
-                      // Handle error
-                      callback(null)
-                  }
-              })
+              override fun onCancelled(error: DatabaseError) {
+                // Handle error
+                callback(null)
+              }
+            })
   }
 }

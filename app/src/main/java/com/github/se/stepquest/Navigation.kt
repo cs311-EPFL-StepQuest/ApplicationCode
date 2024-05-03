@@ -1,5 +1,6 @@
 package com.github.se.stepquest
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -30,6 +31,7 @@ import com.github.se.stepquest.screens.FriendsListScreen
 import com.github.se.stepquest.screens.HomeScreen
 import com.github.se.stepquest.screens.LoginScreen
 import com.github.se.stepquest.screens.NewPlayerScreen
+import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.google.firebase.auth.FirebaseAuth
@@ -76,6 +78,9 @@ fun AppNavigationHost(
   val firebaseAuth = FirebaseAuth.getInstance()
   var userId = firebaseAuth.currentUser?.uid
   val profilePictureUrl = firebaseAuth.currentUser?.photoUrl
+  val startServiceLambda: () -> Unit = {
+    context.startService(Intent(context, StepCounterService::class.java))
+  }
   if (userId == null) {
     userId = "testUserId"
   }
@@ -85,9 +90,11 @@ fun AppNavigationHost(
       startDestination = startDestination) {
         composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions) }
         composable(Routes.DatabaseLoadingScreen.routName) {
-          DatabaseLoadingScreen(navigationActions, context, userId)
+          DatabaseLoadingScreen(navigationActions, startServiceLambda, userId)
         }
-        composable(Routes.NewPlayerScreen.routName) { NewPlayerScreen(navigationActions, context, userId) }
+        composable(Routes.NewPlayerScreen.routName) {
+          NewPlayerScreen(navigationActions, context, userId)
+        }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
         composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository()) }
