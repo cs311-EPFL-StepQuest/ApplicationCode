@@ -2,14 +2,27 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="DatabaseLoadingScreenTest">
+      <entry key="AddFriendScreenTest">
         <State />
       </entry>
       <entry key="FriendsListKtTest">
         <State />
       </entry>
       <entry key="MainActivity">
-        <State />
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\santh\.android\avd\Pixel_8_Pro_API_34_2.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-05-03T12:17:02.858878900Z" />
+        </State>
       </entry>
       <entry key="app">
         <State>
@@ -26,6 +39,9 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-04-29T05:08:33.094809600Z" />
         </State>
+      </entry>
+      <entry key="test_dbUserSearch()">
+        <State />
       </entry>
     </value>
   </component>

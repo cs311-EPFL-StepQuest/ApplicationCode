@@ -1,5 +1,6 @@
 package com.github.se.stepquest.screens
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.google.firebase.database.DataSnapshot
@@ -32,7 +33,7 @@ class AddFriendScreenTest {
   @Test
   fun addFriendScreen_display_works() {
     // Set up the composable content
-    composeTestRule.setContent { AddFriendScreen(onDismiss = { /* Do nothing */}) }
+    composeTestRule.setContent { AddFriendScreen(onDismiss = { /* Do nothing */}, "testUserId") }
 
     // Verify the Back button is displayed
     composeTestRule.onNodeWithText("Back").assertIsDisplayed()
@@ -60,5 +61,8 @@ class AddFriendScreenTest {
               val listener = arg<ValueEventListener>(0)
               listener.onDataChange(mockk())
             }
+    composeTestRule.setContent { AddFriendScreen(onDismiss = { /* Do nothing */}, "testUserId") }
+    composeTestRule.onNodeWithTag("searchField").performTextInput("user")
+    composeTestRule.onNodeWithText("testUsername").assertDoesNotExist()
   }
 }

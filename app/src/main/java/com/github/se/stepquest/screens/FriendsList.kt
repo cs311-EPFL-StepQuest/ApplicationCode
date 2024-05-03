@@ -68,7 +68,7 @@ fun FriendsListScreen(
         })
   }
   if (showAddFriendScreen) {
-    AddFriendScreen(onDismiss = { showAddFriendScreen = false })
+    AddFriendScreen(onDismiss = { showAddFriendScreen = false }, userId)
   } else if (showFriendProfile) {
     FriendDialogBox(
         friend = selectedFriend!!,
