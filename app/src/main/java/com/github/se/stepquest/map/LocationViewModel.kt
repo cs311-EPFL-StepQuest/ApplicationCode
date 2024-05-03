@@ -5,7 +5,11 @@ import android.content.Context
 import android.location.Location
 import android.os.Looper
 import androidx.lifecycle.*
+import com.github.se.stepquest.ConnectionData
+import com.github.se.stepquest.ConnectionRepository
+import com.github.se.stepquest.IUserRepository
 import com.google.android.gms.location.*
+import java.util.UUID
 
 data class LocationDetails(val latitude: Double, val longitude: Double)
 
@@ -15,6 +19,9 @@ class LocationViewModel : ViewModel() {
   var currentLocation = MutableLiveData<LocationDetails>()
   var _allocations = MutableLiveData<List<LocationDetails>?>()
   var locationUpdated = MutableLiveData<Boolean>()
+
+  val connectionRepository = ConnectionRepository()
+  val userRepository = IUserRepository()
 
   init {
     locationUpdated.postValue(false)
@@ -42,6 +49,9 @@ class LocationViewModel : ViewModel() {
                 _allocations.postValue(updatedAllocations)
                 locationUpdated.postValue(updatedLocation)
               }
+            }
+            if (currentLocation.value != null) {
+              connectionRepository.updateConnection(userRepository.getUid()!!, ConnectionData(currentLocation.value!!.longitude, currentLocation.value!!.latitude))
             }
           }
         }
