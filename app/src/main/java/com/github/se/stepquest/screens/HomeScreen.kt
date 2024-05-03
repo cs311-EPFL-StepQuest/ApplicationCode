@@ -34,7 +34,6 @@ import com.github.se.stepquest.activity.Challenge
 import com.github.se.stepquest.activity.Quest
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
-import okhttp3.Route
 
 @Composable
 fun HomeScreen(navigationActions: NavigationActions) {
@@ -71,12 +70,17 @@ fun HomeScreen(navigationActions: NavigationActions) {
           }
           Spacer(Modifier.weight(1f))
           // Notifications icon
-          TextButton(onClick = {navigationActions.navigateTo(TopLevelDestination(Routes.NotificationScreen.routName))}, modifier = Modifier.testTag("notifications_button")) {
-            Image(
-                painter = painterResource(com.github.se.stepquest.R.drawable.notification),
-                modifier = Modifier.fillMaxHeight().size(50.dp),
-                contentDescription = "notifications_icon")
-          }
+          TextButton(
+              onClick = {
+                navigationActions.navigateTo(
+                    TopLevelDestination(Routes.NotificationScreen.routName))
+              },
+              modifier = Modifier.testTag("notifications_button")) {
+                Image(
+                    painter = painterResource(com.github.se.stepquest.R.drawable.notification),
+                    modifier = Modifier.fillMaxHeight().size(50.dp),
+                    contentDescription = "notifications_icon")
+              }
           // Profile icon
           TextButton(
               onClick = {

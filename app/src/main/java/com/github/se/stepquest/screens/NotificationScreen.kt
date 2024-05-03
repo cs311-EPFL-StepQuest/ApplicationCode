@@ -46,13 +46,13 @@ var notificationList: MutableList<NotificationData> by mutableStateOf(mutableLis
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun NotificationScreen() {
-  notificationRepository.createNotification(
-      uuid!!, NotificationData("Hello2", "13:54", UUID.randomUUID().toString(), uuid, ""))
-  notificationRepository.createNotification(
-      uuid, NotificationData("Hello3", "13:55", UUID.randomUUID().toString(), uuid, "lsdiv"))
-  notificationRepository.createNotification(
-      uuid, NotificationData("Hello4", "13:56", UUID.randomUUID().toString(), uuid, ""))
-  updateNotificationList()
+//  notificationRepository.createNotification(
+//      uuid!!, NotificationData("Hello2", "13:54", UUID.randomUUID().toString(), uuid, ""))
+//  notificationRepository.createNotification(
+//      uuid, NotificationData("Hello3", "13:55", UUID.randomUUID().toString(), uuid, "lsdiv"))
+//  notificationRepository.createNotification(
+//      uuid, NotificationData("Hello4", "13:56", UUID.randomUUID().toString(), uuid, ""))
+//  updateNotificationList()
   Column(modifier = Modifier.padding(0.dp, 30.dp)) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
       Text("Notifications", fontSize = 20.sp)
