@@ -9,12 +9,15 @@ import com.google.android.gms.location.*
 
 data class LocationDetails(val latitude: Double, val longitude: Double)
 
+data class Checkpoint(val name: String, val location: LocationDetails)
+
 class LocationViewModel : ViewModel() {
   var locationCallback: LocationCallback? = null
   var fusedLocationClient: FusedLocationProviderClient? = null
   var currentLocation = MutableLiveData<LocationDetails>()
   var _allocations = MutableLiveData<List<LocationDetails>?>()
   var locationUpdated = MutableLiveData<Boolean>()
+  var checkpoints = MutableLiveData<List<Checkpoint>>()
 
   init {
     locationUpdated.postValue(false)
@@ -76,6 +79,19 @@ class LocationViewModel : ViewModel() {
 
   fun getAllocations(): List<LocationDetails>? {
     return _allocations.value
+  }
+
+  fun addNewCheckpoint(name: String): Boolean {
+    val newCheckpointList = checkpoints.value?.toMutableList() ?: mutableListOf()
+    val currLocation = currentLocation.value
+    return if (currLocation == null) {
+      false
+    } else {
+      val newCheckpoint = Checkpoint(name, currentLocation.value!!)
+      newCheckpointList.add(newCheckpoint)
+      checkpoints.postValue(newCheckpointList)
+      true
+    }
   }
 
   fun cleanAllocations() {

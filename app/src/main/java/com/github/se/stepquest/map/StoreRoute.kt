@@ -14,12 +14,12 @@ class StoreRoute {
 
   data class Route(
       val route: List<LocationDetails>?,
-      val checkpoints: List<String>? // Change to the correct checkpoints data type
+      val checkpoints: List<Checkpoint>? // Change to the correct checkpoints data type
   )
 
   data class GlobalRoute(
       val route: List<LocationDetails>?,
-      val checkpoints: List<String>?, // Change to the correct checkpoints data type
+      val checkpoints: List<Checkpoint>?, // Change to the correct checkpoints data type
       val userid: String
   )
 
@@ -27,7 +27,7 @@ class StoreRoute {
     return firebaseAuth.currentUser?.uid
   }
 
-  fun addRoute(userId: String?, route: List<LocationDetails>?, checkpoints: List<String>?) {
+  fun addRoute(userId: String?, route: List<LocationDetails>?, checkpoints: List<Checkpoint>?) {
     if (userId != null) {
       val newroute = Route(route, checkpoints)
       val globalroute = GlobalRoute(route, checkpoints, userId)
