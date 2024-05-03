@@ -90,8 +90,8 @@ class LocationViewModelTest {
 
     assert(success)
     assertEquals(1, list.size)
-    assert(list[0].name == "testName")
-    assert(list[0].location == mockLocationDetails)
+    assertEquals("testName", list[0].name)
+    assertEquals(mockLocationDetails, list[0].location)
   }
 
   @Test
