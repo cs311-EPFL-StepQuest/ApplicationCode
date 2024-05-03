@@ -8,11 +8,11 @@ import org.junit.Rule
 import org.junit.Test
 
 class NotificationsTest {
-    @get:Rule
-    val composeTestRule = createComposeRule()
-    @Test
-    fun everythingIsDisplayed() {
-        composeTestRule.setContent { NotificationScreen(TestUserRepository1()) }
-        composeTestRule.onNodeWithTag("Notifications title").assertIsDisplayed()
-    }
+  @get:Rule val composeTestRule = createComposeRule()
+
+  @Test
+  fun everythingIsDisplayed() {
+    composeTestRule.setContent { NotificationScreen(TestUserRepository1()) }
+    composeTestRule.onNodeWithTag("Notifications title").assertIsDisplayed()
+  }
 }

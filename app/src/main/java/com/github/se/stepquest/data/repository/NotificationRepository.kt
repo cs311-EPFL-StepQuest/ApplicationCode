@@ -9,71 +9,74 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 interface NotificationRepository {
-    fun getNotificationList(userUuid: String) : DatabaseReference
-    fun removeNotification(userUuid: String, notificationUuid: String)
-    fun createNotification(userUuid: String, notificationData: NotificationData)
+  fun getNotificationList(userUuid: String): DatabaseReference
+
+  fun removeNotification(userUuid: String, notificationUuid: String)
+
+  fun createNotification(userUuid: String, notificationData: NotificationData)
 }
-    class INotificationRepository: NotificationRepository {
-      private val notificationCollection =
-          FirebaseDatabase.getInstance().reference.child("notifications")
 
-      override fun getNotificationList(userUuid: String): DatabaseReference {
-        return notificationCollection.child(userUuid)
-      }
+class INotificationRepository : NotificationRepository {
+  private val notificationCollection =
+      FirebaseDatabase.getInstance().reference.child("notifications")
 
-      override fun removeNotification(userUuid: String, notificationUuid: String) {
-        println("Remove userId: $userUuid; notificationId: $notificationUuid")
-        notificationRepository
-            .getNotificationList(userUuid)
-            .child(notificationUuid)
-            .addValueEventListener(
-                object : ValueEventListener {
-                  override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    for (data in dataSnapshot.children) {
-                      println("Data: ${data.value}")
-                      data.ref.removeValue()
-                    }
-                  }
+  override fun getNotificationList(userUuid: String): DatabaseReference {
+    return notificationCollection.child(userUuid)
+  }
 
-                  override fun onCancelled(databaseError: DatabaseError) {}
-                })
-      }
+  override fun removeNotification(userUuid: String, notificationUuid: String) {
+    println("Remove userId: $userUuid; notificationId: $notificationUuid")
+    notificationRepository
+        .getNotificationList(userUuid)
+        .child(notificationUuid)
+        .addValueEventListener(
+            object : ValueEventListener {
+              override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (data in dataSnapshot.children) {
+                  println("Data: ${data.value}")
+                  data.ref.removeValue()
+                }
+              }
 
-      override fun createNotification(userUuid: String, notificationData: NotificationData) {
-        notificationCollection.child(userUuid).child(notificationData.uuid).setValue(notificationData)
-      }
-    }
+              override fun onCancelled(databaseError: DatabaseError) {}
+            })
+  }
 
-    class TestNotificationRepository: NotificationRepository {
-        private val notificationCollection =
-            FirebaseDatabase.getInstance().reference.child("notifications")
-        override fun getNotificationList(userUuid: String): DatabaseReference {
-            return notificationCollection.child("testUser2")
-        }
+  override fun createNotification(userUuid: String, notificationData: NotificationData) {
+    notificationCollection.child(userUuid).child(notificationData.uuid).setValue(notificationData)
+  }
+}
 
-        override fun removeNotification(userUuid: String, notificationUuid: String) {
-            println("Remove userId: $userUuid; notificationId: $notificationUuid")
-            notificationRepository
-                .getNotificationList(userUuid)
-                .child(notificationUuid)
-                .addValueEventListener(
-                    object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            for (data in dataSnapshot.children) {
-                                println("Data: ${data.value}")
-                                data.ref.removeValue()
-                            }
-                        }
+class TestNotificationRepository : NotificationRepository {
+  private val notificationCollection =
+      FirebaseDatabase.getInstance().reference.child("notifications")
 
-                        override fun onCancelled(databaseError: DatabaseError) {}
-                    })
-        }
+  override fun getNotificationList(userUuid: String): DatabaseReference {
+    return notificationCollection.child("testUser2")
+  }
 
-        override fun createNotification(userUuid: String, notificationData: NotificationData) {
-            TODO("Not yet implemented")
-        }
+  override fun removeNotification(userUuid: String, notificationUuid: String) {
+    println("Remove userId: $userUuid; notificationId: $notificationUuid")
+    notificationRepository
+        .getNotificationList(userUuid)
+        .child(notificationUuid)
+        .addValueEventListener(
+            object : ValueEventListener {
+              override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (data in dataSnapshot.children) {
+                  println("Data: ${data.value}")
+                  data.ref.removeValue()
+                }
+              }
 
-    }
+              override fun onCancelled(databaseError: DatabaseError) {}
+            })
+  }
+
+  override fun createNotification(userUuid: String, notificationData: NotificationData) {
+    TODO("Not yet implemented")
+  }
+}
 //    private var notificationList = listOf(
 //        NotificationData("You achieved your daily goal!", Timestamp.now(), "notification1",
 // false),

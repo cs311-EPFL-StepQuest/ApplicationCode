@@ -62,118 +62,121 @@ fun deleteFriend(
     currentUserId: String? = FirebaseAuth.getInstance().currentUser?.uid
 ) {
 
-    if (currentUserId == null) return
+  if (currentUserId == null) return
 
-    // Retrieve friend's uid
-    val usernamesRef = database.reference.child("usernames")
-    usernamesRef.addListenerForSingleValueEvent(
-        object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val uid = snapshot.child(friendName).getValue(String::class.java) ?: return
-
-                // Remove friend from current user's list
-                val curFriendsRefTotal =
-                    database.reference.child("users").child(currentUserId).child("numberOfFriends")
-                curFriendsRefTotal.addListenerForSingleValueEvent(
-                    object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            val numberOfFriends = dataSnapshot.getValue(Int::class.java) ?: 0
-                            curFriendsRefTotal.setValue(numberOfFriends - 1)
-                        }
-
-                        override fun onCancelled(databaseError: DatabaseError) {
-                            // add code when failing to access database
-                        }
-                    })
-
-                val curFriendsListRef =
-                    database.reference.child("users").child(currentUserId).child("friendsList")
-                curFriendsListRef.addListenerForSingleValueEvent(
-                    object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            val currentFriendsList: MutableList<Friend> =
-                                dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
-                            val friendToRemove = currentFriendsList.find { it.name == friendName }
-
-                            if (friendToRemove == null) return
-
-                            currentFriendsList.remove(friendToRemove)
-                            curFriendsListRef.setValue(currentFriendsList)
-                        }
-
-                        override fun onCancelled(databaseError: DatabaseError) {
-                            // add code when failing to access database
-                        }
-                    })
-
-                // Remove current user from friend's list
-                val friendsRefTotal =
-                    database.reference.child("users").child(uid).child("numberOfFriends")
-                friendsRefTotal.addListenerForSingleValueEvent(
-                    object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            val numberOfFriends = dataSnapshot.getValue(Int::class.java) ?: 0
-                            friendsRefTotal.setValue(numberOfFriends - 1)
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            // Handle database access failure
-                        }
-                    })
-
-                val friendsListRef = database.reference.child("users").child(uid).child("friendsList")
-                friendsListRef.addListenerForSingleValueEvent(
-                    object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            val currentFriendsList: MutableList<Friend> =
-                                dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
-                            val friendToRemove = currentFriendsList.find { it.name == currentUsername }
-
-                            if (friendToRemove == null) return
-
-                            currentFriendsList.remove(friendToRemove)
-                            friendsListRef.setValue(currentFriendsList)
-                        }
-
-                        override fun onCancelled(databaseError: DatabaseError) {
-                            // add code when failing to access database
-                        }
-                    })
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle database access failure
-            }
-        })
-}
-
-fun sendFriendRequest(currentUsername: String, friendName: String) {
-    val userRepository = IUserRepository()
-    val notificationRepository = INotificationRepository()
-    val database = FirebaseDatabase.getInstance()
-
-  // Retrieve the new friend's uid
+  // Retrieve friend's uid
   val usernamesRef = database.reference.child("usernames")
-    //Send notification
-    val senderUserId = userRepository.getUid().toString()
-    usernamesRef.child(friendName).addListenerForSingleValueEvent(object : ValueEventListener{
+  usernamesRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-            println("Snapshot: ${snapshot.value}")
-            val receiverUserId = snapshot.value.toString()
-            notificationRepository.createNotification(receiverUserId,
-                NotificationData(
-                    "You received new friend request from $currentUsername!",
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")),
-                    UUID.randomUUID().toString(),
-                    receiverUserId,
-                    senderUserId))
+          val uid = snapshot.child(friendName).getValue(String::class.java) ?: return
+
+          // Remove friend from current user's list
+          val curFriendsRefTotal =
+              database.reference.child("users").child(currentUserId).child("numberOfFriends")
+          curFriendsRefTotal.addListenerForSingleValueEvent(
+              object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                  val numberOfFriends = dataSnapshot.getValue(Int::class.java) ?: 0
+                  curFriendsRefTotal.setValue(numberOfFriends - 1)
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                  // add code when failing to access database
+                }
+              })
+
+          val curFriendsListRef =
+              database.reference.child("users").child(currentUserId).child("friendsList")
+          curFriendsListRef.addListenerForSingleValueEvent(
+              object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                  val currentFriendsList: MutableList<Friend> =
+                      dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
+                  val friendToRemove = currentFriendsList.find { it.name == friendName }
+
+                  if (friendToRemove == null) return
+
+                  currentFriendsList.remove(friendToRemove)
+                  curFriendsListRef.setValue(currentFriendsList)
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                  // add code when failing to access database
+                }
+              })
+
+          // Remove current user from friend's list
+          val friendsRefTotal =
+              database.reference.child("users").child(uid).child("numberOfFriends")
+          friendsRefTotal.addListenerForSingleValueEvent(
+              object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                  val numberOfFriends = dataSnapshot.getValue(Int::class.java) ?: 0
+                  friendsRefTotal.setValue(numberOfFriends - 1)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                  // Handle database access failure
+                }
+              })
+
+          val friendsListRef = database.reference.child("users").child(uid).child("friendsList")
+          friendsListRef.addListenerForSingleValueEvent(
+              object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                  val currentFriendsList: MutableList<Friend> =
+                      dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
+                  val friendToRemove = currentFriendsList.find { it.name == currentUsername }
+
+                  if (friendToRemove == null) return
+
+                  currentFriendsList.remove(friendToRemove)
+                  friendsListRef.setValue(currentFriendsList)
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                  // add code when failing to access database
+                }
+              })
         }
 
         override fun onCancelled(error: DatabaseError) {
-            TODO("Not yet implemented")
+          // Handle database access failure
         }
+      })
+}
 
-    })
+fun sendFriendRequest(currentUsername: String, friendName: String) {
+  val userRepository = IUserRepository()
+  val notificationRepository = INotificationRepository()
+  val database = FirebaseDatabase.getInstance()
+
+  // Retrieve the new friend's uid
+  val usernamesRef = database.reference.child("usernames")
+  // Send notification
+  val senderUserId = userRepository.getUid().toString()
+  usernamesRef
+      .child(friendName)
+      .addListenerForSingleValueEvent(
+          object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+              println("Snapshot: ${snapshot.value}")
+              val receiverUserId = snapshot.value.toString()
+              notificationRepository.createNotification(
+                  receiverUserId,
+                  NotificationData(
+                      "You received new friend request from $currentUsername!",
+                      LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")),
+                      UUID.randomUUID().toString(),
+                      receiverUserId,
+                      senderUserId))
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+              TODO("Not yet implemented")
+            }
+          })
   usernamesRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
