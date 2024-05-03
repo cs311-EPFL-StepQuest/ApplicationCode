@@ -32,7 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.github.se.stepquest.services.deleteFriend
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.google.firebase.auth.FirebaseAuth
@@ -108,7 +107,9 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
             modifier = Modifier.padding(top = 16.dp))
         ClickableText(
             text = AnnotatedString("Achievements: 5"), // Replace with actual number of achievements
-            onClick = { deleteFriend("eliott", "Santhos", database, userId) },
+            onClick = {
+              // Handle click action for achievements
+            },
             style = TextStyle(fontSize = 24.sp),
             modifier = Modifier.padding(top = 8.dp))
         Button(
