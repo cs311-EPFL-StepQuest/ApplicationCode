@@ -21,7 +21,10 @@ class StoreRouteTest {
   fun testRouteCreation() {
     val routeDetails =
         listOf(LocationDetails(1.0, 2.0), LocationDetails(3.0, 4.0), LocationDetails(5.0, 6.0))
-    val checkpoints = listOf("Checkpoint 1", "Checkpoint 2")
+    val checkpoints =
+        listOf(
+            Checkpoint("Checkpoint 1", routeDetails[0]),
+            Checkpoint("Checkpoint 2", routeDetails[1]))
     val route = StoreRoute.Route(routeDetails, checkpoints)
     assertEquals(routeDetails, route.route)
     assertEquals(checkpoints, route.checkpoints)
@@ -31,7 +34,10 @@ class StoreRouteTest {
   fun testGlobalRouteCreation() {
     val routeDetails =
         listOf(LocationDetails(1.0, 2.0), LocationDetails(3.0, 4.0), LocationDetails(5.0, 6.0))
-    val checkpoints = listOf("Checkpoint 1", "Checkpoint 2")
+    val checkpoints =
+        listOf(
+            Checkpoint("Checkpoint 1", routeDetails[0]),
+            Checkpoint("Checkpoint 2", routeDetails[1]))
     val userId = "testUserId"
     val globalRoute = StoreRoute.GlobalRoute(routeDetails, checkpoints, userId)
     assertEquals(routeDetails, globalRoute.route)
@@ -43,7 +49,8 @@ class StoreRouteTest {
   fun testAddRoute() {
     val userId = "testUserId"
     val route = listOf(LocationDetails(1.0, 2.0), LocationDetails(3.0, 4.0))
-    val checkpoints = listOf("Checkpoint 1", "Checkpoint 2")
+    val checkpoints =
+        listOf(Checkpoint("Checkpoint 1", route[0]), Checkpoint("Checkpoint 2", route[1]))
     val database = mockk<FirebaseDatabase>(relaxed = true)
     every { database.reference } returns mockk(relaxed = true)
     storeRoute.addRoute(userId, route, checkpoints)

@@ -6,8 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.location.*
+import io.mockk.MockKAnnotations
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -33,6 +36,7 @@ class LocationViewModelTest {
   @Before
   fun setup() {
     locationViewModel = LocationViewModel()
+    MockKAnnotations.init(this)
     context = ApplicationProvider.getApplicationContext<Context>()
   }
 
@@ -61,6 +65,54 @@ class LocationViewModelTest {
             allocations, currentLocation, locationUpdated)
 
     assertNull(result)
+  }
+
+  @Test fun startLocationUpdatesTest() {}
+
+  @Test
+  fun testAddNewCheckpointSuccess() {
+    val mockLocationDetails = LocationDetails(10.0, 20.0)
+
+    locationViewModel.currentLocation.postValue(mockLocationDetails)
+    locationViewModel.checkpoints.postValue(mutableListOf())
+
+    // Wait to ensure the postvalue is done
+    val latch = CountDownLatch(1)
+
+    latch.await(2, TimeUnit.SECONDS)
+
+    val success = locationViewModel.addNewCheckpoint("testName")
+
+    // Again wait to ensure postvalue in the function we are testing is done
+    latch.await(2, TimeUnit.SECONDS)
+
+    val list = locationViewModel.checkpoints.value!!
+
+    assert(success)
+    assertEquals(1, list.size)
+    assertEquals("testName", list[0].name)
+    assertEquals(mockLocationDetails, list[0].location)
+  }
+
+  @Test
+  fun testAddNewCheckpointFailure() {
+    locationViewModel.currentLocation.postValue(null)
+    locationViewModel.checkpoints.postValue(mutableListOf())
+
+    // Wait to ensure the postvalue is done
+    val latch = CountDownLatch(1)
+
+    latch.await(2, TimeUnit.SECONDS)
+
+    val success = locationViewModel.addNewCheckpoint("testName")
+
+    // Again wait to ensure postvalue in the function we are testing is done
+    latch.await(2, TimeUnit.SECONDS)
+
+    val list = locationViewModel.checkpoints.value!!
+
+    assert(!success)
+    assertEquals(0, list.size)
   }
 
   @Test

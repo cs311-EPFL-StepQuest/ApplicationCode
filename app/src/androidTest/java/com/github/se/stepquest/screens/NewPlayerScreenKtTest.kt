@@ -1,13 +1,14 @@
 package com.github.se.stepquest.screens
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.ui.test.performTextInput
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import io.mockk.*
 import io.mockk.junit4.MockKRule
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -18,36 +19,36 @@ class NewPlayerScreenTest {
 
   @get:Rule val mockkRule = MockKRule(this)
 
-  private lateinit var firebaseAuth: FirebaseAuth
   private lateinit var database: FirebaseDatabase
+  private lateinit var usernameRef: DatabaseReference
 
   @Before
   fun setUp() {
-    firebaseAuth = mockk(relaxed = true)
     database = mockk(relaxed = true)
-    every {
-      database.reference.child(any()).child(any()).addListenerForSingleValueEvent(any())
-    } just Runs
-  }
-
-  @After
-  fun tearDown() {
-    clearAllMocks()
+    usernameRef = mockk(relaxed = true)
+    every { database.reference } returns
+        mockk {
+          every { child(any()) } returns
+              mockk {
+                every { child(any()) } returns mockk { every { child(any()) } returns usernameRef }
+              }
+        }
+    every { usernameRef.setValue(any()) } returns mockk()
   }
 
   @Test
-  fun givenNewPlayer_whenScreenDisplayed_thenUsernameTextFieldDisplayed() {
-    every {
-      database.reference.child(any()).child(any()).addListenerForSingleValueEvent(any())
-    } answers
+  fun blankUsernameIsNotAccepted() {
+    every { usernameRef.addListenerForSingleValueEvent(any()) } answers
         {
           val callback = arg<ValueEventListener>(1)
           callback.onDataChange(mockk())
         }
 
-    composeTestRule.setContent { NewPlayerScreen(navigationActions = mockk(), context = mockk()) }
+    composeTestRule.setContent {
+      NewPlayerScreen(navigationActions = mockk(), context = mockk(), "testUserId")
+    }
 
-    composeTestRule.onNodeWithText("Username").assertExists()
-    composeTestRule.onNodeWithText("Sign in").assertExists()
+    composeTestRule.onNodeWithTag("username_input").performTextInput("")
+    composeTestRule.onNodeWithText("Sign in").assertDoesNotExist()
   }
 }

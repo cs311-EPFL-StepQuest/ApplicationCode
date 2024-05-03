@@ -29,13 +29,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.R
 import com.github.se.stepquest.services.sendFriendRequest
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -43,7 +43,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 @Composable
-fun AddFriendScreen(onDismiss: () -> Unit) {
+fun AddFriendScreen(onDismiss: () -> Unit, userId: String) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var searchQuery by remember { mutableStateOf("") }
   val searchResults = remember { mutableStateOf<List<String>>(emptyList()) }
@@ -52,7 +52,7 @@ fun AddFriendScreen(onDismiss: () -> Unit) {
   val username = remember { mutableStateOf<String?>(null) }
 
   // Retrieve current user's username
-  LaunchedEffect(Unit) { getCurrentUser(database.reference) { username.value = it } }
+  LaunchedEffect(Unit) { getCurrentUser(database.reference, userId) { username.value = it } }
 
   Surface(
       color = Color.White,
@@ -92,8 +92,9 @@ fun AddFriendScreen(onDismiss: () -> Unit) {
                     searchQuery = it
                     dbUserSearch(database, it, searchResults, loading, username.value)
                   },
-                  placeholder = { Text("Search for friends") },
-                  modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
+                  placeholder = { Text("Enter your friend's username") },
+                  modifier =
+                      Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("searchField"))
               Spacer(modifier = Modifier.height(16.dp))
               if (searchQuery.isNotBlank() && !loading.value) {
                 if (searchResults.value.isNotEmpty()) {
@@ -202,9 +203,12 @@ private fun dbUserSearch(
 }
 
 // Helper function to get current username
-private fun getCurrentUser(database: DatabaseReference, callback: (String?) -> Unit) {
-  val userId = FirebaseAuth.getInstance().currentUser?.uid
-  userId?.let { uid ->
+private fun getCurrentUser(
+    database: DatabaseReference,
+    userId: String,
+    callback: (String?) -> Unit
+) {
+  userId.let { uid ->
     database
         .child("users")
         .child(uid)
@@ -221,5 +225,5 @@ private fun getCurrentUser(database: DatabaseReference, callback: (String?) -> U
                 callback(null)
               }
             })
-  } ?: callback(null)
+  }
 }
