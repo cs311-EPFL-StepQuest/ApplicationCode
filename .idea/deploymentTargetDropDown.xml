@@ -1,31 +1,13 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="StepCounterServiceTest">
-        <State />
-      </entry>
-      <entry key="DatabaseLoadingScreenTest">
-        <State />
-      </entry>
-      <entry key="FriendDialogBoxKtTest">
+      <entry key="LocationViewModelTest">
         <State />
       </entry>
       <entry key="MainActivity">
-        <State>
-          <targetSelectedWithDropDown>
-            <Target>
-              <type value="QUICK_BOOT_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\santh\.android\avd\Pixel_8_Pro_API_34_2.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-04-30T13:37:55.907582300Z" />
-        </State>
+        <State />
       </entry>
       <entry key="app">
         <State>
@@ -45,4 +27,3 @@
       </entry>
     </value>
   </component>
-</project>
