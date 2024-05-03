@@ -45,8 +45,8 @@ fun ProgressionPage(user: UserRepository) {
   var dailyStepsMade by remember { mutableStateOf(0) }
   var weeklyStepsMade by remember { mutableStateOf(0) }
 
-  dailyStepsMade = user.getSteps().get(0)
-  weeklyStepsMade = user.getSteps().get(1)
+  user.getSteps { steps -> dailyStepsMade = steps[0] }
+  user.getSteps { steps -> weeklyStepsMade = steps[1] }
 
   var dailyStepGoal by remember { mutableIntStateOf(5000) }
   var weeklyStepGoal by remember { mutableIntStateOf(35000) }
