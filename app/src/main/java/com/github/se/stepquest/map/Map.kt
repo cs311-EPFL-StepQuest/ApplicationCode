@@ -319,14 +319,17 @@ fun Map(locationViewModel: LocationViewModel) {
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp)) {
                   Button(
                       onClick = {
-                        locationViewModel.addNewCheckpoint(checkpointTitle)
-                        // Add the image to the list of images
-                        if (currentImage.value != null) {
-                          images.value += currentImage.value!!
+                        if (locationViewModel.addNewCheckpoint(checkpointTitle)) {
+                          // Add the image to the list of images
+                          if (currentImage.value != null) {
+                            images.value += currentImage.value!!
+                          }
+                          // Increase checkpoint number
+                          numCheckpoints++
+                        } else {
+                          Toast.makeText(context, "Could not save checkpoint", Toast.LENGTH_SHORT)
+                              .show()
                         }
-                        // Increase checkpoint number
-                        numCheckpoints++
-                        val title = checkpointTitle
                         showDialog = false
                         checkpointTitle = ""
                       },

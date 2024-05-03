@@ -70,7 +70,7 @@ class LocationViewModelTest {
   @Test fun startLocationUpdatesTest() {}
 
   @Test
-  fun testAddNewCheckpoint() {
+  fun testAddNewCheckpointSuccess() {
     val mockLocationDetails = LocationDetails(10.0, 20.0)
 
     locationViewModel.currentLocation.postValue(mockLocationDetails)
@@ -81,16 +81,38 @@ class LocationViewModelTest {
 
     latch.await(2, TimeUnit.SECONDS)
 
-    locationViewModel.addNewCheckpoint("testName")
+    val success = locationViewModel.addNewCheckpoint("testName")
 
     // Again wait to ensure postvalue in the function we are testing is done
     latch.await(2, TimeUnit.SECONDS)
 
     val list = locationViewModel.checkpoints.value!!
 
+    assert(success)
     assertEquals(1, list.size)
     assert(list[0].name == "testName")
     assert(list[0].location == mockLocationDetails)
+  }
+
+  @Test
+  fun testAddNewCheckpointFailure() {
+    locationViewModel.currentLocation.postValue(null)
+    locationViewModel.checkpoints.postValue(mutableListOf())
+
+    // Wait to ensure the postvalue is done
+    val latch = CountDownLatch(1)
+
+    latch.await(2, TimeUnit.SECONDS)
+
+    val success = locationViewModel.addNewCheckpoint("testName")
+
+    // Again wait to ensure postvalue in the function we are testing is done
+    latch.await(2, TimeUnit.SECONDS)
+
+    val list = locationViewModel.checkpoints.value!!
+
+    assert(!success)
+    assertEquals(0, list.size)
   }
 
   @Test
