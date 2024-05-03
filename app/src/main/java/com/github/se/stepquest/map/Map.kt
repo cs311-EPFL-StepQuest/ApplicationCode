@@ -261,16 +261,24 @@ fun Map(locationViewModel: LocationViewModel) {
         if (showDialog) {
           AlertDialog(
               shape = RoundedCornerShape(16.dp),
-              onDismissRequest = { showDialog = false },
+              onDismissRequest = {
+                showDialog = false
+                checkpointTitle = ""
+              },
               title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                   Text(
                       "New Checkpoint",
                       style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
                       modifier = Modifier.weight(1f))
-                  IconButton(onClick = { showDialog = false }, modifier = Modifier.size(36.dp)) {
-                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.Black)
-                  }
+                  IconButton(
+                      onClick = {
+                        showDialog = false
+                        checkpointTitle = ""
+                      },
+                      modifier = Modifier.size(36.dp)) {
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.Black)
+                      }
                 }
               },
               text = {
@@ -318,16 +326,19 @@ fun Map(locationViewModel: LocationViewModel) {
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp)) {
                   Button(
                       onClick = {
-                        // ADD HERE CODE FOR ADDING CHECKPOINTS, INPUT TITLE STORED IN title
-
-                        // Add the image to the list of images
-                        if (currentImage.value != null) {
-                          images.value += currentImage.value!!
+                        if (locationViewModel.addNewCheckpoint(checkpointTitle)) {
+                          // Add the image to the list of images
+                          if (currentImage.value != null) {
+                            images.value += currentImage.value!!
+                          }
+                          // Increase checkpoint number
+                          numCheckpoints++
+                        } else {
+                          Toast.makeText(context, "Could not save checkpoint", Toast.LENGTH_SHORT)
+                              .show()
                         }
-                        // Increase checkpoint number
-                        numCheckpoints++
-                        val title = checkpointTitle
                         showDialog = false
+                        checkpointTitle = ""
                       },
                       enabled = checkpointTitle.isNotEmpty(),
                       shape = RoundedCornerShape(12.dp),
@@ -356,7 +367,10 @@ fun Map(locationViewModel: LocationViewModel) {
           stopCreatingRoute = true
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
           storeRoute.addRoute(
-              storeRoute.getUserid(), locationViewModel.getAllocations(), emptyList())
+              storeRoute.getUserid(),
+              locationViewModel.getAllocations(),
+              locationViewModel.checkpoints.value?.toMutableList() ?: mutableListOf())
+          locationViewModel.checkpoints.postValue(mutableListOf())
         },
         closeProgression = { showProgression = false },
         routeLength,
