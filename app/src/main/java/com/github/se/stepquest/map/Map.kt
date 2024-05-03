@@ -360,7 +360,10 @@ fun Map(locationViewModel: LocationViewModel) {
           stopCreatingRoute = true
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
           storeRoute.addRoute(
-              storeRoute.getUserid(), locationViewModel.getAllocations(), emptyList())
+              storeRoute.getUserid(),
+              locationViewModel.getAllocations(),
+              locationViewModel.checkpoints.value?.toMutableList() ?: mutableListOf())
+          locationViewModel.checkpoints.postValue(mutableListOf())
         },
         closeProgression = { showProgression = false },
         routeLength,
