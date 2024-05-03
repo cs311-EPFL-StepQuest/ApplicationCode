@@ -375,6 +375,11 @@ fun Map(locationViewModel: LocationViewModel) {
         closeProgression = { showProgression = false },
         routeLength,
         numCheckpoints)
+
+    // Reset the number of checkpoints created
+    if (stopCreatingRoute) {
+      numCheckpoints = 0
+    }
   }
 }
 
