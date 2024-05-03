@@ -31,6 +31,7 @@ import com.github.se.stepquest.screens.FriendsListScreen
 import com.github.se.stepquest.screens.HomeScreen
 import com.github.se.stepquest.screens.LoginScreen
 import com.github.se.stepquest.screens.NewPlayerScreen
+import com.github.se.stepquest.screens.NotificationScreen
 import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
@@ -105,6 +106,7 @@ fun AppNavigationHost(
         composable(Routes.FriendsListScreen.routName) {
           FriendsListScreen(navigationActions = navigationActions, userId)
         }
+        composable(Routes.NotificationScreen.routName) { NotificationScreen(IUserRepository()) }
       }
 }
 

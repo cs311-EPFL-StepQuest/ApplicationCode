@@ -70,12 +70,17 @@ fun HomeScreen(navigationActions: NavigationActions) {
           }
           Spacer(Modifier.weight(1f))
           // Notifications icon
-          TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("notifications_button")) {
-            Image(
-                painter = painterResource(com.github.se.stepquest.R.drawable.notification),
-                modifier = Modifier.fillMaxHeight().size(50.dp),
-                contentDescription = "notifications_icon")
-          }
+          TextButton(
+              onClick = {
+                navigationActions.navigateTo(
+                    TopLevelDestination(Routes.NotificationScreen.routName))
+              },
+              modifier = Modifier.testTag("notifications_button")) {
+                Image(
+                    painter = painterResource(com.github.se.stepquest.R.drawable.notification),
+                    modifier = Modifier.fillMaxHeight().size(50.dp),
+                    contentDescription = "notifications_icon")
+              }
           // Profile icon
           TextButton(
               onClick = {

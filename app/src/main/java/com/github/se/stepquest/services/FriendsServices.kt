@@ -1,12 +1,18 @@
 package com.github.se.stepquest.services
 
 import com.github.se.stepquest.Friend
+import com.github.se.stepquest.IUserRepository
+import com.github.se.stepquest.data.model.NotificationData
+import com.github.se.stepquest.data.repository.INotificationRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 fun addFriend(
     currentUser: Friend,
@@ -187,11 +193,35 @@ fun deleteFriend(
 }
 
 fun sendFriendRequest(currentUsername: String, friendName: String) {
-
+  val userRepository = IUserRepository()
+  val notificationRepository = INotificationRepository()
   val database = FirebaseDatabase.getInstance()
 
   // Retrieve the new friend's uid
   val usernamesRef = database.reference.child("usernames")
+  // Send notification
+  val senderUserId = userRepository.getUid().toString()
+  usernamesRef
+      .child(friendName)
+      .addListenerForSingleValueEvent(
+          object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+              println("Snapshot: ${snapshot.value}")
+              val receiverUserId = snapshot.value.toString()
+              notificationRepository.createNotification(
+                  receiverUserId,
+                  NotificationData(
+                      "You received new friend request from $currentUsername!",
+                      LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")),
+                      UUID.randomUUID().toString(),
+                      receiverUserId,
+                      senderUserId))
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+              TODO("Not yet implemented")
+            }
+          })
   usernamesRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
