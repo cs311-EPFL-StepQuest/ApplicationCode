@@ -41,6 +41,7 @@ class ProfilePageLayoutTest {
         }
   }
 
+    
   @Test
   fun display_profile_layout() {
     composeTestRule.setContent {
