@@ -90,7 +90,7 @@ fun AppNavigationHost(
         composable(Routes.FriendsListScreen.routName) {
           FriendsListScreen(navigationActions = navigationActions)
         }
-        composable(Routes.NotificationScreen.routName) { NotificationScreen() }
+        composable(Routes.NotificationScreen.routName) { NotificationScreen(IUserRepository()) }
       }
 }
 

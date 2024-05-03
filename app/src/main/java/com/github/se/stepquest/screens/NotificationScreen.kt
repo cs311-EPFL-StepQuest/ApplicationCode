@@ -1,6 +1,7 @@
 package com.github.se.stepquest.screens
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,38 +25,43 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.se.stepquest.Friend
 import com.github.se.stepquest.IUserRepository
 import com.github.se.stepquest.R
+import com.github.se.stepquest.UserRepository
 import com.github.se.stepquest.data.model.NotificationData
-import com.github.se.stepquest.data.repository.NotificationRepository
+import com.github.se.stepquest.data.repository.INotificationRepository
+import com.github.se.stepquest.services.addFriend
+import com.github.se.stepquest.services.deleteFriend
+import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
 import com.google.firebase.database.getValue
-import java.util.UUID
 
-val notificationRepository = NotificationRepository()
-val userRepository = IUserRepository()
-val uuid = userRepository.getUid()
+val notificationRepository = INotificationRepository()
 var notificationList: MutableList<NotificationData> by mutableStateOf(mutableListOf())
 
-@Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun NotificationScreen() {
+fun NotificationScreen(userRepository: UserRepository) {
+    val uuid = userRepository.getUid()
 //  notificationRepository.createNotification(
 //      uuid!!, NotificationData("Hello2", "13:54", UUID.randomUUID().toString(), uuid, ""))
 //  notificationRepository.createNotification(
 //      uuid, NotificationData("Hello3", "13:55", UUID.randomUUID().toString(), uuid, "lsdiv"))
 //  notificationRepository.createNotification(
 //      uuid, NotificationData("Hello4", "13:56", UUID.randomUUID().toString(), uuid, ""))
-  updateNotificationList()
+  updateNotificationList(uuid)
   Column(modifier = Modifier.padding(0.dp, 30.dp)) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-      Text("Notifications", fontSize = 20.sp)
+      Text("Notifications", fontSize = 20.sp, modifier = Modifier.testTag("Notifications title"))
     }
     Box(modifier = Modifier.height(40.dp))
     Divider(color = colorResource(id = R.color.blueTheme), thickness = 1.dp)
@@ -95,18 +101,37 @@ private fun BuildNotification(data: NotificationData?) {
                     })
           }
         }
+      var friendName = ""
+      var currentuserName = ""
+      Firebase.database.reference.child("usernames").addListenerForSingleValueEvent(object : ValueEventListener {
+          override fun onDataChange(snapshot: DataSnapshot) {
+              friendName = snapshot.child(data.senderUuid).value.toString()
+              currentuserName = snapshot.child(data.userUuid).value.toString()
+          }
+          override fun onCancelled(error: DatabaseError) {
+
+          }
+      })
+
     if (data.senderUuid.isNotEmpty())
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth().padding(20.dp, 10.dp)) {
               Button(
-                  onClick = { /*TODO*/},
+                  onClick = {
+
+                      addFriend(Friend(friendName, Uri.EMPTY, false))
+                      notificationRepository.removeNotification(data.userUuid, data.uuid)
+                            },
                   content = { Text("Accept") },
                   modifier = Modifier.fillMaxWidth().weight(1f).height(35.dp),
                   colors = ButtonDefaults.buttonColors(colorResource(id = R.color.blueTheme)))
               Box(modifier = Modifier.width(20.dp))
               Button(
-                  onClick = { /*TODO*/},
+                  onClick = {
+                    deleteFriend(currentuserName, friendName, FirebaseDatabase.getInstance(), data.uuid)
+                      notificationRepository.removeNotification(data.userUuid, data.uuid)
+                  },
                   content = { Text("Reject") },
                   modifier = Modifier.fillMaxWidth().weight(1f).height(35.dp),
                   colors = ButtonDefaults.buttonColors(colorResource(id = R.color.lightGrey)))
@@ -115,7 +140,7 @@ private fun BuildNotification(data: NotificationData?) {
   }
 }
 
-fun updateNotificationList() {
+fun updateNotificationList(uuid: String?) {
   notificationRepository
       .getNotificationList(uuid!!)
       .addValueEventListener(

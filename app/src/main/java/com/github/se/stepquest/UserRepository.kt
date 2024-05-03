@@ -46,7 +46,7 @@ class IUserRepository : UserRepository {
 }
 
 class TestUserRepository1 : UserRepository {
-  private val uid = "testuid"
+  private val uid = "testUser2"
   private val dailyStepsMade = 2500
   private val weeklyStepsMade = 6500
 
