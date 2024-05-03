@@ -41,7 +41,6 @@ class ProfilePageLayoutTest {
         }
   }
 
-
   @Test
   fun display_profile_layout() {
     composeTestRule.setContent {
@@ -88,7 +87,7 @@ class ProfilePageLayoutTest {
     }
 
     // Verify UI components
-    //composeTestRule.onNodeWithText("No name").assertIsDisplayed()
+    // composeTestRule.onNodeWithText("No name").assertIsDisplayed()
     composeTestRule.onNodeWithText("Total Steps: 0").assertIsDisplayed()
   }
 }
