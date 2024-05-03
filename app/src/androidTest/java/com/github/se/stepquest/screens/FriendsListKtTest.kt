@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import com.github.se.stepquest.Friend
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.theme.StepQuestTheme
@@ -73,6 +74,8 @@ class FriendsListKtTest {
     fakeFriendsList.forEach { friend ->
       composeTestRule.onNodeWithText(friend.name).assertIsDisplayed()
     }
+      composeTestRule.onNodeWithText("Alice").performClick()
+      composeTestRule.onNodeWithText("Alice").assertExists()
   }
     @Test
     fun data_base_friends() {

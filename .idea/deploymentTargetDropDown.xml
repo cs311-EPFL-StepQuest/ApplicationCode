@@ -8,6 +8,9 @@
       <entry key="FriendsListKtTest">
         <State />
       </entry>
+      <entry key="MainActivity">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -23,12 +26,6 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-04-29T05:08:33.094809600Z" />
         </State>
-      </entry>
-      <entry key="data_base_friends()">
-        <State />
-      </entry>
-      <entry key="onPauseTest()">
-        <State />
       </entry>
     </value>
   </component>

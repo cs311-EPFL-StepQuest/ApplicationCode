@@ -43,10 +43,8 @@ fun DatabaseLoadingScreen(navigationActions: NavigationActions, context: Context
                 if (isNewPlayer) {
                   navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
                 } else {
-                    if (userId != "testUserId") {
-                        context.startService(Intent(context, StepCounterService::class.java))
-                        navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
-                    }
+                    context.startService(Intent(context, StepCounterService::class.java))
+                    navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
                 }
               }
 
