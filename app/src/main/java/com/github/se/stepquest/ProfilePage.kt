@@ -1,5 +1,6 @@
 package com.github.se.stepquest
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,23 +36,20 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
 
 @Composable
-fun ProfilePageLayout(navigationActions: NavigationActions) {
+fun ProfilePageLayout(navigationActions: NavigationActions, userId: String, profilePicture: Uri?) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-  val firebaseAuth = FirebaseAuth.getInstance()
-  val userId = firebaseAuth.currentUser?.uid
-  val profilePictureURL = firebaseAuth.currentUser?.photoUrl
-  val database = FirebaseDatabase.getInstance()
-  var totalStepsMade by remember { mutableStateOf(0) }
-  val stepsRef = database.reference.child("users").child(userId!!).child("totalSteps")
+  var totalStepsMade by remember { mutableIntStateOf(0) }
   var username by remember { mutableStateOf("No name") }
-  val usernameRef = database.reference.child("users").child(userId).child("username")
+  val database = Firebase.database
+  val databaseRef = database.reference.child("users")
+  val stepsRef = databaseRef.child(userId).child("totalSteps")
   stepsRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -61,6 +60,7 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
           // add code when failing to access database
         }
       })
+  val usernameRef = databaseRef.child(userId).child("username")
 
   usernameRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
@@ -82,20 +82,15 @@ fun ProfilePageLayout(navigationActions: NavigationActions) {
           Image(
               painter = painterResource(id = R.drawable.settings),
               contentDescription = "Settings",
-              modifier = Modifier.size(30.dp))
+              modifier = Modifier.size(30.dp),
+          )
         }
         Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 40.sp)
-        profilePictureURL?.let { uri ->
-          Image(
-              painter = rememberAsyncImagePainter(uri),
-              contentDescription = "Profile Picture",
-              modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
-        }
+        Image(
+            painter = rememberAsyncImagePainter(profilePicture),
+            contentDescription = "Profile Picture",
+            modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
         Spacer(modifier = Modifier.height(16.dp))
-        /*Image(
-        painter = painterResource(id = R.drawable.dummypfp),
-        contentDescription = "Profile Picture",
-        modifier = Modifier.size(200.dp))*/
         Text(
             text = username,
             fontWeight = FontWeight.Bold,
