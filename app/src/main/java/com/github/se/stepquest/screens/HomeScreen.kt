@@ -51,7 +51,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
   var challenges: List<ChallengeData> by remember { mutableStateOf(emptyList()) }
   val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
   quests = quests.plus(firstQuest)
-  SideEffect { challenges = getChallenges(userId) }
+  SideEffect { getChallenges(userId) { receivedChallenges -> challenges = receivedChallenges } }
   // ---------------------------------
 
   Scaffold(
@@ -104,7 +104,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
                     "Eliott",
                     "Santhos",
                     ChallengeData(
-                        "test",
+                        "test3",
                         ChallengeType.DAILY_STEP_CHALLENGE,
                         1000,
                         0,
@@ -181,76 +181,76 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
                                   }
                             }
                       }
-                      Column(modifier = Modifier.padding(top = 15.dp)) {
-                        Button(
-                            onClick = { /*TODO*/},
-                            colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
-                            modifier = Modifier.height(35.dp).width(140.dp)) {
+                      Spacer(modifier = Modifier.weight(1f))
+                      Button(
+                          onClick = { /*TODO*/},
+                          colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
+                          modifier =
+                              Modifier.padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
+                                  .height(35.dp)
+                                  .width(140.dp)) {
+                            Text(
+                                text = "Check active challenge",
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(0.dp))
+                          }
+                    }
+                    // Buttons
+
+                  }
+                }
+              }
+
+          // Daily quests tab
+          Card(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(start = 25.dp, end = 25.dp, bottom = 30.dp)
+                      .height(250.dp),
+              colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                Text(
+                    text = "Daily Quests",
+                    modifier = Modifier.padding(start = 18.dp, top = 14.dp),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold)
+                Column {
+                  if (quests.isEmpty()) {
+                    Text(
+                        text = "No daily quests available",
+                        modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 70.dp),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold)
+                  } else {
+                    for (quest in quests) {
+                      // Quest details
+                      Row(
+                          modifier = Modifier.padding(top = 40.dp, start = 30.dp).fillMaxWidth(),
+                          horizontalArrangement = Arrangement.Center,
+                          verticalAlignment = Alignment.CenterVertically) {
+                            // Icon of a blue dot
+
+                            Image(
+                                painter =
+                                    painterResource(
+                                        com.github.se.stepquest.R.drawable.quest_not_finished),
+                                modifier = Modifier.size(20.dp).fillMaxHeight().fillMaxWidth(),
+                                contentDescription = "profile_challenges")
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                              Spacer(modifier = Modifier.width(10.dp))
                               Text(
-                                  text = "Check challenges",
-                                  fontSize = 16.sp,
-                                  modifier = Modifier.padding(0.dp))
+                                  text = "${quest.currentState}/${quest.questGoal}",
+                                  fontSize = 18.sp)
+                              Spacer(modifier = Modifier.padding(10.dp))
+                              Text(
+                                  text = quest.questDescription,
+                                  fontSize = 18.sp,
+                                  fontWeight = FontWeight.Bold)
                             }
-                      }
+                          }
                     }
                   }
                 }
-
-                // Daily quests tab
-                Card(
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(start = 25.dp, end = 25.dp, bottom = 30.dp)
-                            .height(250.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)) {
-                      Text(
-                          text = "Daily Quests",
-                          modifier = Modifier.padding(start = 18.dp, top = 14.dp),
-                          fontSize = 20.sp,
-                          fontWeight = FontWeight.Bold)
-                      Column {
-                        if (quests.isEmpty()) {
-                          Text(
-                              text = "No daily quests available",
-                              modifier =
-                                  Modifier.fillMaxWidth().fillMaxHeight().padding(top = 70.dp),
-                              fontSize = 16.sp,
-                              textAlign = TextAlign.Center,
-                              fontWeight = FontWeight.Bold)
-                        } else {
-                          for (quest in quests) {
-                            // Quest details
-                            Row(
-                                modifier =
-                                    Modifier.padding(top = 40.dp, start = 30.dp).fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically) {
-                                  // Icon of a blue dot
-
-                                  Image(
-                                      painter =
-                                          painterResource(
-                                              com.github.se.stepquest.R.drawable
-                                                  .quest_not_finished),
-                                      modifier =
-                                          Modifier.size(20.dp).fillMaxHeight().fillMaxWidth(),
-                                      contentDescription = "profile_challenges")
-                                  Row(modifier = Modifier.fillMaxWidth()) {
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Text(
-                                        text = "${quest.currentState}/${quest.questGoal}",
-                                        fontSize = 18.sp)
-                                    Spacer(modifier = Modifier.padding(10.dp))
-                                    Text(
-                                        text = quest.questDescription,
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold)
-                                  }
-                                }
-                          }
-                        }
-                      }
-                    }
               }
         }
       }

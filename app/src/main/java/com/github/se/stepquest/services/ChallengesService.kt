@@ -73,7 +73,11 @@ fun sendPendingChallenge(
 fun getPendingChallenge(userId: String, challengeUuid: String, callback: (ChallengeData?) -> Unit) {
   val database = FirebaseDatabase.getInstance()
   val challengeRef =
-      database.reference.child("users").child(userId).child("pendingChallenges").child("test")
+      database.reference
+          .child("users")
+          .child(userId)
+          .child("pendingChallenges")
+          .child(challengeUuid)
   challengeRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
@@ -88,12 +92,10 @@ fun getPendingChallenge(userId: String, challengeUuid: String, callback: (Challe
 fun acceptChallenge(challenge: ChallengeData) {
   // initialize the challenge
   val database = FirebaseDatabase.getInstance()
-  val userRepository = IUserRepository()
-  val currentUserId = userRepository.getUid().toString()
   val firstUserRef =
       database.reference
           .child("users")
-          .child(currentUserId)
+          .child(challenge.challengedUserUuid)
           .child("acceptedChallenges")
           .child(challenge.uuid)
   val secondUserRef =
@@ -113,7 +115,7 @@ fun acceptChallenge(challenge: ChallengeData) {
       })
 }
 
-fun getChallenges(uid: String): List<ChallengeData> {
+fun getChallenges(uid: String, callback: (List<ChallengeData>) -> Unit) {
   val challenges: List<ChallengeData> = emptyList()
   val database = FirebaseDatabase.getInstance()
   val acceptedChallengesRef =
@@ -125,9 +127,9 @@ fun getChallenges(uid: String): List<ChallengeData> {
             val challenge = snapshot.getValue(ChallengeData::class.java)
             challenges.plus(challenge)
           }
+          callback(challenges)
         }
 
         override fun onCancelled(error: DatabaseError) {}
       })
-  return challenges
 }
