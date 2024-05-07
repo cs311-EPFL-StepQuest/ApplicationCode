@@ -16,8 +16,8 @@ import kotlin.math.cos
 import kotlin.math.sqrt
 
 class LocationArea {
-  private var firebaseAuth: FirebaseAuth
-  private var database: FirebaseDatabase
+  var firebaseAuth: FirebaseAuth
+  var database: FirebaseDatabase
   lateinit var center: LatLng
   var radius: Double = 1000.0
 
@@ -32,34 +32,35 @@ class LocationArea {
   }
 
   fun routesAroundLocation(
-    googleMap: GoogleMap,
-    selectedLocation: LocationDetails,
-    callback: (List<LocationDetails>) -> Unit
+      googleMap: GoogleMap,
+      selectedLocation: LocationDetails,
+      callback: (List<LocationDetails>) -> Unit
   ) {
     val routes = database.reference.child("routes")
     val routeList = mutableListOf<LocationDetails>()
 
-    routes.addListenerForSingleValueEvent(object : ValueEventListener {
-      override fun onDataChange(snapshot: DataSnapshot) {
-        for (routeID in snapshot.children) {
-          val routeDataSnapshot = routeID.child("route").child("0")
-          val latitude = routeDataSnapshot.child("latitude").getValue<Double>()
-          val longitude = routeDataSnapshot.child("longitude").getValue<Double>()
-          if (latitude != null && longitude != null) {
-            val routeData = LocationDetails(latitude, longitude)
-            if (checkInsideArea(routeData)) {
-              Log.d("LocationArea", "Route is inside area")
-              routeList.add(routeData)
+    routes.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(snapshot: DataSnapshot) {
+            for (routeID in snapshot.children) {
+              val routeDataSnapshot = routeID.child("route").child("0")
+              val latitude = routeDataSnapshot.child("latitude").getValue<Double>()
+              val longitude = routeDataSnapshot.child("longitude").getValue<Double>()
+              if (latitude != null && longitude != null) {
+                val routeData = LocationDetails(latitude, longitude)
+                if (checkInsideArea(routeData)) {
+                  Log.d("LocationArea", "Route is inside area")
+                  routeList.add(routeData)
+                }
+              }
             }
+            callback(routeList)
           }
-        }
-        callback(routeList)
-      }
 
-      override fun onCancelled(error: DatabaseError) {
-        // Handle error here
-      }
-    })
+          override fun onCancelled(error: DatabaseError) {
+            // Handle error here
+          }
+        })
   }
 
   fun checkInsideArea(newLocation: LocationDetails): Boolean {
@@ -74,10 +75,10 @@ class LocationArea {
     routesAroundLocation(googleMap, selectedLocation) { routes ->
       for (route in routes) {
         googleMap.addMarker(
-          MarkerOptions()
-            .position(LatLng(route.latitude, route.longitude))
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-            .title("Route"))
+            MarkerOptions()
+                .position(LatLng(route.latitude, route.longitude))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                .title("Route"))
       }
     }
   }
