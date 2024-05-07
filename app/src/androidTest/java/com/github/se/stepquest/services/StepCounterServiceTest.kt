@@ -31,6 +31,7 @@ class StepCounterServiceTest {
   private lateinit var stepsRefTotal: DatabaseReference
   private lateinit var stepsRefDaily: DatabaseReference
   private lateinit var event: SensorEvent
+  private lateinit var userRef: DatabaseReference
 
   private fun mockSensorEvent(): SensorEvent {
     val event = mockk<SensorEvent>()
@@ -50,6 +51,7 @@ class StepCounterServiceTest {
     stepsRefDaily = mockk(relaxed = true)
     event = mockSensorEvent()
     event.sensor = stepSensor
+    userRef = mockk(relaxed = true)
 
     every { sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) } returns stepSensor
     every { stepSensor.type } returns Sensor.TYPE_STEP_DETECTOR
@@ -70,6 +72,23 @@ class StepCounterServiceTest {
 
   @Test
   fun testOnCreate() {
+
+    val testnodeKey = "dailySteps April 11, 2024"
+    val dataSnapshot = mockk<DataSnapshot>(relaxed = true)
+    every { database.reference } returns userRef
+    every { userRef.addListenerForSingleValueEvent(any()) } answers
+        {
+          val listener = arg<ValueEventListener>(0)
+          listener.onDataChange(
+              mockk(
+                  (every { dataSnapshot.children } returns
+                          listOf(
+                              mockk {
+                                every { key } returns testnodeKey
+                                every { userRef.child(any()).removeValue() } returns mockk()
+                              }))
+                      .toString()))
+        }
     stepCounterService.onCreate()
     verify {
       sensorManager.registerListener(

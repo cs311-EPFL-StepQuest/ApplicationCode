@@ -44,6 +44,10 @@ class StepCounterService(
     if (sensorManager != null) {
       sensorManager!!.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
+
+    if (userId != null) {
+      cleanUpOldSteps(userId)
+    }
   }
 
   override fun onDestroy() {
