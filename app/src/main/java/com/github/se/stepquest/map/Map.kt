@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -32,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,9 +74,11 @@ fun Map(locationViewModel: LocationViewModel) {
   var showDialog by remember { mutableStateOf(false) }
   var checkpointTitle by remember { mutableStateOf("") }
   var routeEndMarker: Marker? = null
-  val storeroute = StoreRoute()
+  val storeRoute = StoreRoute()
+  var allroutes by remember { mutableStateOf("") }
 
   // Instantiate all necessary variables to take pictures
+  val cameraActionPermission = remember { mutableStateOf(false) }
   val currentImage = remember { mutableStateOf<ImageBitmap?>(null) }
   val images = remember { MutableStateFlow<List<ImageBitmap>>(emptyList()) }
   var photoFile = getPhotoFile(context)
@@ -92,24 +94,8 @@ fun Map(locationViewModel: LocationViewModel) {
           currentImage.value = takenImage.asImageBitmap()
         }
       }
-  // Launch camera permissions
-  val launcherCameraPermissions =
-      rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-          permissionsMap ->
-        val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
-        println("launcherMultiplePermissions")
-        if (areGranted) {
-          println("Permission Granted")
-          Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-        } else {
-          println("Permission Denied")
-          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-      }
 
   var showProgression by remember { mutableStateOf(false) }
-
-  var routeLength by rememberSaveable { mutableFloatStateOf(0f) }
   var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
 
   val launcherMultiplePermissions =
@@ -119,7 +105,13 @@ fun Map(locationViewModel: LocationViewModel) {
         println("launcherMultiplePermissions")
         if (areGranted) {
           println("Permission Granted")
-          locationViewModel.startLocationUpdates(context as ComponentActivity)
+          // Start location update only if the permission asked comes from a map action
+          if (!cameraActionPermission.value) {
+            locationViewModel.startLocationUpdates(context as ComponentActivity)
+          } else {
+            cameraActionPermission.value = false
+            resultLauncher.launch(takePicture)
+          }
           Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
         } else {
           println("Permission Denied")
@@ -127,10 +119,7 @@ fun Map(locationViewModel: LocationViewModel) {
         }
       }
   val permissions =
-      arrayOf(
-          Manifest.permission.ACCESS_COARSE_LOCATION,
-          Manifest.permission.ACCESS_FINE_LOCATION,
-          Manifest.permission.CAMERA)
+      arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
@@ -216,6 +205,49 @@ fun Map(locationViewModel: LocationViewModel) {
                     contentDescription = "stop button to stop create route",
                     contentScale = ContentScale.None)
               })
+
+          // Search bar
+          Box(Modifier.align(Alignment.TopCenter).offset(y = 16.dp).testTag("SearchBar")) {
+            BasicTextField(
+                value = allroutes,
+                onValueChange = { allroutes = it },
+                textStyle =
+                    TextStyle(
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight(300),
+                        color = Color.Black,
+                    ),
+                modifier =
+                    Modifier.align(Alignment.CenterStart)
+                        .background(Color.White, shape = RoundedCornerShape(15.dp))
+                        .padding(horizontal = 12.dp)
+                        .width(200.dp)
+                        .height(40.dp)
+                        .offset(y = 3.dp)
+                        .testTag("SearchBarTextField"))
+            IconButton(
+                onClick = {},
+                modifier =
+                    Modifier.align(Alignment.CenterEnd).testTag("SearchCleanButton").size(25.dp)) {
+                  androidx.compose.material3.Icon(
+                      painter = painterResource(com.github.se.stepquest.R.drawable.clear),
+                      contentDescription = "Clear search",
+                  )
+                }
+            IconButton(
+                onClick = {},
+                modifier =
+                    Modifier.align(Alignment.CenterEnd)
+                        .offset(x = 45.dp)
+                        .background(Color.White, shape = CircleShape)
+                        .size(35.dp)
+                        .testTag("SearchButton")) {
+                  androidx.compose.material3.Icon(
+                      painter = painterResource(com.github.se.stepquest.R.drawable.search_route),
+                      contentDescription = "Clear search",
+                  )
+                }
+          }
         }
       },
       floatingActionButton = {
@@ -263,7 +295,8 @@ fun Map(locationViewModel: LocationViewModel) {
                               PermissionChecker.PERMISSION_GRANTED) {
                             resultLauncher.launch(takePicture)
                           } else {
-                            launcherCameraPermissions.launch(arrayOf(Manifest.permission.CAMERA))
+                            cameraActionPermission.value = true
+                            launcherMultiplePermissions.launch(arrayOf(Manifest.permission.CAMERA))
                           }
                         }) {
                           Icon(
@@ -281,8 +314,11 @@ fun Map(locationViewModel: LocationViewModel) {
                         // ADD HERE CODE FOR ADDING CHECKPOINTS, INPUT TITLE STORED IN title
 
                         // Add the image to the list of images
-                        images.value += currentImage.value!!
-
+                        if (currentImage.value != null) {
+                          images.value += currentImage.value!!
+                        }
+                        // Increase checkpoint number
+                        numCheckpoints++
                         val title = checkpointTitle
                         showDialog = false
                       },
@@ -304,15 +340,18 @@ fun Map(locationViewModel: LocationViewModel) {
 
   // Open the progression screen
   if (showProgression) {
+    val routeLength = calculateRouteLength(locationViewModel.getAllocations() ?: emptyList())
+
     RouteProgression(
-        onDismiss = {
+        stopRoute = {
           showProgression = false
           locationViewModel.onPause()
           stopCreatingRoute = true
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
-          storeroute.addRoute(
-              storeroute.getUserid(), locationViewModel.getAllocations(), emptyList())
+          storeRoute.addRoute(
+              storeRoute.getUserid(), locationViewModel.getAllocations(), emptyList())
         },
+        closeProgression = { showProgression = false },
         routeLength,
         numCheckpoints)
   }

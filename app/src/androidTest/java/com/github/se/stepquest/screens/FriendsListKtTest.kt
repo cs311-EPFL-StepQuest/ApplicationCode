@@ -40,10 +40,10 @@ class FriendsListKtTest {
 
     val fakeFriendsList =
         listOf(
-            Friend("Alice", "https://example.com/alice.jpg", true),
-            Friend("Bob", "https://example.com/bob.jpg", false),
-            Friend("Charlie", "https://example.com/charlie.jpg", true),
-            Friend("David", "https://example.com/david.jpg", false),
+            Friend("Alice", null, true),
+            Friend("Bob", null, false),
+            Friend("Charlie", null, true),
+            Friend("David", null, false),
         )
     composeTestRule.setContent {
       StepQuestTheme {
