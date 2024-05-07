@@ -12,26 +12,23 @@ data class ChallengeData(
 ) {}
 
 enum class ChallengeType(
-    type: String,
-    messageText: String,
-    completionFunction: (ChallengeData) -> Boolean
+    val type: String,
+    val messageText: String,
+    val completionFunction: (ChallengeData) -> Boolean
 ) {
-  REGULAR_STEP_CHALLENGE(
-      "REGULAR_STEP_CHALLENGE",
-      "",
-      fun(data: ChallengeData): Boolean {
-        return false
-      }),
-  DAILY_STEP_CHALLENGE(
-      "DAILY_STEP_CHALLENGE",
-      "",
-      fun(data: ChallengeData): Boolean {
-        return false
-      }),
-  ROUTE_CHALLENGE(
-      "ROUTE_CHALLENGE",
-      "",
-      fun(data: ChallengeData): Boolean {
-        return false
-      })
+    REGULAR_STEP_CHALLENGE(
+        type = "REGULAR_STEP_CHALLENGE",
+        messageText = "Regular Step Challenge",
+        completionFunction = { false }
+    ),
+    DAILY_STEP_CHALLENGE(
+        type = "DAILY_STEP_CHALLENGE",
+        messageText = "Daily Step Challenge",
+        completionFunction = { false }
+    ),
+    ROUTE_CHALLENGE(
+        type = "ROUTE_CHALLENGE",
+        messageText = "Route Challenge",
+        completionFunction = { false }
+    )
 }
