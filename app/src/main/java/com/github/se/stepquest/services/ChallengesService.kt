@@ -2,11 +2,9 @@ package com.github.se.stepquest.services
 
 import com.github.se.stepquest.IUserRepository
 import com.github.se.stepquest.data.model.ChallengeData
-import com.github.se.stepquest.data.model.ChallengeType
 import com.github.se.stepquest.data.model.NotificationData
 import com.github.se.stepquest.data.model.NotificationType
 import com.github.se.stepquest.data.repository.INotificationRepository
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -72,28 +70,19 @@ fun sendPendingChallenge(
           })
 }
 
-fun getPendingChallenge(challengeUuid: String): ChallengeData {
-  val firebaseAuth = FirebaseAuth.getInstance()
-  val userId = firebaseAuth.currentUser?.uid
-  var challenge = ChallengeData("", ChallengeType.ROUTE_CHALLENGE, 0, 0, 0, "", "", "", "", "")
-  if (userId != null) {
-    val database = FirebaseDatabase.getInstance()
-    val challengeRef =
-        database.reference
-            .child("users")
-            .child(userId)
-            .child("pendingChallenges")
-            .child(challengeUuid)
-    challengeRef.addListenerForSingleValueEvent(
-        object : ValueEventListener {
-          override fun onDataChange(snapshot: DataSnapshot) {
-            challenge = snapshot.getValue(ChallengeData::class.java)!!
-          }
+fun getPendingChallenge(userId: String, challengeUuid: String, callback: (ChallengeData?) -> Unit) {
+  val database = FirebaseDatabase.getInstance()
+  val challengeRef =
+      database.reference.child("users").child(userId).child("pendingChallenges").child("test")
+  challengeRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+          val challenge = snapshot.getValue(ChallengeData::class.java)
+          callback(challenge)
+        }
 
-          override fun onCancelled(error: DatabaseError) {}
-        })
-  }
-  return challenge
+        override fun onCancelled(error: DatabaseError) {}
+      })
 }
 
 fun acceptChallenge(challenge: ChallengeData) {

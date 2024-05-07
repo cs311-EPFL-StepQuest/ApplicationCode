@@ -11,7 +11,20 @@ data class ChallengeData(
     val challengedUserUuid: String = "",
     val senderUsername: String = "",
     val senderUserUuid: String = ""
-) {}
+) {
+  constructor() :
+      this(
+          uuid = "",
+          type = ChallengeType.REGULAR_STEP_CHALLENGE,
+          stepsToMake = 0,
+          kilometersToWalk = 0,
+          daysToComplete = 0,
+          dateTime = "",
+          challengedUsername = "",
+          challengedUserUuid = "",
+          senderUsername = "",
+          senderUserUuid = "")
+}
 
 enum class ChallengeType(
     val type: String,

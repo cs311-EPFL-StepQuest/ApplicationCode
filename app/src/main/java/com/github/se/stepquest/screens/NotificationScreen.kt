@@ -26,17 +26,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.R
 import com.github.se.stepquest.UserRepository
-import com.github.se.stepquest.data.model.ChallengeData
-import com.github.se.stepquest.data.model.ChallengeType
 import com.github.se.stepquest.data.model.NotificationData
 import com.github.se.stepquest.data.model.NotificationType
 import com.github.se.stepquest.data.repository.INotificationRepository
 import com.github.se.stepquest.services.acceptChallenge
+import com.github.se.stepquest.services.getPendingChallenge
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -55,7 +53,9 @@ fun NotificationScreen(userRepository: UserRepository) {
     }
     Box(modifier = Modifier.height(40.dp))
     Divider(color = colorResource(id = R.color.blueTheme), thickness = 1.dp)
-    NotificationList()
+    if (uuid != null) {
+      NotificationList(uuid)
+    }
   }
 }
 
@@ -63,16 +63,15 @@ fun NotificationScreen(userRepository: UserRepository) {
     "CoroutineCreationDuringComposition",
     "UnrememberedMutableState",
     "MutableCollectionMutableState")
-@Preview(showSystemUi = true, showBackground = true)
 @Composable
-private fun NotificationList() {
+private fun NotificationList(userId: String) {
   LazyColumn {
-    items(notificationList.size) { index -> BuildNotification(notificationList[index]) }
+    items(notificationList.size) { index -> BuildNotification(notificationList[index], userId) }
   }
 }
 
 @Composable
-private fun BuildNotification(data: NotificationData?) {
+private fun BuildNotification(data: NotificationData?, userId: String) {
   if (data == null) return
   Column {
     Row(
@@ -119,20 +118,11 @@ private fun BuildNotification(data: NotificationData?) {
                 onClick = {
                   // addFriend(Friend(friendName, Uri.EMPTY, false))
                   if (data.type == NotificationType.CHALLENGE) {
-                    // val challenge = getPendingChallenge(data.uuid)
-                    val challenge =
-                        ChallengeData(
-                            "test",
-                            ChallengeType.DAILY_STEP_CHALLENGE,
-                            1000,
-                            0,
-                            10,
-                            "10.05.2024",
-                            "Santhos",
-                            "BdUmnrMZwraipednJIYXphUlWft2",
-                            "Eliott",
-                            "I4fxxWvA8INUy6cUw7Frf70XLo12")
-                    acceptChallenge(challenge)
+                    getPendingChallenge(userId, data.objectUuid) { challenge ->
+                      if (challenge != null) {
+                        acceptChallenge(challenge)
+                      }
+                    }
                   }
                   notificationRepository.removeNotification(data.userUuid, data.uuid)
                 },
