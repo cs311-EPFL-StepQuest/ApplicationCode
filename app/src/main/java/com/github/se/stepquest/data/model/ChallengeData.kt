@@ -1,14 +1,16 @@
 package com.github.se.stepquest.data.model
 
 data class ChallengeData(
-    var uuid: String = "",
-    var type: ChallengeType,
+    val uuid: String = "",
+    val type: ChallengeType,
     var stepsToMake: Int = 0,
     var kilometersToWalk: Int = 0,
     var daysToComplete: Int = 0,
-    var dateTime: String = "",
-    var challengedUserUuid: String = "",
-    var senderUserUuid: String = ""
+    val dateTime: String = "",
+    val challengedUsername: String = "",
+    val challengedUserUuid: String = "",
+    val senderUsername: String = "",
+    val senderUserUuid: String = ""
 ) {}
 
 enum class ChallengeType(
@@ -16,19 +18,14 @@ enum class ChallengeType(
     val messageText: String,
     val completionFunction: (ChallengeData) -> Boolean
 ) {
-    REGULAR_STEP_CHALLENGE(
-        type = "REGULAR_STEP_CHALLENGE",
-        messageText = "Regular Step Challenge",
-        completionFunction = { false }
-    ),
-    DAILY_STEP_CHALLENGE(
-        type = "DAILY_STEP_CHALLENGE",
-        messageText = "Daily Step Challenge",
-        completionFunction = { false }
-    ),
-    ROUTE_CHALLENGE(
-        type = "ROUTE_CHALLENGE",
-        messageText = "Route Challenge",
-        completionFunction = { false }
-    )
+  REGULAR_STEP_CHALLENGE(
+      type = "REGULAR_STEP_CHALLENGE",
+      messageText = "Regular Step Challenge",
+      completionFunction = { false }),
+  DAILY_STEP_CHALLENGE(
+      type = "DAILY_STEP_CHALLENGE",
+      messageText = "Daily Step Challenge",
+      completionFunction = { false }),
+  ROUTE_CHALLENGE(
+      type = "ROUTE_CHALLENGE", messageText = "Route Challenge", completionFunction = { false })
 }

@@ -97,7 +97,7 @@ fun AppNavigationHost(
           NewPlayerScreen(navigationActions, context, userId)
         }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
-        composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions) }
+        composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions, userId) }
         composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository()) }
         composable(Routes.MapScreen.routName) { Map(locationviewModel) }
         composable(Routes.ProfileScreen.routName) {

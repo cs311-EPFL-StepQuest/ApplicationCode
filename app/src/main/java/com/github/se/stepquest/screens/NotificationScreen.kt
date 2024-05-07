@@ -31,8 +31,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.R
 import com.github.se.stepquest.UserRepository
+import com.github.se.stepquest.data.model.ChallengeData
+import com.github.se.stepquest.data.model.ChallengeType
 import com.github.se.stepquest.data.model.NotificationData
+import com.github.se.stepquest.data.model.NotificationType
 import com.github.se.stepquest.data.repository.INotificationRepository
+import com.github.se.stepquest.services.acceptChallenge
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -44,12 +48,6 @@ var notificationList: MutableList<NotificationData> by mutableStateOf(mutableLis
 @Composable
 fun NotificationScreen(userRepository: UserRepository) {
   val uuid = userRepository.getUid()
-  //  notificationRepository.createNotification(
-  //      uuid!!, NotificationData("Hello2", "13:54", UUID.randomUUID().toString(), uuid, ""))
-  //  notificationRepository.createNotification(
-  //      uuid, NotificationData("Hello3", "13:55", UUID.randomUUID().toString(), uuid, "lsdiv"))
-  //  notificationRepository.createNotification(
-  //      uuid, NotificationData("Hello4", "13:56", UUID.randomUUID().toString(), uuid, ""))
   updateNotificationList(uuid)
   Column(modifier = Modifier.padding(0.dp, 30.dp)) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
@@ -120,6 +118,22 @@ private fun BuildNotification(data: NotificationData?) {
             Button(
                 onClick = {
                   // addFriend(Friend(friendName, Uri.EMPTY, false))
+                  if (data.type == NotificationType.CHALLENGE) {
+                    // val challenge = getPendingChallenge(data.uuid)
+                    val challenge =
+                        ChallengeData(
+                            "test",
+                            ChallengeType.DAILY_STEP_CHALLENGE,
+                            1000,
+                            0,
+                            10,
+                            "10.05.2024",
+                            "Santhos",
+                            "BdUmnrMZwraipednJIYXphUlWft2",
+                            "Eliott",
+                            "I4fxxWvA8INUy6cUw7Frf70XLo12")
+                    acceptChallenge(challenge)
+                  }
                   notificationRepository.removeNotification(data.userUuid, data.uuid)
                 },
                 content = { Text("Accept") },

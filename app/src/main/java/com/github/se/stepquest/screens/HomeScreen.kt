@@ -30,27 +30,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Routes
-import com.github.se.stepquest.activity.Challenge
 import com.github.se.stepquest.activity.Quest
+import com.github.se.stepquest.data.model.ChallengeData
+import com.github.se.stepquest.data.model.ChallengeType
+import com.github.se.stepquest.services.getChallenges
+import com.github.se.stepquest.services.sendPendingChallenge
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun HomeScreen(navigationActions: NavigationActions) {
+fun HomeScreen(navigationActions: NavigationActions, userId: String) {
 
   // Added for testing purposes ------
   var quests: List<Quest> = emptyList()
-  var challenges: List<Challenge> = emptyList()
-  val firstChallenge =
-      Challenge(
-          challengeId = "1",
-          challengerName = "John_Doe",
-          challengeSteps = "1000",
-          challengeDeadline = "Friday",
-          challengeStatus = "0",
-          completionStatus = "0",
-          challengedId = "2")
-  challenges = challenges.plus(firstChallenge)
+  val firebaseAuth = FirebaseAuth.getInstance()
+  val challenges = getChallenges(userId)
   val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
   quests = quests.plus(firstQuest)
   // ---------------------------------
@@ -100,7 +95,22 @@ fun HomeScreen(navigationActions: NavigationActions) {
 
           // Start game button
           Button(
-              onClick = { /*TODO*/},
+              onClick = {
+                sendPendingChallenge(
+                    "Eliott",
+                    "Santhos",
+                    ChallengeData(
+                        "test",
+                        ChallengeType.DAILY_STEP_CHALLENGE,
+                        1000,
+                        0,
+                        10,
+                        "10.05.2024",
+                        "Santhos",
+                        "BdUmnrMZwraipednJIYXphUlWft2",
+                        "Eliott",
+                        "I4fxxWvA8INUy6cUw7Frf70XLo12"))
+              },
               shape = RoundedCornerShape(20.dp),
               colors = ButtonDefaults.buttonColors(Color.White),
               modifier =
@@ -157,17 +167,17 @@ fun HomeScreen(navigationActions: NavigationActions) {
                                   horizontalAlignment = Alignment.CenterHorizontally) {
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Text(
-                                        text = "${challenge.challengerName} challenges you!",
+                                        text = "${challenge.senderUsername} challenges you!",
                                         fontSize = 18.sp)
                                     Text(
                                         text =
-                                            "${challenge.challengeSteps} steps until ${challenge.challengeDeadline}!",
+                                            "${challenge.stepsToMake} steps until ${challenge.dateTime}!",
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold)
                                   }
                             }
                       }
-                      Row(modifier = Modifier.padding(top = 15.dp)) {
+                      /*Row(modifier = Modifier.padding(top = 15.dp)) {
                         // Accept button
                         Button(
                             onClick = { /*TODO*/},
@@ -194,7 +204,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
                                     .width(140.dp)) {
                               Text(text = "Reject", color = Color.Black, fontSize = 16.sp)
                             }
-                      }
+                      }*/
                     }
                     // Buttons
 
