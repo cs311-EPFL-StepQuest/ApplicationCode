@@ -10,7 +10,13 @@ data class ChallengeData(
     val challengedUsername: String = "",
     val challengedUserUuid: String = "",
     val senderUsername: String = "",
-    val senderUserUuid: String = ""
+    val senderUserUuid: String = "",
+    var challengedProgress: ChallengeProgression = ChallengeProgression(
+        "", 0, 0
+    ),
+    var senderProgress: ChallengeProgression = ChallengeProgression(
+        "", 0, 0
+    )
 ) {
   constructor() :
       this(
@@ -23,8 +29,16 @@ data class ChallengeData(
           challengedUsername = "",
           challengedUserUuid = "",
           senderUsername = "",
-          senderUserUuid = "")
+          senderUserUuid = "",
+          challengedProgress = ChallengeProgression("", 0, 0),
+          senderProgress = ChallengeProgression("", 0, 0))
 }
+
+data class ChallengeProgression(
+    val userUuid: String,
+    var stepsCompleted: Int = 0,
+    var kilometersWalked: Int = 0
+)
 
 enum class ChallengeType(
     val type: String,

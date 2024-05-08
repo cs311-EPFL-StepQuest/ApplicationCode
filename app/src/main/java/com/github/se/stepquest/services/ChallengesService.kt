@@ -115,11 +115,29 @@ fun acceptChallenge(challenge: ChallengeData) {
       })
 }
 
-fun getChallenges(uid: String, callback: (List<ChallengeData>) -> Unit) {
+fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
+    val database = FirebaseDatabase.getInstance()
+    val challengeRef = database.reference.child("users").child(userId).child("acceptedChallenges")
+    challengeRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val challenge = dataSnapshot.children.firstOrNull()?.getValue(ChallengeData::class.java)
+                    callback(challenge)
+                } else {
+                    callback(null)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+}
+
+fun getChallenges(userId: String, callback: (List<ChallengeData>) -> Unit) {
   val challenges: List<ChallengeData> = emptyList()
   val database = FirebaseDatabase.getInstance()
   val acceptedChallengesRef =
-      database.reference.child("users").child(uid).child("acceptedChallenges")
+      database.reference.child("users").child(userId).child("acceptedChallenges")
   acceptedChallengesRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
