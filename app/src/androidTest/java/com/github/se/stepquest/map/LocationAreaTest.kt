@@ -1,12 +1,15 @@
 package com.github.se.stepquest.map
 
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import io.mockk.MockKSettings.relaxed
+import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.*
 import org.junit.Before
@@ -70,7 +73,7 @@ class LocationAreaTest {
     assertEquals(center.longitude, locationArea.center.longitude, 0.0)
     assertEquals(radius, locationArea.radius, 0.0)
   }
-  /*
+
   @Test
   fun routesAroundLocation_returnsRoutesWhenLocationIsInside() {
     val locationDetails = LocationDetails(0.0, 0.0)
@@ -85,7 +88,7 @@ class LocationAreaTest {
           val listener = arg<ValueEventListener>(0)
           listener.onDataChange(
               mockk {
-                val snapshot: DataSnapshot = mockk(relaxed = true)
+                val snapshot: DataSnapshot = mockk()
                 every { snapshot.children } returns
                     object : Iterable<DataSnapshot> {
                       override fun iterator() = listOf(mockRouteID).iterator()
@@ -103,5 +106,4 @@ class LocationAreaTest {
     // verify(exactly = 1) { mockRoutes.addListenerForSingleValueEvent(any()) }
     // assertTrue(localRouteList[0].latitude == 0.0)
   }
-  */
 }
