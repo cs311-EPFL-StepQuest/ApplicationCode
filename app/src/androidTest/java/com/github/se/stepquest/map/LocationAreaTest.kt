@@ -29,7 +29,7 @@ class LocationAreaTest {
   @Before
   fun setUp() {
     locationArea = LocationArea()
-    locationArea.createArea(LocationDetails(0.0, 0.0), 1000.0)
+    locationArea.setArea(LocationDetails(0.0, 0.0), 1000.0)
 
     firebaseAuth = mockk()
     mockRouteID = mockk(relaxed = true)
@@ -46,7 +46,7 @@ class LocationAreaTest {
   @Test
   fun createArea_setsCenterAndRadius() {
     val locationDetails = LocationDetails(1.0, 1.0)
-    locationArea.createArea(locationDetails)
+    locationArea.setArea(locationDetails)
     assertEquals(LatLng(1.0, 1.0), locationArea.center)
     assertEquals(1000.0, locationArea.radius, 0.0)
   }
@@ -67,7 +67,7 @@ class LocationAreaTest {
   fun locationArea_initialization_setsCorrectValues() {
     val center = LocationDetails(1.0, 1.0)
     val radius = 1000.0
-    locationArea.createArea(center, radius)
+    locationArea.setArea(center, radius)
 
     assertEquals(center.latitude, locationArea.center.latitude, 0.0)
     assertEquals(center.longitude, locationArea.center.longitude, 0.0)
@@ -80,7 +80,7 @@ class LocationAreaTest {
     val googleMap: GoogleMap = mockk(relaxed = true)
 
     val localRouteList = mutableListOf<LocationDetails>()
-    locationArea.createArea(locationDetails)
+    locationArea.setArea(locationDetails)
 
     every { mockDatabase.reference } returns mockk { every { child(any()) } returns mockRoutes }
     every { mockRoutes.addListenerForSingleValueEvent(any()) } answers
@@ -102,7 +102,7 @@ class LocationAreaTest {
               })
         }
 
-    locationArea.routesAroundLocation(googleMap, locationDetails) { localRouteList.addAll(it) }
+    locationArea.routesAroundLocation{ localRouteList.addAll(it) }
     // verify(exactly = 1) { mockRoutes.addListenerForSingleValueEvent(any()) }
     // assertTrue(localRouteList[0].latitude == 0.0)
   }
