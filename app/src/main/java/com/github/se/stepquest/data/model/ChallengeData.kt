@@ -35,7 +35,7 @@ data class ChallengeData(
 }
 
 data class ChallengeProgression(
-    val userUuid: String,
+    val userUuid: String = "",
     var stepsCompleted: Int = 0,
     var kilometersWalked: Int = 0
 )
