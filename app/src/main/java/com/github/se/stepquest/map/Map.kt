@@ -6,7 +6,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -16,11 +16,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -82,9 +77,11 @@ fun Map(locationViewModel: LocationViewModel) {
   var allroutes by remember { mutableStateOf("") }
 
   // Instantiate all necessary variables to take pictures
+  var currentCheckpointHasPicture by remember { mutableStateOf(false) }
   val cameraActionPermission = remember { mutableStateOf(false) }
   val currentImage = remember { mutableStateOf<ImageBitmap?>(null) }
   val images = remember { MutableStateFlow<List<ImageBitmap>>(emptyList()) }
+
   var photoFile = getPhotoFile(context)
   val fileProvider =
       FileProvider.getUriForFile(context, "com.github.se.stepquest.map.fileprovider", photoFile)
@@ -94,8 +91,11 @@ fun Map(locationViewModel: LocationViewModel) {
       rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result
         ->
         if (result.resultCode == Activity.RESULT_OK) {
-          val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
-          currentImage.value = takenImage.asImageBitmap()
+          var takenImage: Bitmap? = null
+          // Sometimes the picture in portrait mode is rotated
+          rotatePicture(context, fileProvider, photoFile) { takenImage = it }
+          currentImage.value = takenImage?.asImageBitmap()
+          currentCheckpointHasPicture = true
         }
       }
 
@@ -275,6 +275,7 @@ fun Map(locationViewModel: LocationViewModel) {
                       onClick = {
                         showDialog = false
                         checkpointTitle = ""
+                        currentCheckpointHasPicture = false
                       },
                       modifier = Modifier.size(36.dp)) {
                         Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.Black)
@@ -294,31 +295,41 @@ fun Map(locationViewModel: LocationViewModel) {
                       label = { Text("Name:") },
                       modifier = Modifier.fillMaxWidth())
                   Spacer(modifier = Modifier.height(36.dp))
-                  Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "Take a picture",
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp))
-                  }
-                  Spacer(modifier = Modifier.height(10.dp))
 
-                  // Button to take picture
-                  Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    IconButton(
-                        onClick = {
-                          if (PermissionChecker.checkSelfPermission(
-                              context, Manifest.permission.CAMERA) ==
-                              PermissionChecker.PERMISSION_GRANTED) {
-                            resultLauncher.launch(takePicture)
-                          } else {
-                            cameraActionPermission.value = true
-                            launcherMultiplePermissions.launch(arrayOf(Manifest.permission.CAMERA))
+                  if (currentCheckpointHasPicture) {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                      Image(
+                          bitmap = currentImage.value!!,
+                          contentDescription = "checkpoint_image",
+                          modifier = Modifier.size(200.dp))
+                    }
+                  } else {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                      Text(
+                          text = "Take a picture",
+                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp))
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    // Button to take picture
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                      IconButton(
+                          onClick = {
+                            if (PermissionChecker.checkSelfPermission(
+                                context, Manifest.permission.CAMERA) ==
+                                PermissionChecker.PERMISSION_GRANTED) {
+                              resultLauncher.launch(takePicture)
+                            } else {
+                              cameraActionPermission.value = true
+                              launcherMultiplePermissions.launch(
+                                  arrayOf(Manifest.permission.CAMERA))
+                            }
+                          }) {
+                            Icon(
+                                painterResource(R.drawable.camera_icon),
+                                contentDescription = "camera_icon",
+                                modifier = Modifier.size(60.dp))
                           }
-                        }) {
-                          Icon(
-                              painterResource(R.drawable.camera_icon),
-                              contentDescription = "camera_icon",
-                              modifier = Modifier.size(60.dp))
-                        }
+                    }
                   }
                 }
               },
@@ -333,6 +344,8 @@ fun Map(locationViewModel: LocationViewModel) {
                           }
                           // Increase checkpoint number
                           numCheckpoints++
+                          // Show picture button for next checkpoint
+                          currentCheckpointHasPicture = false
                         } else {
                           Toast.makeText(context, "Could not save checkpoint", Toast.LENGTH_SHORT)
                               .show()
