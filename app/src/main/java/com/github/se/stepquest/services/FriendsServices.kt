@@ -199,29 +199,7 @@ fun sendFriendRequest(currentUsername: String, friendName: String) {
 
   // Retrieve the new friend's uid
   val usernamesRef = database.reference.child("usernames")
-  // Send notification
-  val senderUserId = userRepository.getUid().toString()
-  usernamesRef
-      .child(friendName)
-      .addListenerForSingleValueEvent(
-          object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-              println("Snapshot: ${snapshot.value}")
-              val receiverUserId = snapshot.value.toString()
-              notificationRepository.createNotification(
-                  receiverUserId,
-                  NotificationData(
-                      "You received new friend request from $currentUsername!",
-                      LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")),
-                      UUID.randomUUID().toString(),
-                      receiverUserId,
-                      senderUserId))
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-              TODO("Not yet implemented")
-            }
-          })
   usernamesRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
@@ -238,6 +216,31 @@ fun sendFriendRequest(currentUsername: String, friendName: String) {
                   if (currentUsername in pendingRequests) return
                   pendingRequests.add(currentUsername)
                   friendRequestsRef.setValue(pendingRequests)
+
+                  // Send notification
+                  val senderUserId = userRepository.getUid().toString()
+                  usernamesRef
+                      .child(friendName)
+                      .addListenerForSingleValueEvent(
+                          object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                              println("Snapshot: ${snapshot.value}")
+                              val receiverUserId = snapshot.value.toString()
+                              notificationRepository.createNotification(
+                                  receiverUserId,
+                                  NotificationData(
+                                      "You received new friend request from $currentUsername!",
+                                      LocalDateTime.now()
+                                          .format(DateTimeFormatter.ofPattern("HH:mm")),
+                                      UUID.randomUUID().toString(),
+                                      receiverUserId,
+                                      senderUserId))
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                              TODO("Not yet implemented")
+                            }
+                          })
                 }
 
                 override fun onCancelled(error: DatabaseError) {
