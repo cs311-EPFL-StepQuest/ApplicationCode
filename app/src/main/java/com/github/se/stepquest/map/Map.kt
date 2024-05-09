@@ -141,6 +141,8 @@ fun Map(locationViewModel: LocationViewModel) {
                   getMapAsync { googleMap ->
                     map.value = googleMap
                     initMap(map.value!!)
+                    // TODO: Could put this here, but maybe add an if for changing different state (ex. create route, display route, etc.)
+                    //FollowRoute.drawRouteDetail(googleMap)
                   }
                 }
               },
@@ -454,3 +456,5 @@ fun locationPermission(
     launcherMultiplePermissions.launch(permissions)
   }
 }
+
+

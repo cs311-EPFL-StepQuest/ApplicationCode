@@ -32,10 +32,11 @@ class LocationArea {
   }
 
   fun routesAroundLocation(
-    callback: (List<LocationDetails>) -> Unit
+    callback: (List<LocationDetails>, List<RouteDetails>) -> Unit
   ) {
     val routes = database.reference.child("routes")
     val routeList = mutableListOf<LocationDetails>()
+    val routeDetailList= mutableListOf<RouteDetails>()
 
     routes.addListenerForSingleValueEvent(object : ValueEventListener {
       override fun onDataChange(snapshot: DataSnapshot) {
@@ -45,13 +46,16 @@ class LocationArea {
           val longitude = routeDataSnapshot.child("longitude").getValue<Double>()
           if (latitude != null && longitude != null) {
             val routeData = LocationDetails(latitude, longitude)
+            val routedetailData=RouteDetails(routeID.key.toString(), routeID.child("route").getValue<List<LocationDetails>>(), routeID.child("userID").getValue<String>().toString())
             if (checkInsideArea(routeData)) {
               Log.d("LocationArea", "Route is inside area")
               routeList.add(routeData)
+              routeDetailList.add(routedetailData)
+
             }
           }
         }
-        callback(routeList)
+        callback(routeList, routeDetailList)
       }
 
       override fun onCancelled(error: DatabaseError) {
@@ -69,14 +73,21 @@ class LocationArea {
   }
 
   fun drawRoutesOnMap(googleMap: GoogleMap) {
-    routesAroundLocation{ routes ->
-      for (route in routes) {
-        googleMap.addMarker(
+    routesAroundLocation{ routes, routedetails ->
+      routes.zip(routedetails).forEach { (route, routedetail) ->
+        val marker = googleMap.addMarker(
           MarkerOptions()
             .position(LatLng(route.latitude, route.longitude))
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
             .title("Route"))
+        marker?.tag = routedetail  // Storing the RouteDetail object in the tag of the marker, for displying route detail
       }
     }
   }
 }
+
+data class RouteDetails(
+  val routeID: String,
+  val routeDetails: List<LocationDetails>?,
+  val userID: String
+)
