@@ -51,7 +51,6 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
         getTopChallenge(userId) { receivedChallenge ->
             topChallenge = receivedChallenge
         }
-        println(topChallenge?.uuid)
 
         // Simulated data for testing purposes
         val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
@@ -159,7 +158,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
                                 horizontalAlignment = Alignment.CenterHorizontally) {
                                   Spacer(modifier = Modifier.width(10.dp))
                                   Text(
-                                      text = "${topChallenge!!.senderUsername} challenges you!",
+                                      text = "Main challenge",
                                       fontSize = 18.sp)
                                   Text(
                                       text =
@@ -179,7 +178,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
                               .fillMaxWidth()
                               .align(Alignment.CenterHorizontally)) {
                             Text(
-                                text = "Check active challenge",
+                                text = "Check active challenges",
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(0.dp))
                           }

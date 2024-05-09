@@ -212,7 +212,7 @@ fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
 }
 
 fun getChallenges(userId: String, callback: (List<ChallengeData>) -> Unit) {
-  val challenges: List<ChallengeData> = emptyList()
+    val challenges: MutableList<ChallengeData> = mutableListOf()
   val database = FirebaseDatabase.getInstance()
   val acceptedChallengesRef =
       database.reference.child("users").child(userId).child("acceptedChallenges")
@@ -221,7 +221,9 @@ fun getChallenges(userId: String, callback: (List<ChallengeData>) -> Unit) {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
           for (snapshot in dataSnapshot.getChildren()) {
             val challenge = snapshot.getValue(ChallengeData::class.java)
-            challenges.plus(challenge)
+              if (challenge != null) {
+                  challenges.add(challenge)
+              }
           }
           callback(challenges)
         }

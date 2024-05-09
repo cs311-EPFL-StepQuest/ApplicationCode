@@ -108,7 +108,7 @@ fun AppNavigationHost(
           FriendsListScreen(navigationActions = navigationActions, userId)
         }
         composable(Routes.NotificationScreen.routName) { NotificationScreen(IUserRepository()) }
-        composable(Routes.ChallengeScreen.routName) { ChallengesScreen(userId) }
+        composable(Routes.ChallengeScreen.routName) { ChallengesScreen(userId, navigationActions) }
       }
 }
 
