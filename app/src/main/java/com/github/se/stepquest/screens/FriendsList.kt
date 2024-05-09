@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
-import com.github.se.stepquest.data.model.ChallengeData
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.google.firebase.database.DataSnapshot
@@ -54,15 +53,15 @@ fun FriendsListScreen(
   var currentFriendsList: MutableList<Friend> = testCurrentFriendsList.toMutableList()
   val database = FirebaseDatabase.getInstance()
   if (currentFriendsList.isEmpty()) {
-    val friendsListRef = database.reference.child("users").child(userId).child("friendsList").child("0")
+    val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
     friendsListRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
           override fun onDataChange(dataSnapshot: DataSnapshot) {
-              for (snapshot in dataSnapshot.getChildren()) {
-                  val friend = snapshot.getValue(Friend::class.java)
-                  currentFriendsList.plus(friend)
-              }
+            for (snapshot in dataSnapshot.getChildren()) {
+              val friend = snapshot.getValue(Friend::class.java)
+              currentFriendsList.plus(friend)
             }
+          }
 
           override fun onCancelled(databaseError: DatabaseError) {
             // add code when failing to access database

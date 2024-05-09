@@ -116,17 +116,17 @@ fun acceptChallenge(challenge: ChallengeData) {
 }
 
 fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
-    val database = FirebaseDatabase.getInstance()
-    val challengeRef = database.reference.child("users").child(userId).child("acceptedChallenges")
-    challengeRef.addListenerForSingleValueEvent(
-        object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val challenge = dataSnapshot.children.firstOrNull()?.getValue(ChallengeData::class.java)
-                callback(challenge)
-            }
+  val database = FirebaseDatabase.getInstance()
+  val challengeRef = database.reference.child("users").child(userId).child("acceptedChallenges")
+  challengeRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          val challenge = dataSnapshot.children.firstOrNull()?.getValue(ChallengeData::class.java)
+          callback(challenge)
+        }
 
-            override fun onCancelled(error: DatabaseError) {}
-        })
+        override fun onCancelled(error: DatabaseError) {}
+      })
 }
 
 fun getChallenges(userId: String, callback: (List<ChallengeData>) -> Unit) {

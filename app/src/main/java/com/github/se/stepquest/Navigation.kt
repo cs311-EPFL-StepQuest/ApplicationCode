@@ -24,7 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.github.se.stepquest.data.model.ChallengeData
 import com.github.se.stepquest.map.LocationViewModel
 import com.github.se.stepquest.map.Map
 import com.github.se.stepquest.screens.ChallengesScreen
@@ -109,7 +108,7 @@ fun AppNavigationHost(
           FriendsListScreen(navigationActions = navigationActions, userId)
         }
         composable(Routes.NotificationScreen.routName) { NotificationScreen(IUserRepository()) }
-      composable(Routes.ChallengeScreen.routName) { ChallengesScreen(userId)}
+        composable(Routes.ChallengeScreen.routName) { ChallengesScreen(userId) }
       }
 }
 

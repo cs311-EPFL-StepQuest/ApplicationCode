@@ -35,8 +35,8 @@ import com.github.se.stepquest.data.model.NotificationData
 import com.github.se.stepquest.data.model.NotificationType
 import com.github.se.stepquest.data.repository.INotificationRepository
 import com.github.se.stepquest.services.acceptChallenge
-import com.github.se.stepquest.services.getPendingChallenge
 import com.github.se.stepquest.services.addFriend
+import com.github.se.stepquest.services.getPendingChallenge
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -104,13 +104,13 @@ private fun BuildNotification(data: NotificationData?, userId: String) {
             Button(
                 onClick = {
                   val database = FirebaseDatabase.getInstance()
-                    if (data.type == NotificationType.CHALLENGE) {
-                        getPendingChallenge(userId, data.objectUuid) { challenge ->
-                            if (challenge != null) {
-                                acceptChallenge(challenge)
-                            }
-                        }
+                  if (data.type == NotificationType.CHALLENGE) {
+                    getPendingChallenge(userId, data.objectUuid) { challenge ->
+                      if (challenge != null) {
+                        acceptChallenge(challenge)
+                      }
                     }
+                  }
 
                   database.reference
                       .child("users")

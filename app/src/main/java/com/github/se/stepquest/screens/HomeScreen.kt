@@ -20,10 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,10 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.activity.Quest
 import com.github.se.stepquest.data.model.ChallengeData
-import com.github.se.stepquest.data.model.ChallengeType
-import com.github.se.stepquest.services.getChallenges
 import com.github.se.stepquest.services.getTopChallenge
-import com.github.se.stepquest.services.sendPendingChallenge
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
@@ -50,7 +44,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
   // Added for testing purposes ------
   var quests: List<Quest> = emptyList()
   var topChallenge: ChallengeData? = null
-    getTopChallenge(userId) { receivedChallenge -> topChallenge = receivedChallenge }
+  getTopChallenge(userId) { receivedChallenge -> topChallenge = receivedChallenge }
   val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
   quests = quests.plus(firstQuest)
   // ---------------------------------
@@ -100,7 +94,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
 
           // Start game button
           Button(
-              onClick = {/* start game when ready */},
+              onClick = { /* start game when ready */},
               shape = RoundedCornerShape(20.dp),
               colors = ButtonDefaults.buttonColors(Color.White),
               modifier =
@@ -139,30 +133,30 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
                           textAlign = TextAlign.Center,
                           fontWeight = FontWeight.Bold)
                     } else {
-                        Row(
-                            modifier = Modifier.padding(top = 20.dp, start = 30.dp).fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically) {
+                      Row(
+                          modifier = Modifier.padding(top = 20.dp, start = 30.dp).fillMaxWidth(),
+                          horizontalArrangement = Arrangement.Center,
+                          verticalAlignment = Alignment.CenterVertically) {
                             Image(
                                 painter =
-                                painterResource(
-                                    com.github.se.stepquest.R.drawable.profile_challenges),
+                                    painterResource(
+                                        com.github.se.stepquest.R.drawable.profile_challenges),
                                 modifier = Modifier.size(40.dp).fillMaxHeight().fillMaxWidth(),
                                 contentDescription = "profile_challenges")
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally) {
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(
-                                    text = "${topChallenge!!.senderUsername} challenges you!",
-                                    fontSize = 18.sp)
-                                Text(
-                                    text =
-                                    "${topChallenge!!.stepsToMake} steps until ${topChallenge!!.dateTime}!",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold)
-                            }
-                        }
+                                  Spacer(modifier = Modifier.width(10.dp))
+                                  Text(
+                                      text = "${topChallenge!!.senderUsername} challenges you!",
+                                      fontSize = 18.sp)
+                                  Text(
+                                      text =
+                                          "${topChallenge!!.stepsToMake} steps until ${topChallenge!!.dateTime}!",
+                                      fontSize = 18.sp,
+                                      fontWeight = FontWeight.Bold)
+                                }
+                          }
                       Spacer(modifier = Modifier.weight(1f))
                       Button(
                           onClick = { /*TODO*/},

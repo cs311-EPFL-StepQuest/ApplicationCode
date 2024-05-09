@@ -11,12 +11,8 @@ data class ChallengeData(
     val challengedUserUuid: String = "",
     val senderUsername: String = "",
     val senderUserUuid: String = "",
-    var challengedProgress: ChallengeProgression = ChallengeProgression(
-        "", 0, 0
-    ),
-    var senderProgress: ChallengeProgression = ChallengeProgression(
-        "", 0, 0
-    )
+    var challengedProgress: ChallengeProgression = ChallengeProgression("", 0, 0),
+    var senderProgress: ChallengeProgression = ChallengeProgression("", 0, 0)
 ) {
   constructor() :
       this(

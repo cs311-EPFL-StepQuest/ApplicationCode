@@ -46,7 +46,11 @@ fun addFriend(
               })
 
           val curFriendsListRef =
-              database.reference.child("users").child(currentUserId).child("friendsList").child(newFriend.name)
+              database.reference
+                  .child("users")
+                  .child(currentUserId)
+                  .child("friendsList")
+                  .child(newFriend.name)
           curFriendsListRef.addListenerForSingleValueEvent(
               object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -73,7 +77,12 @@ fun addFriend(
                 }
               })
 
-          val friendsListRef = database.reference.child("users").child(uid).child("friendsList").child(currentUser.name)
+          val friendsListRef =
+              database.reference
+                  .child("users")
+                  .child(uid)
+                  .child("friendsList")
+                  .child(currentUser.name)
           friendsListRef.addListenerForSingleValueEvent(
               object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
