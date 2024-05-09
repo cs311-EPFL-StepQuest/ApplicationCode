@@ -2,7 +2,8 @@ package com.github.se.stepquest.data.model
 
 enum class NotificationType {
   FRIEND_REQUEST,
-  CHALLENGE
+  CHALLENGE,
+  TEMP
 }
 
 data class NotificationData(
@@ -12,7 +13,7 @@ data class NotificationData(
     var userUuid: String = "",
     var senderUuid: String = "",
     val objectUuid: String = "",
-    var type: NotificationType = NotificationType.FRIEND_REQUEST
+    var type: NotificationType = NotificationType.TEMP
 ) {
   fun toMap(): Map<String, Any?> {
     return mapOf(

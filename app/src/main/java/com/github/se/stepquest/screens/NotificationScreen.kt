@@ -104,47 +104,54 @@ private fun BuildNotification(data: NotificationData?, userId: String) {
             Button(
                 onClick = {
                   val database = FirebaseDatabase.getInstance()
-                  if (data.type == NotificationType.CHALLENGE) {
-                    getPendingChallenge(userId, data.objectUuid) { challenge ->
-                      if (challenge != null) {
-                        acceptChallenge(challenge)
+
+                  when (data.type) {
+                    NotificationType.FRIEND_REQUEST -> {
+
+                      database.reference
+                          .child("users")
+                          .child(data.userUuid)
+                          .child("username")
+                          .addListenerForSingleValueEvent(
+                              object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                  currentuserName = snapshot.getValue(String::class.java) ?: return
+
+                                  database.reference
+                                      .child("users")
+                                      .child(data.senderUuid)
+                                      .child("username")
+                                      .addListenerForSingleValueEvent(
+                                          object : ValueEventListener {
+                                            override fun onDataChange(snapshot: DataSnapshot) {
+                                              friendName =
+                                                  snapshot.getValue(String::class.java) ?: return
+
+                                              addFriend(
+                                                  Friend(name = currentuserName),
+                                                  Friend(name = friendName))
+                                            }
+
+                                            override fun onCancelled(error: DatabaseError) {}
+                                          })
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {}
+                              })
+                    }
+
+                    NotificationType.CHALLENGE -> {
+
+                      getPendingChallenge(userId, data.objectUuid) { challenge ->
+                        if (challenge != null) {
+                          acceptChallenge(challenge)
+                        }
                       }
                     }
+
+                    else -> {}
                   }
 
-                  database.reference
-                      .child("users")
-                      .child(data.userUuid)
-                      .child("username")
-                      .addListenerForSingleValueEvent(
-                          object : ValueEventListener {
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                              currentuserName = snapshot.getValue(String::class.java) ?: return
-
-                              database.reference
-                                  .child("users")
-                                  .child(data.senderUuid)
-                                  .child("username")
-                                  .addListenerForSingleValueEvent(
-                                      object : ValueEventListener {
-                                        override fun onDataChange(snapshot: DataSnapshot) {
-                                          friendName =
-                                              snapshot.getValue(String::class.java) ?: return
-
-                                          println("Your name is $currentuserName")
-                                          println("Their name is $friendName")
-
-                                          addFriend(
-                                              Friend(name = currentuserName),
-                                              Friend(name = friendName))
-                                        }
-
-                                        override fun onCancelled(error: DatabaseError) {}
-                                      })
-                            }
-
-                            override fun onCancelled(error: DatabaseError) {}
-                          })
                   notificationRepository.removeNotification(data.userUuid, data.uuid)
                 },
                 content = { Text("Accept") },

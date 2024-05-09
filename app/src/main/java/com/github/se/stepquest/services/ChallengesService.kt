@@ -176,6 +176,20 @@ fun acceptChallenge(challenge: ChallengeData) {
 
         override fun onCancelled(error: DatabaseError) {}
       })
+
+    // Remove challenge from pending list
+    val challengeRef =
+        database.reference
+            .child("users")
+            .child(challenge.challengedUserUuid)
+            .child("pendingChallenges")
+            .child(challenge.uuid)
+    challengeRef.removeValue()
+
+    // Add challenge to global challenges list
+    val challengeListRef = database.reference.child("challenges").child(challenge.uuid)
+    val newChallengeRef = challengeListRef.child(challenge.uuid)
+    newChallengeRef.setValue(challenge)
 }
 
 fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
