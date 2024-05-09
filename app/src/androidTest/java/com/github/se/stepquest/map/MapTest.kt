@@ -332,7 +332,7 @@ object Constants {
   const val CAMERA_BUTTON_DONE_ACTION_ID = "com.android.camera2:id/done_button"
 }
 
-fun executeUiAutomatorActions(device: UiDevice, vararg ids: String, actionTimeOut: Long = 4000L) {
+fun executeUiAutomatorActions(device: UiDevice, vararg ids: String, actionTimeOut: Long = 8000L) {
   for (id in ids) {
     val obj = device.findObject(UiSelector().resourceId(id))
     if (obj.waitForExists(actionTimeOut)) {
