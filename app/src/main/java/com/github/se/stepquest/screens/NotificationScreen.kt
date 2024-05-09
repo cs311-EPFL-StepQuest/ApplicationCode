@@ -139,7 +139,6 @@ private fun BuildNotification(data: NotificationData?, userId: String) {
                                 override fun onCancelled(error: DatabaseError) {}
                               })
                     }
-
                     NotificationType.CHALLENGE -> {
 
                       getPendingChallenge(userId, data.objectUuid) { challenge ->
@@ -148,7 +147,6 @@ private fun BuildNotification(data: NotificationData?, userId: String) {
                         }
                       }
                     }
-
                     else -> {}
                   }
 

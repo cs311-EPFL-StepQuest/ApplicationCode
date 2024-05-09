@@ -14,56 +14,56 @@ data class ChallengeData(
     var challengedProgress: ChallengeProgression = ChallengeProgression("", 0, 0),
     var senderProgress: ChallengeProgression = ChallengeProgression("", 0, 0)
 ) {
-    val _uuid: String
-        get() = uuid
+  val _uuid: String
+    get() = uuid
 
-    val _type: ChallengeType
-        get() = type
+  val _type: ChallengeType
+    get() = type
 
-    var _stepsToMake: Int
-        get() = stepsToMake
-        set(value) {
-            stepsToMake = value
-        }
+  var _stepsToMake: Int
+    get() = stepsToMake
+    set(value) {
+      stepsToMake = value
+    }
 
-    var _kilometersToWalk: Int
-        get() = kilometersToWalk
-        set(value) {
-            kilometersToWalk = value
-        }
+  var _kilometersToWalk: Int
+    get() = kilometersToWalk
+    set(value) {
+      kilometersToWalk = value
+    }
 
-    var _daysToComplete: Int
-        get() = daysToComplete
-        set(value) {
-            daysToComplete = value
-        }
+  var _daysToComplete: Int
+    get() = daysToComplete
+    set(value) {
+      daysToComplete = value
+    }
 
-    val _dateTime: String
-        get() = dateTime
+  val _dateTime: String
+    get() = dateTime
 
-    val _challengedUsername: String
-        get() = challengedUsername
+  val _challengedUsername: String
+    get() = challengedUsername
 
-    val _challengedUserUuid: String
-        get() = challengedUserUuid
+  val _challengedUserUuid: String
+    get() = challengedUserUuid
 
-    val _senderUsername: String
-        get() = senderUsername
+  val _senderUsername: String
+    get() = senderUsername
 
-    val _senderUserUuid: String
-        get() = senderUserUuid
+  val _senderUserUuid: String
+    get() = senderUserUuid
 
-    var _challengedProgress: ChallengeProgression
-        get() = challengedProgress
-        set(value) {
-            challengedProgress = value
-        }
+  var _challengedProgress: ChallengeProgression
+    get() = challengedProgress
+    set(value) {
+      challengedProgress = value
+    }
 
-    var _senderProgress: ChallengeProgression
-        get() = senderProgress
-        set(value) {
-            senderProgress = value
-        }
+  var _senderProgress: ChallengeProgression
+    get() = senderProgress
+    set(value) {
+      senderProgress = value
+    }
 
   constructor() :
       this(

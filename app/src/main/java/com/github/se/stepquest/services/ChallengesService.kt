@@ -177,19 +177,19 @@ fun acceptChallenge(challenge: ChallengeData) {
         override fun onCancelled(error: DatabaseError) {}
       })
 
-    // Remove challenge from pending list
-    val challengeRef =
-        database.reference
-            .child("users")
-            .child(challenge.challengedUserUuid)
-            .child("pendingChallenges")
-            .child(challenge.uuid)
-    challengeRef.removeValue()
+  // Remove challenge from pending list
+  val challengeRef =
+      database.reference
+          .child("users")
+          .child(challenge.challengedUserUuid)
+          .child("pendingChallenges")
+          .child(challenge.uuid)
+  challengeRef.removeValue()
 
-    // Add challenge to global challenges list
-    val challengeListRef = database.reference.child("challenges").child(challenge.uuid)
-    val newChallengeRef = challengeListRef.child(challenge.uuid)
-    newChallengeRef.setValue(challenge)
+  // Add challenge to global challenges list
+  val challengeListRef = database.reference.child("challenges").child(challenge.uuid)
+  val newChallengeRef = challengeListRef.child(challenge.uuid)
+  newChallengeRef.setValue(challenge)
 }
 
 fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
@@ -199,20 +199,20 @@ fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
   challengeRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-            dataSnapshot.children.forEach { childSnapshot ->
-                val challenge = childSnapshot.getValue(ChallengeData::class.java)
-                callback(challenge)
-            }
+          dataSnapshot.children.forEach { childSnapshot ->
+            val challenge = childSnapshot.getValue(ChallengeData::class.java)
+            callback(challenge)
+          }
         }
 
         override fun onCancelled(error: DatabaseError) {
-            callback(null)
+          callback(null)
         }
       })
 }
 
 fun getChallenges(userId: String, callback: (List<ChallengeData>) -> Unit) {
-    val challenges: MutableList<ChallengeData> = mutableListOf()
+  val challenges: MutableList<ChallengeData> = mutableListOf()
   val database = FirebaseDatabase.getInstance()
   val acceptedChallengesRef =
       database.reference.child("users").child(userId).child("acceptedChallenges")
@@ -221,9 +221,9 @@ fun getChallenges(userId: String, callback: (List<ChallengeData>) -> Unit) {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
           for (snapshot in dataSnapshot.getChildren()) {
             val challenge = snapshot.getValue(ChallengeData::class.java)
-              if (challenge != null) {
-                  challenges.add(challenge)
-              }
+            if (challenge != null) {
+              challenges.add(challenge)
+            }
           }
           callback(challenges)
         }

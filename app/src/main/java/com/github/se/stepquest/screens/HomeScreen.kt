@@ -45,19 +45,17 @@ import com.github.se.stepquest.ui.navigation.TopLevelDestination
 fun HomeScreen(navigationActions: NavigationActions, userId: String) {
 
   // Added for testing purposes ------
-    var quests: List<Quest> by remember { mutableStateOf(emptyList()) }
-    var topChallenge: ChallengeData? by remember { mutableStateOf(null) }
-    LaunchedEffect(Unit) {
-        getTopChallenge(userId) { receivedChallenge ->
-            topChallenge = receivedChallenge
-        }
+  var quests: List<Quest> by remember { mutableStateOf(emptyList()) }
+  var topChallenge: ChallengeData? by remember { mutableStateOf(null) }
+  LaunchedEffect(Unit) {
+    getTopChallenge(userId) { receivedChallenge -> topChallenge = receivedChallenge }
 
-        // Simulated data for testing purposes
-        val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
-        quests = quests.plus(firstQuest)
-    }
+    // Simulated data for testing purposes
+    val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
+    quests = quests.plus(firstQuest)
+  }
 
-    // ---------------------------------
+  // ---------------------------------
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),
@@ -157,9 +155,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally) {
                                   Spacer(modifier = Modifier.width(10.dp))
-                                  Text(
-                                      text = "Main challenge",
-                                      fontSize = 18.sp)
+                                  Text(text = "Main challenge", fontSize = 18.sp)
                                   Text(
                                       text =
                                           "${topChallenge!!.stepsToMake} steps until ${topChallenge!!.dateTime}!",
@@ -169,14 +165,16 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
                           }
                       Spacer(modifier = Modifier.weight(1f))
                       Button(
-                          onClick = { navigationActions.navigateTo(TopLevelDestination(Routes.ChallengeScreen.routName))},
+                          onClick = {
+                            navigationActions.navigateTo(
+                                TopLevelDestination(Routes.ChallengeScreen.routName))
+                          },
                           colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
                           modifier =
-                          Modifier
-                              .padding(horizontal = 5.dp, vertical = 10.dp)
-                              .height(40.dp)
-                              .fillMaxWidth()
-                              .align(Alignment.CenterHorizontally)) {
+                              Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                                  .height(40.dp)
+                                  .fillMaxWidth()
+                                  .align(Alignment.CenterHorizontally)) {
                             Text(
                                 text = "Check active challenges",
                                 fontSize = 16.sp,
