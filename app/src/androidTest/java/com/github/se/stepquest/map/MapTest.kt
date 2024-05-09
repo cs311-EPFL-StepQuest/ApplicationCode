@@ -15,6 +15,10 @@ import androidx.core.content.PermissionChecker
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiSelector
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -32,7 +36,6 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -42,6 +45,8 @@ import org.junit.runner.RunWith
 class MapTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+  // Grant camera permissions
+  @get:Rule var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
@@ -213,14 +218,6 @@ class MapTest {
   }
 
   @Test
-  fun map_opensRouteProgression_onStopRouteButtonClick() {
-    var showProgression = false
-    composeTestRule.setContent { Map(vm).apply { showProgression = true } }
-    composeTestRule.onNodeWithTag("stopRouteButton").performClick()
-    assertTrue(showProgression)
-  }
-
-  @Test
   fun testCleanGoogleMap_withoutrouteEndMarker() {
     val googleMap = mockk<GoogleMap>()
     every { googleMap.clear() } just Runs
@@ -278,5 +275,68 @@ class MapTest {
 
     // Assert that numCheckpoints is increased by 1
     assertEquals(numCheckpoints, 1)
+  }
+
+  @Test
+  fun map_opensRouteProgression_onStopRouteButtonClick() {
+    val routeLength = 0f
+    val numCheckpoints = 0
+    val reward = 0
+    val extraKilometers = 0
+    val extraCheckpoints = 0
+
+    composeTestRule.setContent { Map(vm) }
+
+    composeTestRule.onNodeWithTag("stopRouteButton").performClick()
+    composeTestRule.onNodeWithText("End Route").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Route name").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Route length: $routeLength km").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Number of checkpoints: $numCheckpoints").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Reward: $reward points").assertIsDisplayed()
+    composeTestRule.onNodeWithContentDescription("Close").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Finish").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(
+            "$extraKilometers extra kilometers or $extraCheckpoints extra checkpoints for next reward")
+        .assertIsDisplayed()
+  }
+
+  @Test
+  fun testNewCheckpointIsAdded() {
+    every { locationViewModel.locationUpdated } returns MutableLiveData()
+    composeTestRule.setContent { Map(locationViewModel) }
+    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
+    composeTestRule.onNodeWithText("Name:").performTextInput("Test")
+    composeTestRule.onNodeWithText("Confirm").performClick()
+
+    verify { locationViewModel.addNewCheckpoint(any()) }
+  }
+
+  @Test
+  fun verifyCheckpointImageIsDisplayed() {
+    composeTestRule.setContent { Map(vm) }
+    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
+    composeTestRule.onNodeWithText("Name:").performTextInput("Test")
+    composeTestRule.onNodeWithContentDescription("camera_icon").performClick()
+    val instrumentation = InstrumentationRegistry.getInstrumentation()
+    val device = UiDevice.getInstance(instrumentation)
+    executeUiAutomatorActions(
+        device, Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID, Constants.CAMERA_BUTTON_DONE_ACTION_ID)
+
+    composeTestRule.onNodeWithContentDescription("checkpoint_image").assertIsDisplayed()
+  }
+}
+
+object Constants {
+  const val CAMERA_BUTTON_SHUTTER_ACTION_ID = "com.android.camera2:id/shutter_button"
+  const val CAMERA_BUTTON_DONE_ACTION_ID = "com.android.camera2:id/done_button"
+}
+
+fun executeUiAutomatorActions(device: UiDevice, vararg ids: String, actionTimeOut: Long = 4000L) {
+  for (id in ids) {
+    val obj = device.findObject(UiSelector().resourceId(id))
+    if (obj.waitForExists(actionTimeOut)) {
+      obj.click()
+    }
   }
 }
