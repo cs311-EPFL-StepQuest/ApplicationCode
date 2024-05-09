@@ -50,16 +50,19 @@ fun FriendsListScreen(
   var showAddFriendScreen by remember { mutableStateOf(false) }
   var showFriendProfile by remember { mutableStateOf(false) }
   var selectedFriend by remember { mutableStateOf<Friend?>(null) }
-  var currentFriendsList: MutableList<Friend> = testCurrentFriendsList.toMutableList()
+  var currentFriendsList by remember { mutableStateOf(testCurrentFriendsList.toMutableList()) }
   val database = FirebaseDatabase.getInstance()
   if (currentFriendsList.isEmpty()) {
     val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
     friendsListRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
           override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-            currentFriendsList =
-                dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
+            for (snapshot in dataSnapshot.getChildren()) {
+              val friend = snapshot.getValue(Friend::class.java)
+              if (friend != null) {
+                currentFriendsList.add(friend)
+              }
+            }
           }
 
           override fun onCancelled(databaseError: DatabaseError) {
@@ -72,6 +75,7 @@ fun FriendsListScreen(
   } else if (showFriendProfile) {
     FriendDialogBox(
         friend = selectedFriend!!,
+        userId,
         onDismiss = {
           selectedFriend = null
           showFriendProfile = false
