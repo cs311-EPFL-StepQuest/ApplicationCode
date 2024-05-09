@@ -20,7 +20,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,12 +45,20 @@ import com.github.se.stepquest.ui.navigation.TopLevelDestination
 fun HomeScreen(navigationActions: NavigationActions, userId: String) {
 
   // Added for testing purposes ------
-  var quests: List<Quest> = emptyList()
-  var topChallenge: ChallengeData? = null
-  getTopChallenge(userId) { receivedChallenge -> topChallenge = receivedChallenge }
-  val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
-  quests = quests.plus(firstQuest)
-  // ---------------------------------
+    var quests: List<Quest> by remember { mutableStateOf(emptyList()) }
+    var topChallenge: ChallengeData? by remember { mutableStateOf(null) }
+    LaunchedEffect(Unit) {
+        getTopChallenge(userId) { receivedChallenge ->
+            topChallenge = receivedChallenge
+        }
+        println(topChallenge?.uuid)
+
+        // Simulated data for testing purposes
+        val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
+        quests = quests.plus(firstQuest)
+    }
+
+    // ---------------------------------
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),
@@ -159,12 +170,14 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
                           }
                       Spacer(modifier = Modifier.weight(1f))
                       Button(
-                          onClick = { /*TODO*/},
+                          onClick = { navigationActions.navigateTo(TopLevelDestination(Routes.ChallengeScreen.routName))},
                           colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
                           modifier =
-                              Modifier.padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
-                                  .height(35.dp)
-                                  .width(140.dp)) {
+                          Modifier
+                              .padding(horizontal = 5.dp, vertical = 10.dp)
+                              .height(40.dp)
+                              .fillMaxWidth()
+                              .align(Alignment.CenterHorizontally)) {
                             Text(
                                 text = "Check active challenge",
                                 fontSize = 16.sp,

@@ -199,12 +199,15 @@ fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
   challengeRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-          val challenge = dataSnapshot.getValue(ChallengeData::class.java)
-          println(dataSnapshot.value.toString())
-          callback(challenge)
+            dataSnapshot.children.forEach { childSnapshot ->
+                val challenge = childSnapshot.getValue(ChallengeData::class.java)
+                callback(challenge)
+            }
         }
 
-        override fun onCancelled(error: DatabaseError) {}
+        override fun onCancelled(error: DatabaseError) {
+            callback(null)
+        }
       })
 }
 
