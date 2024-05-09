@@ -130,6 +130,7 @@ fun Map(locationViewModel: LocationViewModel) {
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
 
   val keyboardController = LocalSoftwareKeyboardController.current
+
   Scaffold(
       content = {
         Box(modifier = Modifier.fillMaxSize().testTag("MapScreen")) {
@@ -138,14 +139,16 @@ fun Map(locationViewModel: LocationViewModel) {
               factory = { context ->
                 MapView(context).apply {
                   onCreate(null) // Lifecycle integration
+                  // TODO: need to move permission to the beginning to login
+                  //                    locationPermission(context, launcherMultiplePermissions,
+                  // permissions)
                   // Get the GoogleMap asynchronously
-                  locationPermission(context, launcherMultiplePermissions, permissions)
                   getMapAsync { googleMap ->
                     map.value = googleMap
                     initMap(map.value!!)
-                    // TODO: Could put this here, but maybe add an if for changing different state (ex. create route, display route, etc.)
-                    followRoute.fakeRouteDetail(map.value!!)
-                    followRoute.drawRouteDetail(map.value!!,context)
+                    // TODO: Could put this here, but maybe add an if for changing different state ex. create route, display route, etc.
+                    //followRoute.fakeRouteDetail(map.value!!) //TODO: need remove
+                    //followRoute.drawRouteDetail(map.value!!,context)
                   }
                 }
               },
@@ -167,6 +170,7 @@ fun Map(locationViewModel: LocationViewModel) {
                 // empty too
                 cleanGoogleMap(map.value!!, routeEndMarker)
                 locationViewModel.cleanAllocations()
+                locationPermission(context, launcherMultiplePermissions, permissions)
                 locationViewModel.startLocationUpdates(context)
               },
               modifier =
@@ -450,11 +454,8 @@ fun locationPermission(
     PermissionChecker.checkSelfPermission(context, it) == PermissionChecker.PERMISSION_GRANTED
   }) {
     println("Permission successful")
-    Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
   } else {
     println("Ask Permission")
     launcherMultiplePermissions.launch(permissions)
   }
 }
-
-

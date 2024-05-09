@@ -31,36 +31,40 @@ class LocationArea {
     this.center = LatLng(centerLocation.latitude, centerLocation.longitude)
   }
 
-  fun routesAroundLocation(
-    callback: (List<LocationDetails>, List<RouteDetails>) -> Unit
-  ) {
+  fun routesAroundLocation(callback: (List<LocationDetails>, List<RouteDetails>) -> Unit) {
     val routes = database.reference.child("routes")
     val routeList = mutableListOf<LocationDetails>()
-    val routeDetailList= mutableListOf<RouteDetails>()
+    val routeDetailList = mutableListOf<RouteDetails>()
 
-    routes.addListenerForSingleValueEvent(object : ValueEventListener {
-      override fun onDataChange(snapshot: DataSnapshot) {
-        for (routeID in snapshot.children) {
-          val routeDataSnapshot = routeID.child("route").child("0")
-          val latitude = routeDataSnapshot.child("latitude").getValue<Double>()
-          val longitude = routeDataSnapshot.child("longitude").getValue<Double>()
-          if (latitude != null && longitude != null) {
-            val routeData = LocationDetails(latitude, longitude)
-            val routedetailData=RouteDetails(routeID.key.toString(), routeID.child("route").getValue<List<LocationDetails>>(),routeID.child("checkpoints").getValue<List<Checkpoint>>(), routeID.child("userID").getValue<String>().toString())
-            if (checkInsideArea(routeData)) {
-              Log.d("LocationArea", "Route is inside area")
-              routeList.add(routeData)
-              routeDetailList.add(routedetailData)
+    routes.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(snapshot: DataSnapshot) {
+            for (routeID in snapshot.children) {
+              val routeDataSnapshot = routeID.child("route").child("0")
+              val latitude = routeDataSnapshot.child("latitude").getValue<Double>()
+              val longitude = routeDataSnapshot.child("longitude").getValue<Double>()
+              if (latitude != null && longitude != null) {
+                val routeData = LocationDetails(latitude, longitude)
+                val routedetailData =
+                    RouteDetails(
+                        routeID.key.toString(),
+                        routeID.child("route").getValue<List<LocationDetails>>(),
+                        routeID.child("checkpoints").getValue<List<Checkpoint>>(),
+                        routeID.child("userID").getValue<String>().toString())
+                if (checkInsideArea(routeData)) {
+                  Log.d("LocationArea", "Route is inside area")
+                  routeList.add(routeData)
+                  routeDetailList.add(routedetailData)
+                }
+              }
             }
+            callback(routeList, routeDetailList)
           }
-        }
-        callback(routeList, routeDetailList)
-      }
 
-      override fun onCancelled(error: DatabaseError) {
-        // Handle error here
-      }
-    })
+          override fun onCancelled(error: DatabaseError) {
+            // Handle error here
+          }
+        })
   }
 
   fun checkInsideArea(newLocation: LocationDetails): Boolean {
@@ -72,22 +76,25 @@ class LocationArea {
   }
 
   fun drawRoutesOnMap(googleMap: GoogleMap) {
-    routesAroundLocation{ routes, routedetails ->
+    routesAroundLocation { routes, routedetails ->
       routes.zip(routedetails).forEach { (route, routedetail) ->
-        val marker = googleMap.addMarker(
-          MarkerOptions()
-            .position(LatLng(route.latitude, route.longitude))
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-            .title("Route"))
-        marker?.tag = routedetail  // Storing the RouteDetail object in the tag of the marker, for displying route detail
+        val marker =
+            googleMap.addMarker(
+                MarkerOptions()
+                    .position(LatLng(route.latitude, route.longitude))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                    .title("Route"))
+        marker?.tag =
+            routedetail // Storing the RouteDetail object in the tag of the marker, for displying
+        // route detail
       }
     }
   }
 }
 
 data class RouteDetails(
-  val routeID: String,
-  val routeDetails: List<LocationDetails>?,
-  val checkpoints: List<Checkpoint>?,
-  val userID: String
+    val routeID: String,
+    val routeDetails: List<LocationDetails>?,
+    val checkpoints: List<Checkpoint>?,
+    val userID: String
 )

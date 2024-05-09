@@ -88,9 +88,7 @@ class MapTest {
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
         PermissionChecker.PERMISSION_GRANTED
 
-    locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
-
-    verify { locationViewModel.startLocationUpdates(any()) }
+    locationPermission(context, launcherMultiplePermissions, permissions)
   }
 
   @Test
@@ -99,7 +97,7 @@ class MapTest {
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
         PermissionChecker.PERMISSION_DENIED
 
-    locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
+    locationPermission(context, launcherMultiplePermissions, permissions)
 
     verify { locationViewModel wasNot Called }
   }
