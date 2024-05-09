@@ -117,11 +117,13 @@ fun acceptChallenge(challenge: ChallengeData) {
 
 fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
   val database = FirebaseDatabase.getInstance()
-  val challengeRef = database.reference.child("users").child(userId).child("acceptedChallenges")
+  val challengeRef =
+      database.reference.child("users").child(userId).child("acceptedChallenges").limitToFirst(1)
   challengeRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-          val challenge = dataSnapshot.children.firstOrNull()?.getValue(ChallengeData::class.java)
+          val challenge = dataSnapshot.getValue(ChallengeData::class.java)
+          println(dataSnapshot.value.toString())
           callback(challenge)
         }
 
