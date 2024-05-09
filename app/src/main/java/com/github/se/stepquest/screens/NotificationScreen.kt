@@ -104,6 +104,13 @@ private fun BuildNotification(data: NotificationData?, userId: String) {
             Button(
                 onClick = {
                   val database = FirebaseDatabase.getInstance()
+                    if (data.type == NotificationType.CHALLENGE) {
+                        getPendingChallenge(userId, data.objectUuid) { challenge ->
+                            if (challenge != null) {
+                                acceptChallenge(challenge)
+                            }
+                        }
+                    }
 
                   database.reference
                       .child("users")

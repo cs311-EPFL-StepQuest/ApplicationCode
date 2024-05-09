@@ -121,12 +121,8 @@ fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
     challengeRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    val challenge = dataSnapshot.children.firstOrNull()?.getValue(ChallengeData::class.java)
-                    callback(challenge)
-                } else {
-                    callback(null)
-                }
+                val challenge = dataSnapshot.children.firstOrNull()?.getValue(ChallengeData::class.java)
+                callback(challenge)
             }
 
             override fun onCancelled(error: DatabaseError) {}

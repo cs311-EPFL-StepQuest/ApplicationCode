@@ -20,6 +20,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,18 +36,28 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
+import kotlinx.coroutines.delay
 
 @Composable
 fun FriendDialogBox(friend: Friend, onDismiss: () -> Unit) {
-  val blueThemeColor = colorResource(id = R.color.blueTheme)
   val profilePictureURL = friend.profilePicture
+    var challengeMode by remember { mutableStateOf(false) }
+    var challengeSentVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(challengeSentVisible) {
+        if (challengeSentVisible) {
+            delay(2000) // Adjust the duration as needed (e.g., 2000 milliseconds)
+            challengeSentVisible = false
+        }
+    }
   Surface(
       color = Color.White,
       border = BorderStroke(1.dp, Color.Black),
       shape = RoundedCornerShape(8.dp),
       modifier = Modifier.padding(16.dp)) {
         Column(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally) {
               Row(
                   modifier = Modifier.fillMaxWidth(),
@@ -58,31 +73,45 @@ fun FriendDialogBox(friend: Friend, onDismiss: () -> Unit) {
                 Image(
                     painter = rememberAsyncImagePainter(uri),
                     contentDescription = "Profile Picture",
-                    modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(RoundedCornerShape(100.dp)))
               }
               Spacer(modifier = Modifier.height(16.dp))
-              Button(
-                  onClick = { /*Handle connection*/},
-                  colors = ButtonDefaults.buttonColors(blueThemeColor),
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .height(72.dp)
-                          .padding(vertical = 8.dp)
-                          .padding(horizontal = 16.dp),
-                  shape = RoundedCornerShape(8.dp)) {
-                    Text(text = "Connect", fontSize = 24.sp, color = Color.White)
-                  }
-              Button(
-                  onClick = { /*Handle connection*/},
-                  colors = ButtonDefaults.buttonColors(blueThemeColor),
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .height(72.dp)
-                          .padding(vertical = 8.dp)
-                          .padding(horizontal = 16.dp),
-                  shape = RoundedCornerShape(8.dp)) {
-                    Text(text = "Challenge", fontSize = 24.sp, color = Color.White)
-                  }
+            if (challengeMode) {
+                ButtonElement(buttonText = "Regular Step Challenge", onClick = {
+                    challengeSentVisible = true
+                    challengeMode = false
+
+                })
+                ButtonElement(buttonText = "Daily Step Challenge", onClick = { /* to be added soon */ })
+                ButtonElement(buttonText = "Route Challenge", onClick = { /* to be added soon */ })
+            } else {
+                if (challengeSentVisible) {
+                    Text(text = "Challenge sent", color = Color.Green, modifier = Modifier.padding(top = 4.dp))
+                }
+                ButtonElement(buttonText = "Connection", onClick = {/*handle connection*/})
+                ButtonElement(buttonText = "Challenge", onClick = {
+                    challengeMode = true
+                })
+                }
             }
       }
+}
+
+@Composable
+fun ButtonElement(buttonText: String, onClick: () -> Unit) {
+    val blueThemeColor = colorResource(id = R.color.blueTheme)
+    Button(
+        onClick = { onClick() },
+        colors = ButtonDefaults.buttonColors(blueThemeColor),
+        modifier =
+        Modifier
+            .fillMaxWidth()
+            .height(72.dp)
+            .padding(vertical = 8.dp)
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(8.dp)) {
+        Text(text = buttonText, fontSize = 24.sp, color = Color.White)
+    }
 }
