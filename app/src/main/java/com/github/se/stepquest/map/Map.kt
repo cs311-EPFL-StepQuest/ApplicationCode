@@ -80,6 +80,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var routeEndMarker: Marker? = null
   val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
+  val followRoute = FollowRoute()
 
   // Instantiate all necessary variables to take pictures
   val cameraActionPermission = remember { mutableStateOf(false) }
@@ -138,11 +139,13 @@ fun Map(locationViewModel: LocationViewModel) {
                 MapView(context).apply {
                   onCreate(null) // Lifecycle integration
                   // Get the GoogleMap asynchronously
+                  locationPermission(context, launcherMultiplePermissions, permissions)
                   getMapAsync { googleMap ->
                     map.value = googleMap
                     initMap(map.value!!)
                     // TODO: Could put this here, but maybe add an if for changing different state (ex. create route, display route, etc.)
-                    //FollowRoute.drawRouteDetail(googleMap)
+                    followRoute.fakeRouteDetail(map.value!!)
+                    followRoute.drawRouteDetail(map.value!!,context)
                   }
                 }
               },
@@ -164,8 +167,7 @@ fun Map(locationViewModel: LocationViewModel) {
                 // empty too
                 cleanGoogleMap(map.value!!, routeEndMarker)
                 locationViewModel.cleanAllocations()
-                locationPermission(
-                    locationViewModel, context, launcherMultiplePermissions, permissions)
+                locationViewModel.startLocationUpdates(context)
               },
               modifier =
                   Modifier.size(85.dp)
@@ -440,7 +442,6 @@ fun initMap(googleMap: GoogleMap) {
 }
 
 fun locationPermission(
-    locationViewModel: LocationViewModel,
     context: Context,
     launcherMultiplePermissions: ActivityResultLauncher<Array<String>>,
     permissions: Array<String>
@@ -449,8 +450,7 @@ fun locationPermission(
     PermissionChecker.checkSelfPermission(context, it) == PermissionChecker.PERMISSION_GRANTED
   }) {
     println("Permission successful")
-    // Get the location
-    locationViewModel.startLocationUpdates(context)
+    Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
   } else {
     println("Ask Permission")
     launcherMultiplePermissions.launch(permissions)

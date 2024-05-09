@@ -46,12 +46,11 @@ class LocationArea {
           val longitude = routeDataSnapshot.child("longitude").getValue<Double>()
           if (latitude != null && longitude != null) {
             val routeData = LocationDetails(latitude, longitude)
-            val routedetailData=RouteDetails(routeID.key.toString(), routeID.child("route").getValue<List<LocationDetails>>(), routeID.child("userID").getValue<String>().toString())
+            val routedetailData=RouteDetails(routeID.key.toString(), routeID.child("route").getValue<List<LocationDetails>>(),routeID.child("checkpoints").getValue<List<Checkpoint>>(), routeID.child("userID").getValue<String>().toString())
             if (checkInsideArea(routeData)) {
               Log.d("LocationArea", "Route is inside area")
               routeList.add(routeData)
               routeDetailList.add(routedetailData)
-
             }
           }
         }
@@ -89,5 +88,6 @@ class LocationArea {
 data class RouteDetails(
   val routeID: String,
   val routeDetails: List<LocationDetails>?,
+  val checkpoints: List<Checkpoint>?,
   val userID: String
 )
