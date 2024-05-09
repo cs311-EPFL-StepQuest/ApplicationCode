@@ -32,10 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
+import com.github.se.stepquest.data.model.ChallengeType
+import com.github.se.stepquest.services.createChallengeItem
+import com.github.se.stepquest.services.sendPendingChallenge
 import kotlinx.coroutines.delay
 
 @Composable
-fun FriendDialogBox(friend: Friend, onDismiss: () -> Unit) {
+fun FriendDialogBox(friend: Friend, userId: String, onDismiss: () -> Unit) {
   // val profilePictureURL = friend.profilePicture
   var challengeMode by remember { mutableStateOf(false) }
   var challengeSentVisible by remember { mutableStateOf(false) }
@@ -74,6 +77,10 @@ fun FriendDialogBox(friend: Friend, onDismiss: () -> Unit) {
                 ButtonElement(
                     buttonText = "Regular Step Challenge",
                     onClick = {
+                      val challenge =
+                          createChallengeItem(
+                              userId, friend.name, ChallengeType.REGULAR_STEP_CHALLENGE)
+                      sendPendingChallenge(challenge)
                       challengeSentVisible = true
                       challengeMode = false
                     })

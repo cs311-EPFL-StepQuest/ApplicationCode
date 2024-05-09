@@ -1,7 +1,10 @@
 package com.github.se.stepquest.services
 
+import android.text.format.DateFormat
 import com.github.se.stepquest.IUserRepository
 import com.github.se.stepquest.data.model.ChallengeData
+import com.github.se.stepquest.data.model.ChallengeProgression
+import com.github.se.stepquest.data.model.ChallengeType
 import com.github.se.stepquest.data.model.NotificationData
 import com.github.se.stepquest.data.model.NotificationType
 import com.github.se.stepquest.data.repository.INotificationRepository
@@ -10,22 +13,81 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import java.util.UUID
 
-fun sendPendingChallenge(
-    senderUsername: String,
-    receiverUsername: String,
-    challenge: ChallengeData
-) {
+fun createChallengeItem(
+    currentUserId: String,
+    friendUsername: String,
+    type: ChallengeType
+): ChallengeData {
+  val currentDate = Date()
+  var friendUid = ""
+  getUserId(friendUsername) { fUserid -> friendUid = fUserid }
+  var currentUsername = ""
+  getUsername(currentUserId) { cUsername -> currentUsername = cUsername }
+  return when (type) {
+    ChallengeType.REGULAR_STEP_CHALLENGE ->
+        ChallengeData(
+            DateFormat.format("MMMM d, yyyy ", currentDate.time)
+                .toString(), // use of the current date for Uid
+            ChallengeType.REGULAR_STEP_CHALLENGE,
+            stepsToMake = 50000,
+            kilometersToWalk = 0,
+            daysToComplete = 10,
+            getEndDate(currentDate, 10),
+            friendUsername,
+            friendUid,
+            currentUsername,
+            currentUserId,
+            ChallengeProgression(friendUid, 0, 0),
+            ChallengeProgression(currentUserId, 0, 0))
+    ChallengeType.DAILY_STEP_CHALLENGE ->
+        ChallengeData(
+            DateFormat.format("MMMM d, yyyy ", currentDate.time)
+                .toString(), // use of the current date for Uid
+            ChallengeType.DAILY_STEP_CHALLENGE,
+            stepsToMake = 5000,
+            kilometersToWalk = 0,
+            daysToComplete = 1,
+            getEndDate(currentDate, 1),
+            friendUsername,
+            friendUid,
+            currentUsername,
+            currentUserId,
+            ChallengeProgression(friendUid, 0, 0),
+            ChallengeProgression(currentUserId, 0, 0))
+    ChallengeType.ROUTE_CHALLENGE ->
+        ChallengeData(
+            DateFormat.format("MMMM d, yyyy ", currentDate.time)
+                .toString(), // use of the current date for Uid
+            ChallengeType.REGULAR_STEP_CHALLENGE,
+            stepsToMake = 0,
+            kilometersToWalk = 2,
+            daysToComplete = 1,
+            getEndDate(currentDate, 1),
+            friendUsername,
+            friendUid,
+            currentUsername,
+            currentUserId,
+            ChallengeProgression(friendUid, 0, 0),
+            ChallengeProgression(currentUserId, 0, 0))
+  }
+}
+
+fun sendPendingChallenge(challenge: ChallengeData) {
   val userRepository = IUserRepository()
   val notificationRepository = INotificationRepository()
   val database = FirebaseDatabase.getInstance()
   val usernamesRef = database.reference.child("usernames")
   val senderUserId = userRepository.getUid().toString()
   usernamesRef
-      .child(receiverUsername)
+      .child(challenge.challengedUsername)
       .addListenerForSingleValueEvent(
           object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -45,6 +107,7 @@ fun sendPendingChallenge(
                         val receiverUserId = snapshot.value.toString()
                         val challengeType = challenge.type
                         val messageText = challengeType.messageText
+                        val senderUsername = challenge.senderUsername
                         notificationRepository.createNotification(
                             receiverUserId,
                             NotificationData(
@@ -148,4 +211,12 @@ fun getChallenges(userId: String, callback: (List<ChallengeData>) -> Unit) {
 
         override fun onCancelled(error: DatabaseError) {}
       })
+}
+
+fun getEndDate(startDate: Date, daysToAdd: Int): String {
+  val calendar = Calendar.getInstance()
+  calendar.time = startDate
+  calendar.add(Calendar.DAY_OF_YEAR, daysToAdd)
+  val dateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
+  return dateFormat.format(calendar.time)
 }
