@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,11 +17,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -38,6 +34,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -67,8 +64,26 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FetchPlaceResponse
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse
+import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.maps.DirectionsApi
+import com.google.maps.GeoApiContext
+import com.google.maps.model.DirectionsResult
+import com.google.maps.model.TravelMode
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import java.io.FileInputStream
+import java.util.Properties
+
+data class PlaceSuggestion(val name: String, val placeId: String)
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
@@ -128,10 +143,29 @@ fun Map(locationViewModel: LocationViewModel) {
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
 
+    val coroutineScope = rememberCoroutineScope()
+    val polylineList = mutableListOf<Polyline>()
+  //val properties = Properties()
+  //val localPropertiesFile = FileInputStream("local.properties")
+  //properties.load(localPropertiesFile)
+  //val apiKey = properties.getProperty("MAPS_API_KEY")
+  Places.initialize(context.applicationContext, "AIzaSyAGwX5Q1srVTBHbqEv6mMRegd_P8iLToBQ")
+  val placesClient = Places.createClient(context)
+  var suggestions by remember { mutableStateOf<List<PlaceSuggestion>>(emptyList()) }
+  var searchable by remember { mutableStateOf(false) }
+    var startDrawRoute by remember { mutableStateOf(false) }
+  var possibleDest by remember { mutableStateOf<LatLng?>(null) }
+  var destination by remember { mutableStateOf<LatLng?>(null) }
+  val geoContext = GeoApiContext.Builder()
+        .apiKey("AIzaSyAGwX5Q1srVTBHbqEv6mMRegd_P8iLToBQ")
+        .build()
+
   val keyboardController = LocalSoftwareKeyboardController.current
   Scaffold(
       content = {
-        Box(modifier = Modifier.fillMaxSize().testTag("MapScreen")) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .testTag("MapScreen")) {
           // Google Map
           AndroidView(
               factory = { context ->
@@ -144,7 +178,9 @@ fun Map(locationViewModel: LocationViewModel) {
                   }
                 }
               },
-              modifier = Modifier.fillMaxSize().testTag("GoogleMap"))
+              modifier = Modifier
+                  .fillMaxSize()
+                  .testTag("GoogleMap"))
 
           LaunchedEffect(locationUpdated) {
             if (locationUpdated == true) {
@@ -166,11 +202,12 @@ fun Map(locationViewModel: LocationViewModel) {
                     locationViewModel, context, launcherMultiplePermissions, permissions)
               },
               modifier =
-                  Modifier.size(85.dp)
-                      .padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-204).dp)
-                      .testTag("createRouteButton")) {
+              Modifier
+                  .size(85.dp)
+                  .padding(16.dp)
+                  .align(Alignment.BottomEnd)
+                  .offset(y = (-204).dp)
+                  .testTag("createRouteButton")) {
                 Image(
                     painter = painterResource(id = R.drawable.addbutton),
                     contentDescription = "image description",
@@ -181,12 +218,15 @@ fun Map(locationViewModel: LocationViewModel) {
           FloatingActionButton(
               onClick = { showDialog = true },
               modifier =
-                  Modifier.padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-150).dp)
-                      .size(48.dp)) {
+              Modifier
+                  .padding(16.dp)
+                  .align(Alignment.BottomEnd)
+                  .offset(y = (-150).dp)
+                  .size(48.dp)) {
                 Box(
-                    modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(Color(0xff00b3ff), CircleShape),
                     contentAlignment = Alignment.Center) {
                       Icon(
                           painter = painterResource(R.drawable.map_marker),
@@ -199,11 +239,12 @@ fun Map(locationViewModel: LocationViewModel) {
           FloatingActionButton(
               onClick = { showProgression = true },
               modifier =
-                  Modifier.size(85.dp)
-                      .padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-90).dp)
-                      .testTag("stopRouteButton"),
+              Modifier
+                  .size(85.dp)
+                  .padding(16.dp)
+                  .align(Alignment.BottomEnd)
+                  .offset(y = (-90).dp)
+                  .testTag("stopRouteButton"),
               content = {
                 Image(
                     painter = painterResource(id = R.drawable.stopbutton),
@@ -212,49 +253,122 @@ fun Map(locationViewModel: LocationViewModel) {
               })
 
           // Search bar
-          Box(Modifier.align(Alignment.TopCenter).offset(y = 16.dp).testTag("SearchBar")) {
-            BasicTextField(
-                value = allroutes,
-                onValueChange = { allroutes = it },
-                textStyle =
-                    TextStyle(
-                        fontSize = 25.sp,
-                        fontWeight = FontWeight(300),
-                        color = Color.Black,
-                    ),
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                modifier =
-                    Modifier.align(Alignment.CenterStart)
-                        .background(Color.White, shape = RoundedCornerShape(15.dp))
-                        .padding(horizontal = 12.dp)
-                        .width(200.dp)
-                        .height(40.dp)
-                        .offset(y = 3.dp)
-                        .testTag("SearchBarTextField"))
-            IconButton(
-                onClick = {},
-                modifier =
-                    Modifier.align(Alignment.CenterEnd).testTag("SearchCleanButton").size(25.dp)) {
-                  androidx.compose.material3.Icon(
-                      painter = painterResource(com.github.se.stepquest.R.drawable.clear),
-                      contentDescription = "Clear search",
-                  )
-                }
-            IconButton(
-                onClick = {},
-                modifier =
-                    Modifier.align(Alignment.CenterEnd)
-                        .offset(x = 45.dp)
-                        .background(Color.White, shape = CircleShape)
-                        .size(35.dp)
-                        .testTag("SearchButton")) {
-                  androidx.compose.material3.Icon(
-                      painter = painterResource(com.github.se.stepquest.R.drawable.search_route),
-                      contentDescription = "Clear search",
-                  )
-                }
+          Column (
+              Modifier
+                  .align(Alignment.TopCenter)
+                  .offset(y = 16.dp)
+          ){
+              Box(
+                  Modifier
+                      .testTag("SearchBar")) {
+                  BasicTextField(
+                      value = allroutes,
+                      onValueChange = { searchText ->
+                          searchable = false
+                          allroutes = searchText
+                          fetchPlaceSuggestions(
+                              placesClient,
+                              searchText,
+                              {
+                                suggestions = it
+                              },
+                              { }
+                          )
+                      },
+                      textStyle =
+                      TextStyle(
+                          fontSize = 25.sp,
+                          fontWeight = FontWeight(300),
+                          color = Color.Black,
+                      ),
+                      keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                      keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                      modifier =
+                      Modifier
+                          .align(Alignment.CenterStart)
+                          .background(Color.White)
+                          .padding(horizontal = 12.dp)
+                          .width(200.dp)
+                          .height(40.dp)
+                          .offset(y = 3.dp)
+                          .testTag("SearchBarTextField"))
+                  IconButton(
+                      onClick = {
+                          searchable = false
+                          allroutes = ""
+                          suggestions = listOf()
+                      },
+                      modifier =
+                      Modifier
+                          .align(Alignment.CenterEnd)
+                          .testTag("SearchCleanButton")
+                          .size(25.dp)) {
+                      androidx.compose.material3.Icon(
+                          painter = painterResource(com.github.se.stepquest.R.drawable.clear),
+                          contentDescription = "Clear search",
+                      )
+                  }
+                  if (searchable && !startDrawRoute) {
+                      IconButton(
+                          onClick = {
+                              startDrawRoute = true
+                              searchable = false
+                              destination = possibleDest
+                          },
+                          modifier =
+                          Modifier
+                              .align(Alignment.CenterEnd)
+                              .offset(x = 45.dp)
+                              .background(Color.White, shape = CircleShape)
+                              .size(35.dp)
+                              .testTag("SearchButton")
+                      ) {
+                          androidx.compose.material3.Icon(
+                              painter = painterResource(R.drawable.directions_icon),
+                              contentDescription = "show route",
+                          )
+                      }
+                  }
+                  if (startDrawRoute) {
+                      IconButton(
+                          onClick = {
+                              startDrawRoute = false
+                          },
+                          modifier =
+                          Modifier
+                              .align(Alignment.CenterEnd)
+                              .offset(x = 45.dp)
+                              .background(Color.White, shape = CircleShape)
+                              .size(35.dp)
+                              .testTag("ClearButton")
+                      ) {
+                          androidx.compose.material3.Icon(
+                              painter = painterResource(R.drawable.clear),
+                              contentDescription = "clear route",
+                          )
+                      }
+                  }
+              }
+              DropDownMenu(
+                  suggestions = suggestions,
+                  onSuggestionSelected = { placeSuggestion ->
+                      // Handle suggestion selection
+                      // You might want to set the selected suggestion as the value of the text field
+                      allroutes = placeSuggestion.name
+                      searchable = true
+                      fetchCoordinates(
+                          placesClient,
+                          placeSuggestion.placeId,
+                          {
+                              possibleDest = it
+                              map.value!!.moveCamera(CameraUpdateFactory.newLatLngZoom(it, map.value!!.cameraPosition.zoom))
+                          },
+                          { }
+                      )
+                  },
+              )
           }
+
         }
       },
       floatingActionButton = {
@@ -323,7 +437,10 @@ fun Map(locationViewModel: LocationViewModel) {
                 }
               },
               confirmButton = {
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp)) {
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .height(48.dp)) {
                   Button(
                       onClick = {
                         if (locationViewModel.addNewCheckpoint(checkpointTitle)) {
@@ -343,7 +460,9 @@ fun Map(locationViewModel: LocationViewModel) {
                       enabled = checkpointTitle.isNotEmpty(),
                       shape = RoundedCornerShape(12.dp),
                       colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff00b3ff)),
-                      modifier = Modifier.width(150.dp).align(Alignment.Center)) {
+                      modifier = Modifier
+                          .width(150.dp)
+                          .align(Alignment.Center)) {
                         Text(
                             "Confirm",
                             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp),
@@ -381,6 +500,93 @@ fun Map(locationViewModel: LocationViewModel) {
       numCheckpoints = 0
     }
   }
+    LaunchedEffect(Unit) {
+        while (true) {
+            if (startDrawRoute && map.value != null) {
+                for (polyline in polylineList) {
+                    polyline.remove()
+                }
+                // Clear the list of polyline objects
+                polylineList.clear()
+                drawRoute(map.value!!, geoContext, locationViewModel, destination!!, polylineList)
+                delay(5000) // Wait for 5 seconds
+            } else {
+                if (map.value != null) {
+                    for (polyline in polylineList) {
+                        polyline.remove()
+                    }
+                    // Clear the list of polyline objects
+                    polylineList.clear()
+                }
+                delay(100) // If shouldDrawRoute is false, wait for 1 second before checking again
+            }
+        }
+    }
+}
+
+fun fetchPlaceSuggestions(
+    placesClient: PlacesClient,
+    query: String,
+    onSuccess: (List<PlaceSuggestion>) -> Unit,
+    onFailure: (Exception) -> Unit
+) {
+    val request = FindAutocompletePredictionsRequest.builder()
+        .setQuery(query)
+        .build()
+
+    placesClient.findAutocompletePredictions(request)
+        .addOnSuccessListener { response: FindAutocompletePredictionsResponse ->
+            val suggestions = response.autocompletePredictions.map {
+                PlaceSuggestion(it.getPrimaryText(null).toString(), it.placeId)
+            }
+            onSuccess(suggestions)
+        }
+        .addOnFailureListener { exception: Exception ->
+            onFailure(exception)
+        }
+}
+
+fun fetchCoordinates(
+    placesClient: PlacesClient,
+    placeId: String,
+    onSuccess: (LatLng) -> Unit,
+    onFailure: (Exception) -> Unit
+) {
+    val placeRequest = FetchPlaceRequest.newInstance(placeId, listOf(Place.Field.LAT_LNG))
+
+    placesClient.fetchPlace(placeRequest)
+        .addOnSuccessListener { response: FetchPlaceResponse ->
+            val place = response.place
+            val latLng = place.latLng
+            onSuccess(latLng!!)
+        }
+        .addOnFailureListener { exception: Exception ->
+            onFailure(exception)
+        }
+}
+
+fun drawRoute(map: GoogleMap, context: GeoApiContext, lvm: LocationViewModel, destination: LatLng, polylineList: MutableList<Polyline>) {
+    val start = lvm.currentLocation.value!!
+    val request = DirectionsApi.newRequest(context)
+        .mode(TravelMode.WALKING)
+        .origin("${start.latitude},${start.longitude}")
+        .destination("${destination.latitude},${destination.longitude}")
+
+    val directionsResult: DirectionsResult = request.await()
+
+    if (directionsResult.routes.isNotEmpty()) {
+        val route = directionsResult.routes[0]
+        val polylineOptions = PolylineOptions()
+            .color(Color.Blue.toArgb())
+            .width(5f)
+
+        for (step in route.legs[0].steps) {
+            polylineOptions.add(LatLng(step.startLocation.lat, step.startLocation.lng))
+        }
+
+        val polyline = map.addPolyline(polylineOptions)
+        polylineList.add(polyline)
+    }
 }
 
 fun updateMap(

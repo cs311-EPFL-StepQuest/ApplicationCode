@@ -197,6 +197,9 @@ dependencies {
 
     implementation("androidx.camera:camera-view:$cameraxVersion")
     implementation("androidx.camera:camera-extensions:$cameraxVersion")
+
+    implementation("com.google.android.libraries.places:places:2.6.0")
+    implementation("com.google.maps:google-maps-services:0.15.0")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
