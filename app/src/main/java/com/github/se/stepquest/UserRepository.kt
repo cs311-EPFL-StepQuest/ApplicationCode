@@ -12,6 +12,7 @@ interface UserRepository {
   fun getUid(): String?
 
   fun getSteps(callback: (List<Int>) -> Unit)
+  fun getDailyStepsForDate(date: Date, callback: (Int) -> Unit)
 }
 
 class IUserRepository : UserRepository {
@@ -43,6 +44,24 @@ class IUserRepository : UserRepository {
           }
         })
   }
+
+  override fun getDailyStepsForDate(date: Date, callback: (Int) -> Unit) {
+    var dailySteps = 0
+    val d = date
+    val s: CharSequence = DateFormat.format("MMMM d, yyyy ", d.time)
+    val stepsRef = database.reference.child("users").child(userId!!).child("dailySteps $s")
+    stepsRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          dailySteps = dataSnapshot.getValue(Int::class.java) ?: 0
+          callback(dailySteps)
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+          callback(dailySteps)
+        }
+      })
+  }
 }
 
 class TestUserRepository1 : UserRepository {
@@ -57,6 +76,9 @@ class TestUserRepository1 : UserRepository {
   override fun getSteps(callback: (List<Int>) -> Unit) {
     return callback(listOf(dailyStepsMade, weeklyStepsMade))
   }
+  override fun getDailyStepsForDate(date: Date, callback: (Int) -> Unit) {
+    return callback(dailyStepsMade)
+  }
 }
 
 class TestUserRepository2 : UserRepository {
@@ -70,5 +92,9 @@ class TestUserRepository2 : UserRepository {
 
   override fun getSteps(callback: (List<Int>) -> Unit) {
     return callback(listOf(dailyStepsMade, weeklyStepsMade))
+  }
+
+  override fun getDailyStepsForDate(date: Date, callback: (Int) -> Unit) {
+    return callback(dailyStepsMade)
   }
 }
