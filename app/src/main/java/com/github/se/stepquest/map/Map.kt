@@ -145,11 +145,8 @@ fun Map(locationViewModel: LocationViewModel) {
 
     val coroutineScope = rememberCoroutineScope()
     val polylineList = mutableListOf<Polyline>()
-  //val properties = Properties()
-  //val localPropertiesFile = FileInputStream("local.properties")
-  //properties.load(localPropertiesFile)
-  //val apiKey = properties.getProperty("MAPS_API_KEY")
-  Places.initialize(context.applicationContext, "AIzaSyAGwX5Q1srVTBHbqEv6mMRegd_P8iLToBQ")
+  val API_KEY = ""
+  Places.initialize(context.applicationContext, API_KEY)
   val placesClient = Places.createClient(context)
   var suggestions by remember { mutableStateOf<List<PlaceSuggestion>>(emptyList()) }
   var searchable by remember { mutableStateOf(false) }
@@ -157,7 +154,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var possibleDest by remember { mutableStateOf<LatLng?>(null) }
   var destination by remember { mutableStateOf<LatLng?>(null) }
   val geoContext = GeoApiContext.Builder()
-        .apiKey("AIzaSyAGwX5Q1srVTBHbqEv6mMRegd_P8iLToBQ")
+        .apiKey(API_KEY)
         .build()
 
   val keyboardController = LocalSoftwareKeyboardController.current
