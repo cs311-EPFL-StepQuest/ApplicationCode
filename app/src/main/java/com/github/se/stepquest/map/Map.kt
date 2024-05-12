@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
 import android.widget.Toast
@@ -38,6 +39,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -68,6 +70,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
@@ -127,6 +130,8 @@ fun Map(locationViewModel: LocationViewModel) {
 
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
+
+    val coroutineScope = rememberCoroutineScope()
 
   val keyboardController = LocalSoftwareKeyboardController.current
   Scaffold(
@@ -381,6 +386,33 @@ fun Map(locationViewModel: LocationViewModel) {
       numCheckpoints = 0
     }
   }
+    LaunchedEffect(Unit) {
+        while (true) {
+            if(map.value != null && locationViewModel.currentLocation.value != null) {
+                val customIcon =
+                    BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)
+                val customIconScaled =
+                    Bitmap.createScaledBitmap(customIcon, 320, 320, false)
+                val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
+
+                val coordinates =
+                    LatLng(
+                        locationViewModel.currentLocation.value!!.latitude,
+                        locationViewModel.currentLocation.value!!.longitude
+                    )
+
+                map.value!!.addMarker(
+                    MarkerOptions()
+                        .position(coordinates)
+                        .anchor(0.5f, 0.5f)
+                        .icon(icon)
+                        .title("Current location marker")
+                )
+            }
+            delay(100)
+        }
+    }
+
 }
 
 fun updateMap(
