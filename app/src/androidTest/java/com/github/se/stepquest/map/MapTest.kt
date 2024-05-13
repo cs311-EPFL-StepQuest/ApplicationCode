@@ -279,4 +279,34 @@ class MapTest {
     // Assert that numCheckpoints is increased by 1
     assertEquals(numCheckpoints, 1)
   }
+
+  /*
+  @Test
+  fun testCurrentLocationMarker(){
+    every { locationViewModel.currentLocation.value } returns mockk(relaxed = true){
+      every {latitude} returns 1.0
+      every {longitude} returns 2.0
+    }
+
+    val gmap = mockk<GoogleMap>(relaxed = true)
+
+    composeTestRule.setContent { Map(locationViewModel).apply { numCheckpoints += 1 } }
+
+    val customIcon = mockk<Bitmap>(relaxed = true)
+    val customIconScaled = mockk<Bitmap>(relaxed = true)
+    val icon = mockk<BitmapDescriptor>(relaxed = true)
+    val coordinates = LatLng(1.0, 2.0)
+
+    every { BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)} returns customIcon
+    every { Bitmap.createScaledBitmap(customIcon, 320, 320, false) } returns customIconScaled
+    every {BitmapDescriptorFactory.fromBitmap(customIconScaled)} returns icon
+
+    verify { gmap.addMarker(
+      MarkerOptions()
+        .position(coordinates)
+        .anchor(0.5f, 0.5f)
+        .icon(icon)
+        .title("Current location marker")
+    ) }
+  }*/
 }
