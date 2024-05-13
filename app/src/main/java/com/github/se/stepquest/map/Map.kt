@@ -112,7 +112,6 @@ fun Map(locationViewModel: LocationViewModel) {
           println("Permission Granted")
           // Start location update only if the permission asked comes from a map action
           if (!cameraActionPermission.value) {
-            locationViewModel.startLocationUpdates(context as ComponentActivity)
           } else {
             cameraActionPermission.value = false
             resultLauncher.launch(takePicture)
@@ -140,15 +139,14 @@ fun Map(locationViewModel: LocationViewModel) {
                 MapView(context).apply {
                   onCreate(null) // Lifecycle integration
                   // TODO: need to move permission to the beginning to login
-                  //                    locationPermission(context, launcherMultiplePermissions,
-                  // permissions)
+                  locationPermission(context, launcherMultiplePermissions, permissions)
                   // Get the GoogleMap asynchronously
                   getMapAsync { googleMap ->
                     map.value = googleMap
                     initMap(map.value!!)
                     // TODO: Could put this here, but maybe add an if for changing different state ex. create route, display route, etc.
-                    //followRoute.fakeRouteDetail(map.value!!) //TODO: need remove
-                    //followRoute.drawRouteDetail(map.value!!,context)
+                    followRoute.fakeRouteDetail(map.value!!) //TODO: need remove
+                    followRoute.drawRouteDetail(map.value!!,context)
                   }
                 }
               },
@@ -170,7 +168,6 @@ fun Map(locationViewModel: LocationViewModel) {
                 // empty too
                 cleanGoogleMap(map.value!!, routeEndMarker)
                 locationViewModel.cleanAllocations()
-                locationPermission(context, launcherMultiplePermissions, permissions)
                 locationViewModel.startLocationUpdates(context)
               },
               modifier =
