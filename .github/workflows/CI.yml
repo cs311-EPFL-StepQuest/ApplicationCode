@@ -26,6 +26,11 @@ jobs:
           submodules: recursive
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of Sonar analysis (if we use Sonar Later)
 
+      - name: Firebase Emulator
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12"
+        run: npm install -g firebase-tools
 
       # Kernel-based Virtual Machine (KVM) is an open source virtualization technology built into Linux. Enabling it allows the Android emulator to run faster.
       - name: Enable KVM group perms
