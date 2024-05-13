@@ -138,7 +138,7 @@ fun Map(locationViewModel: LocationViewModel) {
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
 
-  val API_KEY = "AIzaSyCuxqvrudoeFuHXGmSrD48ya5NGcpXcM6Y"
+  val API_KEY = ""
   Places.initialize(context.applicationContext, API_KEY)
   val placesClient = Places.createClient(context)
   var suggestions by remember { mutableStateOf<List<PlaceSuggestion>>(emptyList()) }
