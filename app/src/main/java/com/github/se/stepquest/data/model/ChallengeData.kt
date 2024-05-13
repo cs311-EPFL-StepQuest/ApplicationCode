@@ -5,7 +5,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 
-
 data class ChallengeData(
     var uuid: String = "",
     var type: String = "",
@@ -18,6 +17,7 @@ data class ChallengeData(
 )
 
 val userRepository = IUserRepository()
+
 enum class ChallengeType(
     type: String,
     messageText: String,
@@ -27,16 +27,15 @@ enum class ChallengeType(
       "REGULAR_STEP_CHALLENGE",
       "",
       fun(data: ChallengeData): Boolean {
-          val date = LocalDate.parse(data.dateTime)
-          var dailySteps = 0
-          var totalSteps = 0
-          for (i in 0..data.daysToComplete) {
-              val dateOffset = date.plusDays(i.toLong())
-              userRepository.getDailyStepsForDate(asDate(dateOffset), { steps -> dailySteps = steps })
-              totalSteps += dailySteps
-              if (totalSteps >= data.stepsToMake) return true
-          }
-          return false
+        val date = LocalDate.parse(data.dateTime)
+        var dailySteps = 0
+        var totalSteps = 0
+        for (i in 0..data.daysToComplete) {
+          val dateOffset = date.plusDays(i.toLong())
+          userRepository.getDailyStepsForDate(asDate(dateOffset)) { steps -> dailySteps = steps }
+            totalSteps += dailySteps
+          if (totalSteps >= data.stepsToMake) return true
+        }
         return false
       }),
   DAILY_STEP_CHALLENGE(
@@ -45,11 +44,11 @@ enum class ChallengeType(
       fun(data: ChallengeData): Boolean {
         val date = LocalDate.parse(data.dateTime)
         var dailySteps = 0
-          for (i in 0..data.daysToComplete) {
-              val dateOffset = date.plusDays(i.toLong())
-              userRepository.getDailyStepsForDate(asDate(dateOffset), { steps -> dailySteps = steps })
-             if (dailySteps >= data.stepsToMake) return true
-          }
+        for (i in 0..data.daysToComplete) {
+          val dateOffset = date.plusDays(i.toLong())
+          userRepository.getDailyStepsForDate(asDate(dateOffset)) { steps -> dailySteps = steps }
+            if (dailySteps >= data.stepsToMake) return true
+        }
         return false
       }),
   ROUTE_CHALLENGE(
@@ -61,5 +60,5 @@ enum class ChallengeType(
 }
 
 private fun asDate(localDate: LocalDate): Date {
-    return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+  return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
 }
