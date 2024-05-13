@@ -7,7 +7,7 @@ import java.util.Date
 
 data class ChallengeData(
     var uuid: String = "",
-    var type: String = "",
+    var type: ChallengeType = ChallengeType.REGULAR_STEP_CHALLENGE,
     var stepsToMake: Int = 0,
     var kilometersToWalk: Int = 0,
     var daysToComplete: Int = 0,
@@ -91,11 +91,13 @@ data class ChallengeProgression(
     var stepsCompleted: Int = 0,
     var kilometersWalked: Int = 0
 )
+
 val userRepository = IUserRepository()
+
 enum class ChallengeType(
-    type: String,
-    messageText: String,
-    completionFunction: (ChallengeData) -> Boolean
+    val type: String,
+    val messageText: String,
+    val completionFunction: (ChallengeData) -> Boolean
 ) {
   REGULAR_STEP_CHALLENGE(
       "REGULAR_STEP_CHALLENGE",
@@ -107,7 +109,7 @@ enum class ChallengeType(
         for (i in 0..data.daysToComplete) {
           val dateOffset = date.plusDays(i.toLong())
           userRepository.getDailyStepsForDate(asDate(dateOffset)) { steps -> dailySteps = steps }
-            totalSteps += dailySteps
+          totalSteps += dailySteps
           if (totalSteps >= data.stepsToMake) return true
         }
         return false
@@ -121,7 +123,7 @@ enum class ChallengeType(
         for (i in 0..data.daysToComplete) {
           val dateOffset = date.plusDays(i.toLong())
           userRepository.getDailyStepsForDate(asDate(dateOffset)) { steps -> dailySteps = steps }
-            if (dailySteps >= data.stepsToMake) return true
+          if (dailySteps >= data.stepsToMake) return true
         }
         return false
       }),
