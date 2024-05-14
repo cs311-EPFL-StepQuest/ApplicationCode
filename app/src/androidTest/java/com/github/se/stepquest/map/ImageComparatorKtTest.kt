@@ -17,7 +17,7 @@ class ImageComparatorKtTest {
     val referenceLocation = LocationDetails(0.0, 0.0)
     val newImageLocation = LocationDetails(0.0, 10.0)
     val distance = compareImages(referenceLocation, newImageLocation)
-    assertEquals(0f, distance)
+    assertEquals(-1f, distance)
   }
 
   @Test
@@ -26,5 +26,6 @@ class ImageComparatorKtTest {
     val newImageLocation = LocationDetails(0.0, 0.0001)
     val distance = compareImages(referenceLocation, newImageLocation)
     assertNotEquals(0f, distance)
+    assertNotEquals(-1f, distance)
   }
 }

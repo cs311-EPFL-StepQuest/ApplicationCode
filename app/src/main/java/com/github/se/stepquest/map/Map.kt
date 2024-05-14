@@ -313,11 +313,12 @@ fun Map(locationViewModel: LocationViewModel) {
                             cameraActionPermission.value = true
                             launcherMultiplePermissions.launch(arrayOf(Manifest.permission.CAMERA))
                           }
-                        }) {
+                        },
+                        modifier = Modifier.size(70.dp)) {
                           Icon(
                               painterResource(R.drawable.camera_icon),
                               contentDescription = "camera_icon",
-                              modifier = Modifier.size(60.dp))
+                              modifier = Modifier.size(50.dp))
                         }
                   }
                 }
