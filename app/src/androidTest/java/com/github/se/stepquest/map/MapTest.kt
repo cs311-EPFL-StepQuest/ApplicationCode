@@ -322,19 +322,20 @@ class MapTest {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
     val device = UiDevice.getInstance(instrumentation)
     executeUiAutomatorActions(
-        device, Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID, Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID2, Constants.CAMERA_BUTTON_DONE_ACTION_ID)
+        device,
+        Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID,
+        Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID2,
+        Constants.CAMERA_BUTTON_DONE_ACTION_ID)
     Thread.sleep(2000)
     composeTestRule.onNodeWithContentDescription("checkpoint_image").assertIsDisplayed()
   }
 }
-
 
 object Constants {
   const val CAMERA_BUTTON_SHUTTER_ACTION_ID = "com.android.camera2:id/shutter_button"
   const val CAMERA_BUTTON_SHUTTER_ACTION_ID2 = "com.android.camera:id/shutter_button"
   const val CAMERA_BUTTON_DONE_ACTION_ID = "com.android.camera2:id/done_button"
   const val CAMERA_BUTTON_DONE_ACTION_ID2 = "com.android.camera:id/done_button"
-
 }
 
 fun executeUiAutomatorActions(device: UiDevice, vararg ids: String, actionTimeOut: Long = 8000L) {
