@@ -22,7 +22,7 @@ class HomeScreenTest {
 
     composeTestRule.setContent {
       StepQuestTheme {
-        HomeScreen(navigationActions = NavigationActions(navController = navController))
+        HomeScreen(navigationActions = NavigationActions(navController = navController), userId = "testUserId")
       }
     }
     // Verify that the messages button is displayed

@@ -2,6 +2,9 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="FirebaseServiceTest">
+        <State />
+      </entry>
       <entry key="MainActivity">
         <State>
           <targetSelectedWithDropDown>
@@ -18,7 +21,7 @@
           <timeTargetWasSelectedWithDropDown value="2024-05-08T10:21:53.558459800Z" />
         </State>
       </entry>
-      <entry key="ProfilePageLayoutTest">
+      <entry key="sendFriendRequestTest()">
         <State />
       </entry>
     </value>

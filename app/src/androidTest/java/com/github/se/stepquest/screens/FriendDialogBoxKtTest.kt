@@ -18,9 +18,9 @@ class FriendDialogBoxKtTest {
 
   @Test
   fun friendDialogBoxTest() {
-    val friend = Friend(name = "John Doe", profilePicture = null, status = true)
+    val friend = Friend(name = "John Doe", status = true)
 
-    composeTestRule.setContent { FriendDialogBox(friend = friend, onDismiss = {}) }
+    composeTestRule.setContent { FriendDialogBox(friend = friend, "testUserId", onDismiss = {}) }
 
     // Verify the presence of UI elements
     composeTestRule.onNodeWithText("John Doe").assertExists()
