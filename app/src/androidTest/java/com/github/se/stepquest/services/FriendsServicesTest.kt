@@ -20,6 +20,7 @@ import com.google.firebase.initialize
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,17 +32,21 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 class FirebaseServiceTest {
 
-  private lateinit var database: FirebaseDatabase
+  object FirebaseDatabaseInstance {
+    val instance: FirebaseDatabase by lazy {
+      val database = FirebaseDatabase.getInstance()
+      database.useEmulator("10.0.2.2", 9000)
+      database
+    }
+  }
 
-  private lateinit var requestsRef: DatabaseReference
+  private lateinit var database: FirebaseDatabase
 
   @Before
   fun setup() {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     FirebaseApp.initializeApp(context)
-
-    database = Firebase.database
-    database.useEmulator("10.0.2.2", 9000)
+    database = FirebaseDatabaseInstance.instance
     addUsername("currentUsername", "currentUsernameId", database)
     addUsername("friendName", "friendNameId", database)
   }
@@ -78,23 +83,40 @@ class FirebaseServiceTest {
     }
   }
 
-  /*@Test
+  @Test
   fun deletePendingFriendRequestTest() {
-
-    requestsRef = mockk(relaxed = true)
-
-    every { database.reference } returns
-        mockk {
-          every { child(any()) } returns
-              mockk {
-                every { child(any()) } returns mockk { every { child(any()) } returns requestsRef }
-              }
+    val latch = CountDownLatch(1)
+    sendFriendRequest("currentUsername", "friendName")
+    deletePendingFriendRequest("friendName", database, "currentUsernameId")
+    val friendRequestsRef =
+      database.reference.child("users").child("friendNameId").child("pendingFriendRequests")
+    friendRequestsRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+          try {
+            val pendingRequests = snapshot.getValue<List<String>>()?.toMutableList()
+            assert(pendingRequests == null)
+          } finally {
+            latch.countDown()
+          }
         }
 
-    deletePendingFriendRequest("friendName", database, "currentUsername")
+        override fun onCancelled(error: DatabaseError) {
+          try {
+            assert(false)
+          } finally {
+            latch.countDown()
+          }
+        }
+
+      }
+    )
+    if (!latch.await(10, TimeUnit.SECONDS)) { // Wait with timeout
+      fail("Timeout waiting for database operation")
+    }
   }
 
-  @Test
+  /*@Test
   fun deleteFriendTest() {
     deleteFriend("currentUsername", "friendName", database, "uid")
   }*/
