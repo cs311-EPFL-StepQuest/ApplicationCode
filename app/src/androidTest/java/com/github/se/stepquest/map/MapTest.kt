@@ -43,10 +43,10 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MapTest {
-
-  @get:Rule val composeTestRule = createComposeRule()
   // Grant camera permissions
   @get:Rule var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
+
+  @get:Rule val composeTestRule = createComposeRule()
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
@@ -318,18 +318,23 @@ class MapTest {
     composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
     composeTestRule.onNodeWithText("Name:").performTextInput("Test")
     composeTestRule.onNodeWithContentDescription("camera_icon").performClick()
+    Thread.sleep(2000)
     val instrumentation = InstrumentationRegistry.getInstrumentation()
     val device = UiDevice.getInstance(instrumentation)
     executeUiAutomatorActions(
-        device, Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID, Constants.CAMERA_BUTTON_DONE_ACTION_ID)
-
+        device, Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID, Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID2, Constants.CAMERA_BUTTON_DONE_ACTION_ID)
+    Thread.sleep(2000)
     composeTestRule.onNodeWithContentDescription("checkpoint_image").assertIsDisplayed()
   }
 }
 
+
 object Constants {
   const val CAMERA_BUTTON_SHUTTER_ACTION_ID = "com.android.camera2:id/shutter_button"
+  const val CAMERA_BUTTON_SHUTTER_ACTION_ID2 = "com.android.camera:id/shutter_button"
   const val CAMERA_BUTTON_DONE_ACTION_ID = "com.android.camera2:id/done_button"
+  const val CAMERA_BUTTON_DONE_ACTION_ID2 = "com.android.camera:id/done_button"
+
 }
 
 fun executeUiAutomatorActions(device: UiDevice, vararg ids: String, actionTimeOut: Long = 8000L) {
