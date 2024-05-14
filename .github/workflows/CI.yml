@@ -49,7 +49,7 @@ jobs:
         run: npm install -g firebase-tools
       - name: Install dependencies
         run: npm install
-        working-directory: app/src/androidTest/java/com.github.se.stepquest
+        working-directory: app/src/androidTest/java/com/github/se/stepquest
 
 
       # To Load a fake google map api key for the test
