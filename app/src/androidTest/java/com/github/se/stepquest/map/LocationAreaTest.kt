@@ -1,16 +1,16 @@
 package com.github.se.stepquest.map
 
-import com.google.android.gms.maps.GoogleMap
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import io.mockk.MockKSettings.relaxed
-import io.mockk.every
+import com.google.firebase.database.database
 import io.mockk.mockk
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -26,10 +26,11 @@ class LocationAreaTest {
   private lateinit var mockDatabase: FirebaseDatabase
   private lateinit var mockTask: Task<DataSnapshot>
 
+  private lateinit var emulatedDatabase: FirebaseDatabase
+
   @Before
   fun setUp() {
     locationArea = LocationArea()
-    locationArea.setArea(LocationDetails(0.0, 0.0), 1000.0)
 
     firebaseAuth = mockk()
     mockRouteID = mockk(relaxed = true)
@@ -41,6 +42,15 @@ class LocationAreaTest {
 
     locationArea.firebaseAuth = firebaseAuth
     locationArea.database = mockDatabase
+
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    FirebaseApp.initializeApp(context)
+    emulatedDatabase = FirebaseDatabaseInstance.instance
+  }
+
+  @After
+  fun cleanup() {
+    emulatedDatabase.reference.setValue(null)
   }
 
   @Test
@@ -73,7 +83,23 @@ class LocationAreaTest {
     assertEquals(center.longitude, locationArea.center.longitude, 0.0)
     assertEquals(radius, locationArea.radius, 0.0)
   }
+  /*
+    @Test
+    fun drawRoutesOnMapTest() {
+      val googleMap: GoogleMap = mockk(relaxed = true)
+      val locationArea = LocationArea()
+      locationArea.setArea(LocationDetails(0.0, 0.0), 1000.0)
+      every { locationArea.routesAroundLocation(call) } answers
+          {
+            val callback = arg<(List<LocationDetails>) -> Unit>(0)
+            callback.invoke(listOf(LocationDetails(0.0, 0.0)))
+          }
 
+      locationArea.drawRoutesOnMap(googleMap)
+
+    }
+  */
+  /*
   @Test
   fun routesAroundLocation_returnsRoutesWhenLocationIsInside() {
     val locationDetails = LocationDetails(0.0, 0.0)
@@ -81,29 +107,53 @@ class LocationAreaTest {
 
     val localRouteList = mutableListOf<LocationDetails>()
     locationArea.setArea(locationDetails)
-
+    val dataSnapshot = mockk<DataSnapshot>(relaxed = true)
     every { mockDatabase.reference } returns mockk { every { child(any()) } returns mockRoutes }
     every { mockRoutes.addListenerForSingleValueEvent(any()) } answers
         {
           val listener = arg<ValueEventListener>(0)
+
           listener.onDataChange(
               mockk {
-                val snapshot: DataSnapshot = mockk()
-                every { snapshot.children } returns
-                    object : Iterable<DataSnapshot> {
-                      override fun iterator() = listOf(mockRouteID).iterator()
-                    }
-                every { mockRouteID.child(any()) } returns
-                    mockk { every { child(any()) } returns mockRouteDataSnapshot }
-                every { mockRouteDataSnapshot.child("latitude") } returns
-                    mockk { every { getValue(Double::class.java) } returns 0.0 }
-                every { mockRouteDataSnapshot.child("longitude") } returns
-                    mockk { every { getValue(Double::class.java) } returns 0.0 }
+                (every { dataSnapshot.children } returns
+                        listOf(
+                         mockk {
+                          every { child(any()) } returns
+                                  mockk { every { child(any()) } returns mockRouteDataSnapshot }
+                          every { mockRouteDataSnapshot.child("latitude") } returns
+                                  mockk { every { getValue(Double::class.java) } returns 0.0 }
+                          every { mockRouteDataSnapshot.child("longitude") } returns
+                                  mockk { every { getValue(Double::class.java) } returns 0.0 }
+                        }
+                      )).toString()
               })
         }
 
     locationArea.routesAroundLocation{ localRouteList.addAll(it) }
     // verify(exactly = 1) { mockRoutes.addListenerForSingleValueEvent(any()) }
     // assertTrue(localRouteList[0].latitude == 0.0)
+  }
+  */
+  object FirebaseDatabaseInstance {
+    val instance: FirebaseDatabase by lazy {
+      val database = FirebaseDatabase.getInstance()
+      database.useEmulator("10.0.2.2", 9000)
+      database
+    }
+  }
+
+  @Test
+  fun database_emulator() {
+    val ref = emulatedDatabase.reference
+    locationArea.database = emulatedDatabase
+
+    val route = ref.child("routes").child("route").child("0")
+    route.child("latitude").setValue(0.0)
+    route.child("longitude").setValue(0.0)
+    locationArea.setArea(LocationDetails(0.0, 0.0), 1000.0)
+    val localRouteList = mutableListOf<LocationDetails>()
+    locationArea.routesAroundLocation { localRouteList.addAll(it) }
+    assertTrue(localRouteList[0].latitude == 0.0)
+    assertTrue(localRouteList[0].longitude == 0.0)
   }
 }
