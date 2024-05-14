@@ -51,40 +51,13 @@ class FirebaseServiceTest {
     addUsername("friendName", "friendNameId", database)
   }
 
-  @Test
-  fun sendFriendRequestTest() {
-    val latch = CountDownLatch(1)
-    sendFriendRequest("currentUsername", "friendName")
-    val friendRequestsRef =
-      database.reference.child("users").child("friendNameId").child("pendingFriendRequests")
-    friendRequestsRef.addListenerForSingleValueEvent(
-      object : ValueEventListener {
-        override fun onDataChange(snapshot: DataSnapshot) {
-          try {
-            val pendingRequests = snapshot.getValue<List<String>>()?.toMutableList()
-            assert(pendingRequests != null)
-          } finally {
-            latch.countDown()
-          }
-        }
-
-        override fun onCancelled(error: DatabaseError) {
-          try {
-            assert(false)
-          } finally {
-            latch.countDown()
-          }
-        }
-
-      }
-    )
-    if (!latch.await(10, TimeUnit.SECONDS)) { // Wait with timeout
-      fail("Timeout waiting for database operation")
-    }
+  @After
+  fun cleanup() {
+    database.reference.setValue(null)
   }
 
   @Test
-  fun deletePendingFriendRequestTest() {
+  fun pendingFriendRequestTest() {
     val latch = CountDownLatch(1)
     sendFriendRequest("currentUsername", "friendName")
     deletePendingFriendRequest("friendName", database, "currentUsernameId")
