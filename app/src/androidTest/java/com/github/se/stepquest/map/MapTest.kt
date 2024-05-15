@@ -138,7 +138,7 @@ class MapTest {
 
   @Test
   fun testUpdateMap_multiplelocation() {
-    // Mock the GoogleMap object
+    // Mock the GoogleMap objects
     val googleMap = mockk<GoogleMap>()
 
     // Mock allocation data
