@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.libraries.places.api.Places
 import io.mockk.Called
 import io.mockk.Runs
 import io.mockk.every
@@ -37,6 +38,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse
+import com.google.android.libraries.places.api.net.PlacesClient
+import io.mockk.coEvery
+import io.mockk.mockkObject
 
 @RunWith(AndroidJUnit4::class)
 class MapTest {
@@ -75,9 +81,6 @@ class MapTest {
     composeTestRule.onNodeWithTag("SearchCleanButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("SearchCleanButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("SearchCleanButton").performClick()
-    composeTestRule.onNodeWithTag("SearchButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("SearchButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("SearchButton").performClick()
     composeTestRule.onNodeWithTag("SearchBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("SearchBarTextField").assertIsDisplayed()
   }

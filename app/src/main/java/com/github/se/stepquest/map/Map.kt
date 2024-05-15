@@ -468,7 +468,7 @@ fun fetchCoordinates(
       }
       .addOnFailureListener { exception: Exception -> onFailure(exception) }
 }
-
+/*
 fun drawRoute(
     map: GoogleMap,
     context: GeoApiContext,
@@ -497,7 +497,7 @@ fun drawRoute(
     polylineList.add(polyline)
   }
 }
-
+*/
 fun updateMap(
     googleMap: GoogleMap,
     locationViewModel: LocationViewModel,
