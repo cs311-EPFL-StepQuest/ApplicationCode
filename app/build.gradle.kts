@@ -44,6 +44,8 @@ android {
         //fetch the map key
         val apiKey = properties.getProperty("MAPS_API_KEY") ?: ""
 
+        buildConfigField("String", "MAPS_API_KEY", apiKey)
+
         //inject the key dynamically into the manifest
         manifestPlaceholders["GOOGLE_MAP_KEY"] = apiKey
     }
@@ -70,6 +72,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

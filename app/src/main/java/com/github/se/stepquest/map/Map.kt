@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker
+import com.github.se.stepquest.BuildConfig
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -138,8 +139,8 @@ fun Map(locationViewModel: LocationViewModel) {
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
 
-  val API_KEY = ""
-  Places.initialize(context.applicationContext, API_KEY)
+  val apiKey = BuildConfig.MAPS_API_KEY
+  Places.initialize(context.applicationContext, apiKey)
   val placesClient = Places.createClient(context)
   var suggestions by remember { mutableStateOf<List<PlaceSuggestion>>(emptyList()) }
   var searchable by remember { mutableStateOf(false) }

@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "316177260128-131rgrc7spg2fc7g72mc9i2jt5g16c1f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.stepquest",
+            "certificate_hash": "292f802d2c92f9b2d63405594b400995ee5b1055"
+          }
+        },
+        {
+          "client_id": "316177260128-3dg897pssg5hqj30lqccbt9odufpjih6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.stepquest",
+            "certificate_hash": "482a36530e9c3d56876cd8a71fe5debf1d717c67"
+          }
+        },
+        {
           "client_id": "316177260128-57trduel58m7p5ka98f1kf4k3pf704a9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -36,6 +52,22 @@
           "android_info": {
             "package_name": "com.github.se.stepquest",
             "certificate_hash": "01e44aded5143690d7a82b1cb2254da9a2fa756d"
+          }
+        },
+        {
+          "client_id": "316177260128-p9lktv6he8a5crr9o1u2r3mvmgh2vrgr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.stepquest",
+            "certificate_hash": "d4f32486a3018ded05e8db3715c22eaa02985074"
+          }
+        },
+        {
+          "client_id": "316177260128-vid4b5nd71kkto2517fbkoqu3d8nkv9j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.stepquest",
+            "certificate_hash": "64935d98a38a643cdd80d78d7fedef366851307d"
           }
         },
         {
