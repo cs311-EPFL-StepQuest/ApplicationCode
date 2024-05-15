@@ -76,15 +76,15 @@ fun DatabaseLoadingScreen(
 
             override fun onCancelled(databaseError: DatabaseError) {
               // Handle cancellation
-  }
-})
-Column(
-modifier = Modifier.fillMaxSize(),
-verticalArrangement = Arrangement.Center,
-horizontalAlignment = Alignment.CenterHorizontally) {
-    Text(
-        text = "Waiting for database...",
-        modifier = Modifier.padding(32.dp),
-        fontWeight = FontWeight.Bold)
+            }
+          })
+  Column(
+      modifier = Modifier.fillMaxSize(),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = "Waiting for database...",
+            modifier = Modifier.padding(32.dp),
+            fontWeight = FontWeight.Bold)
       }
 }
