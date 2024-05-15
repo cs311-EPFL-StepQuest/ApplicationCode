@@ -112,6 +112,7 @@ fun Map(locationViewModel: LocationViewModel) {
           println("Permission Granted")
           // Start location update only if the permission asked comes from a map action
           if (!cameraActionPermission.value) {
+              locationViewModel.startLocationUpdates(context)
           } else {
             cameraActionPermission.value = false
             resultLauncher.launch(takePicture)
@@ -139,7 +140,7 @@ fun Map(locationViewModel: LocationViewModel) {
                 MapView(context).apply {
                   onCreate(null) // Lifecycle integration
                   // TODO: need to move permission to the beginning to login
-                  locationPermission(context, launcherMultiplePermissions, permissions)
+                  locationPermission(locationViewModel,context, launcherMultiplePermissions, permissions)
                   // Get the GoogleMap asynchronously
                   getMapAsync { googleMap ->
                     map.value = googleMap
@@ -168,7 +169,7 @@ fun Map(locationViewModel: LocationViewModel) {
                 // empty too
                 cleanGoogleMap(map.value!!, routeEndMarker)
                 locationViewModel.cleanAllocations()
-                locationViewModel.startLocationUpdates(context)
+                locationViewModel.create_route_start.postValue(true)
               },
               modifier =
                   Modifier.size(85.dp)
@@ -368,7 +369,8 @@ fun Map(locationViewModel: LocationViewModel) {
     RouteProgression(
         stopRoute = {
           showProgression = false
-          locationViewModel.onPause()
+          locationViewModel.locationUpdated.value = false
+          locationViewModel.create_route_start.postValue(false) // Stop creating route
           stopCreatingRoute = true
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
           storeRoute.addRoute(
@@ -443,6 +445,7 @@ fun initMap(googleMap: GoogleMap) {
 }
 
 fun locationPermission(
+    locationViewModel: LocationViewModel,
     context: Context,
     launcherMultiplePermissions: ActivityResultLauncher<Array<String>>,
     permissions: Array<String>
@@ -451,6 +454,7 @@ fun locationPermission(
     PermissionChecker.checkSelfPermission(context, it) == PermissionChecker.PERMISSION_GRANTED
   }) {
     println("Permission successful")
+    locationViewModel.startLocationUpdates(context)
   } else {
     println("Ask Permission")
     launcherMultiplePermissions.launch(permissions)
