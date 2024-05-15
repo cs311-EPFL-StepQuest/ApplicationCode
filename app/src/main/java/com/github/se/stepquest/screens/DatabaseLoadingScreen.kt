@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.content.PermissionChecker
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
@@ -36,16 +35,14 @@ fun DatabaseLoadingScreen(
   val database = FirebaseDatabase.getInstance()
   var isNewPlayer by remember { mutableStateOf(false) }
   val databaseRef = database.reference
-  val bodySensorsPermissionGranted = remember { mutableStateOf(false) }
-  val permissionsAllowed =
-      (PermissionChecker.checkSelfPermission(context, android.Manifest.permission.BODY_SENSORS) ==
-          PermissionChecker.PERMISSION_GRANTED) &&
-          (PermissionChecker.checkSelfPermission(
-              context, android.Manifest.permission.ACTIVITY_RECOGNITION) ==
-              PermissionChecker.PERMISSION_GRANTED)
-  val launcherBodySensorsPermission =
-      rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        bodySensorsPermissionGranted.value = isGranted
+  var permissionsGranted by remember { mutableStateOf(false) }
+  val launcherPermission =
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+          permissions ->
+        val bodySensorsGranted = permissions[android.Manifest.permission.BODY_SENSORS] ?: false
+        val activityRecognitionGranted =
+            permissions[android.Manifest.permission.ACTIVITY_RECOGNITION] ?: false
+        permissionsGranted = bodySensorsGranted && activityRecognitionGranted
       }
   databaseRef
       .child("users")
@@ -57,13 +54,19 @@ fun DatabaseLoadingScreen(
               val username = dataSnapshot.getValue(String::class.java)
               isNewPlayer = username == null
               if (isNewPlayer) {
-                if (!permissionsAllowed) {
-                  launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
+                if (!permissionsGranted) {
+                  launcherPermission.launch(
+                      arrayOf(
+                          android.Manifest.permission.BODY_SENSORS,
+                          android.Manifest.permission.ACTIVITY_RECOGNITION))
                 }
                 navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
               } else {
-                if (!permissionsAllowed) {
-                  launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
+                if (!permissionsGranted) {
+                  launcherPermission.launch(
+                      arrayOf(
+                          android.Manifest.permission.BODY_SENSORS,
+                          android.Manifest.permission.ACTIVITY_RECOGNITION))
                 }
                 startService()
                 navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
