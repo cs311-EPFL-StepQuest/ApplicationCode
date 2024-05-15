@@ -31,16 +31,16 @@ fun DatabaseLoadingScreen(
     navigationActions: NavigationActions,
     startService: () -> Unit,
     userId: String,
-    context : Context
+    context: Context
 ) {
   val database = FirebaseDatabase.getInstance()
   var isNewPlayer by remember { mutableStateOf(false) }
   val databaseRef = database.reference
-    val bodySensorsPermissionGranted = remember { mutableStateOf(false) }
-    val launcherBodySensorsPermission =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            bodySensorsPermissionGranted.value = isGranted
-        }
+  val bodySensorsPermissionGranted = remember { mutableStateOf(false) }
+  val launcherBodySensorsPermission =
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        bodySensorsPermissionGranted.value = isGranted
+      }
   databaseRef
       .child("users")
       .child(userId)
@@ -51,16 +51,20 @@ fun DatabaseLoadingScreen(
               val username = dataSnapshot.getValue(String::class.java)
               isNewPlayer = username == null
               if (isNewPlayer) {
-                  if (PermissionChecker.checkSelfPermission(context, android.Manifest.permission.BODY_SENSORS) != PermissionChecker.PERMISSION_GRANTED) {
-                      launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
-                  }
-                  navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
+                if (PermissionChecker.checkSelfPermission(
+                    context, android.Manifest.permission.BODY_SENSORS) !=
+                    PermissionChecker.PERMISSION_GRANTED) {
+                  launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
+                }
+                navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
               } else {
-                  if (PermissionChecker.checkSelfPermission(context, android.Manifest.permission.BODY_SENSORS) != PermissionChecker.PERMISSION_GRANTED) {
-                      launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
-                  }
-                  startService()
-                  navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+                if (PermissionChecker.checkSelfPermission(
+                    context, android.Manifest.permission.BODY_SENSORS) !=
+                    PermissionChecker.PERMISSION_GRANTED) {
+                  launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
+                }
+                startService()
+                navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
               }
             }
 
