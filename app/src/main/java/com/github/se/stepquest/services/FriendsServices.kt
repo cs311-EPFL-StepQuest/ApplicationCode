@@ -46,15 +46,15 @@ fun addFriend(
               })
 
           val curFriendsListRef =
-              database.reference.child("users").child(currentUserId).child("friendsList")
+              database.reference
+                  .child("users")
+                  .child(currentUserId)
+                  .child("friendsList")
+                  .child(newFriend.name)
           curFriendsListRef.addListenerForSingleValueEvent(
               object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                  val currentFriendsList: MutableList<Friend> =
-                      dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
-
-                  currentFriendsList.add(newFriend)
-                  curFriendsListRef.setValue(currentFriendsList)
+                  curFriendsListRef.setValue(newFriend)
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
@@ -77,15 +77,16 @@ fun addFriend(
                 }
               })
 
-          val friendsListRef = database.reference.child("users").child(uid).child("friendsList")
+          val friendsListRef =
+              database.reference
+                  .child("users")
+                  .child(uid)
+                  .child("friendsList")
+                  .child(currentUser.name)
           friendsListRef.addListenerForSingleValueEvent(
               object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                  val currentFriendsList: MutableList<Friend> =
-                      dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
-
-                  currentFriendsList.add(currentUser)
-                  friendsListRef.setValue(currentFriendsList)
+                  friendsListRef.setValue(currentUser)
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
