@@ -197,6 +197,7 @@ dependencies {
 
     implementation("androidx.camera:camera-view:$cameraxVersion")
     implementation("androidx.camera:camera-extensions:$cameraxVersion")
+    androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
