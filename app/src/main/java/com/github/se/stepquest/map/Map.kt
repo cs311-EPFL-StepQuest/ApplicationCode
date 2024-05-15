@@ -128,6 +128,8 @@ fun Map(locationViewModel: LocationViewModel) {
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
 
+  var makingRoute by remember { mutableStateOf(false) }
+
   val keyboardController = LocalSoftwareKeyboardController.current
   Scaffold(
       content = {
@@ -155,61 +157,96 @@ fun Map(locationViewModel: LocationViewModel) {
           }
 
           // Button for creating a route
-          FloatingActionButton(
-              onClick = {
-                // Beofre start creating route, make sure map is clean and route list (allocation)
-                // is
-                // empty too
-                cleanGoogleMap(map.value!!, routeEndMarker)
-                locationViewModel.cleanAllocations()
-                locationPermission(
-                    locationViewModel, context, launcherMultiplePermissions, permissions)
-              },
-              modifier =
-                  Modifier.size(85.dp)
-                      .padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-204).dp)
-                      .testTag("createRouteButton")) {
-                Image(
-                    painter = painterResource(id = R.drawable.addbutton),
-                    contentDescription = "image description",
-                    contentScale = ContentScale.None)
-              }
-
-          // Check point button
-          FloatingActionButton(
-              onClick = { showDialog = true },
-              modifier =
-                  Modifier.padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-150).dp)
-                      .size(48.dp)) {
-                Box(
-                    modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
-                    contentAlignment = Alignment.Center) {
-                      Icon(
-                          painter = painterResource(R.drawable.map_marker),
-                          contentDescription = "Add checkpoint",
-                          tint = Color.Red)
+            if(!makingRoute) {
+                FloatingActionButton(
+                    onClick = {
+                        // Beofre start creating route, make sure map is clean and route list (allocation)
+                        // is
+                        // empty too
+                        cleanGoogleMap(map.value!!, routeEndMarker)
+                        locationViewModel.cleanAllocations()
+                        locationPermission(
+                            locationViewModel, context, launcherMultiplePermissions, permissions
+                        )
+                        makingRoute = true
+                    },
+                    modifier =
+                    Modifier.size(85.dp)
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(y = (-150).dp)
+                        .testTag("createRouteButton")
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.addbutton),
+                        contentDescription = "image description",
+                        contentScale = ContentScale.None
+                    )
+                }
+                // Button for searching for routes
+                FloatingActionButton(
+                    onClick = { showDialog = true },
+                    modifier =
+                    Modifier.padding(16.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(y = (-90).dp)
+                        .size(54.dp)
+                        .testTag("routeSearchButton")) {
+                    Box(
+                        modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
+                        contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(R.drawable.magnifying_icon),
+                            contentDescription = "Button to search for neaby routes",
+                            tint = Color.Black,
+                            modifier = Modifier.size(40.dp))
                     }
-              }
+                }
+            } else {
 
-          // Button for stopping a route
-          FloatingActionButton(
-              onClick = { showProgression = true },
-              modifier =
-                  Modifier.size(85.dp)
-                      .padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-90).dp)
-                      .testTag("stopRouteButton"),
-              content = {
-                Image(
-                    painter = painterResource(id = R.drawable.stopbutton),
-                    contentDescription = "stop button to stop create route",
-                    contentScale = ContentScale.None)
-              })
+                // Check point button
+                FloatingActionButton(
+                    onClick = { showDialog = true },
+                    modifier =
+                    Modifier.padding(16.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(y = (-150).dp)
+                        .size(48.dp)
+                        .testTag("addCheckpointButton")
+                ) {
+                    Box(
+                        modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.map_marker),
+                            contentDescription = "Add checkpoint",
+                            tint = Color.Red
+                        )
+                    }
+                }
+
+                // Button for stopping a route
+                FloatingActionButton(
+                    onClick = {
+                        showProgression = true
+                        makingRoute = false
+                    },
+                    modifier =
+                    Modifier.size(85.dp)
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(y = (-90).dp)
+                        .testTag("stopRouteButton"),
+                    content = {
+                        Image(
+                            painter = painterResource(id = R.drawable.stopbutton),
+                            contentDescription = "stop button to stop create route",
+                            contentScale = ContentScale.None
+                        )
+                    })
+            }
+
 
           // Search bar
           Box(Modifier.align(Alignment.TopCenter).offset(y = 16.dp).testTag("SearchBar")) {

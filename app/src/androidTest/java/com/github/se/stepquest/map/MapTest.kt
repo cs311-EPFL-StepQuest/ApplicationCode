@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -14,6 +15,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.core.content.PermissionChecker
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 import com.google.android.gms.maps.CameraUpdate
@@ -70,16 +72,26 @@ class MapTest {
     composeTestRule.onNodeWithTag("GoogleMap").assertExists()
     composeTestRule.onNodeWithTag("createRouteButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createRouteButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("stopRouteButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("stopRouteButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("routeSearchButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("routeSearchButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("SearchCleanButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("SearchCleanButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("SearchCleanButton").performClick()
-    composeTestRule.onNodeWithTag("SearchButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("SearchButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("SearchButton").performClick()
     composeTestRule.onNodeWithTag("SearchBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("SearchBarTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("stopRouteButton").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("addCheckpointButton").assertIsNotDisplayed()
+    /*
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
+
+    pressBack()
+
+    composeTestRule.onNodeWithTag("stopRouteButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("stopRouteButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("addCheckpointButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addCheckpointButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("createRouteButton").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("routeSearchButton").assertIsNotDisplayed()*/
   }
 
   @Test
