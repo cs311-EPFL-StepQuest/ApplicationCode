@@ -56,11 +56,11 @@ class FriendsListKtTest {
 
     val fakeFriendsList =
         listOf(
-            //ORIGINAL:
-            //Friend("Alice", null, true),
-            //Friend("Bob", null, false),
-            //Friend("Charlie", null, true),
-            //Friend("David", null, false),
+            // ORIGINAL:
+            // Friend("Alice", null, true),
+            // Friend("Bob", null, false),
+            // Friend("Charlie", null, true),
+            // Friend("David", null, false),
             Friend("Alice", true),
             Friend("Bob", false),
             Friend("Charlie", true),
@@ -85,10 +85,11 @@ class FriendsListKtTest {
 
   @Test
   fun data_base_friends() {
-    //ORIGINAL: val fakeFriendsList = mutableListOf(Friend("Alice", null, true), Friend("Bob", null, false))
-      val fakeFriendsList = mutableListOf(Friend("Alice", true), Friend("Bob", false))
+    // ORIGINAL: val fakeFriendsList = mutableListOf(Friend("Alice", null, true), Friend("Bob",
+    // null, false))
+    val fakeFriendsList = mutableListOf(Friend("Alice", true), Friend("Bob", false))
 
-      every { friendsRef.addListenerForSingleValueEvent(any()) } answers
+    every { friendsRef.addListenerForSingleValueEvent(any()) } answers
         {
           val listener = arg<ValueEventListener>(0)
           listener.onDataChange(
