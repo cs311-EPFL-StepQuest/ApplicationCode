@@ -157,7 +157,7 @@ fun Map(locationViewModel: LocationViewModel) {
           // Button for creating a route
           FloatingActionButton(
               onClick = {
-                // Beofre start creating route, make sure map is clean and route list (allocation)
+                // Before start creating route, make sure map is clean and route list (allocation)
                 // is
                 // empty too
                 cleanGoogleMap(map.value!!, routeEndMarker)
