@@ -59,15 +59,11 @@ fun DatabaseLoadingScreen(
               if (isNewPlayer) {
                 if (!permissionsAllowed) {
                   launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
-                  launcherBodySensorsPermission.launch(
-                      android.Manifest.permission.ACTIVITY_RECOGNITION)
                 }
                 navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
               } else {
                 if (!permissionsAllowed) {
                   launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
-                  launcherBodySensorsPermission.launch(
-                      android.Manifest.permission.ACTIVITY_RECOGNITION)
                 }
                 startService()
                 navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
