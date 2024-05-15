@@ -9,7 +9,6 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -112,7 +111,7 @@ fun Map(locationViewModel: LocationViewModel) {
           println("Permission Granted")
           // Start location update only if the permission asked comes from a map action
           if (!cameraActionPermission.value) {
-              locationViewModel.startLocationUpdates(context)
+            locationViewModel.startLocationUpdates(context)
           } else {
             cameraActionPermission.value = false
             resultLauncher.launch(takePicture)
@@ -140,14 +139,16 @@ fun Map(locationViewModel: LocationViewModel) {
                 MapView(context).apply {
                   onCreate(null) // Lifecycle integration
                   // TODO: need to move permission to the beginning to login
-                  locationPermission(locationViewModel,context, launcherMultiplePermissions, permissions)
+                  locationPermission(
+                      locationViewModel, context, launcherMultiplePermissions, permissions)
                   // Get the GoogleMap asynchronously
                   getMapAsync { googleMap ->
                     map.value = googleMap
                     initMap(map.value!!)
-                    // TODO: Could put this here, but maybe add an if for changing different state ex. create route, display route, etc.
-                    followRoute.fakeRouteDetail(map.value!!) //TODO: need remove
-                    followRoute.drawRouteDetail(map.value!!,context)
+                    // TODO: Could put this here, but maybe add an if for changing different state
+                    // ex. create route, display route, etc.
+                    followRoute.fakeRouteDetail(map.value!!) // TODO: need remove
+                    followRoute.drawRouteDetail(map.value!!, context)
                   }
                 }
               },

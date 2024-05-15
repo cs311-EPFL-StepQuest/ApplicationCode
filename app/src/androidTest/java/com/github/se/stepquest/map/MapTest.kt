@@ -47,7 +47,12 @@ class MapTest {
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
 
-  @get:Rule val permissionRule= GrantPermissionRule.grant(Manifest.permission.CAMERA, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+  @get:Rule
+  val permissionRule =
+      GrantPermissionRule.grant(
+          Manifest.permission.CAMERA,
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+          Manifest.permission.ACCESS_FINE_LOCATION)
 
   // Declare vm as a public variable
   private lateinit var vm: LocationViewModel
