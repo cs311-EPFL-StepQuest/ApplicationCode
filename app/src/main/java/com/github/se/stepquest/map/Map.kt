@@ -80,6 +80,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var routeEndMarker: Marker? = null
   val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
+  val isFollowingRoute by locationViewModel.isFollowingRoute.observeAsState(initial = false)
 
   // Instantiate all necessary variables to take pictures
   val cameraActionPermission = remember { mutableStateOf(false) }
@@ -111,6 +112,8 @@ fun Map(locationViewModel: LocationViewModel) {
           println("Permission Granted")
           // Start location update only if the permission asked comes from a map action
           if (!cameraActionPermission.value) {
+            locationViewModel.isFollowingRoute.value = true
+
             locationViewModel.startLocationUpdates(context as ComponentActivity)
           } else {
             cameraActionPermission.value = false
@@ -255,6 +258,30 @@ fun Map(locationViewModel: LocationViewModel) {
                   )
                 }
           }
+          if (isFollowingRoute) {
+            // Button for going back to default map
+            FloatingActionButton(
+                onClick = {
+                  locationViewModel.onPause()
+                  stopCreatingRoute = true
+                  locationViewModel.cleanAllocations()
+                  cleanGoogleMap(map.value!!)
+                  locationViewModel.isFollowingRoute.value = false
+                },
+                modifier =
+                    Modifier.size(70.dp)
+                        .padding(18.dp)
+                        .offset(y = 1.dp)
+                        .align(Alignment.TopStart)
+                        .testTag("gobackbutton"),
+                containerColor = Color.White,
+                content = {
+                  Image(
+                      painter = painterResource(id = R.drawable.goback),
+                      modifier = Modifier.size(20.dp),
+                      contentDescription = "go back button")
+                })
+          }
         }
       },
       floatingActionButton = {
@@ -364,6 +391,7 @@ fun Map(locationViewModel: LocationViewModel) {
         stopRoute = {
           showProgression = false
           locationViewModel.onPause()
+          locationViewModel.isFollowingRoute.value = false
           stopCreatingRoute = true
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
           storeRoute.addRoute(
@@ -378,6 +406,7 @@ fun Map(locationViewModel: LocationViewModel) {
 
     // Reset the number of checkpoints created
     if (stopCreatingRoute) {
+
       numCheckpoints = 0
     }
   }
@@ -448,6 +477,7 @@ fun locationPermission(
   }) {
     println("Permission successful")
     // Get the location
+    locationViewModel.isFollowingRoute.value = true
     locationViewModel.startLocationUpdates(context)
   } else {
     println("Ask Permission")
