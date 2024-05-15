@@ -22,7 +22,7 @@ class HomeScreenTest {
 
     composeTestRule.setContent {
       StepQuestTheme {
-        HomeScreen(navigationActions = NavigationActions(navController = navController))
+        HomeScreen(navigationActions = NavigationActions(navController = navController), "testUid")
       }
     }
     // Verify that the messages button is displayed
@@ -44,8 +44,7 @@ class HomeScreenTest {
 
     // Verify that the "Challenges" card is displayed
     composeTestRule.onNodeWithText("Challenges").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Accept").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Reject").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No challenges available").assertIsDisplayed()
 
     // Verify that the "Daily Quests" card is displayed
     composeTestRule.onNodeWithText("Daily Quests").assertIsDisplayed()

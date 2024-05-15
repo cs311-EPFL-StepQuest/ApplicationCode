@@ -37,6 +37,12 @@ fun DatabaseLoadingScreen(
   var isNewPlayer by remember { mutableStateOf(false) }
   val databaseRef = database.reference
   val bodySensorsPermissionGranted = remember { mutableStateOf(false) }
+  val permissionsAllowed =
+      (PermissionChecker.checkSelfPermission(context, android.Manifest.permission.BODY_SENSORS) ==
+          PermissionChecker.PERMISSION_GRANTED) &&
+          (PermissionChecker.checkSelfPermission(
+              context, android.Manifest.permission.ACTIVITY_RECOGNITION) ==
+              PermissionChecker.PERMISSION_GRANTED)
   val launcherBodySensorsPermission =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         bodySensorsPermissionGranted.value = isGranted
@@ -51,17 +57,17 @@ fun DatabaseLoadingScreen(
               val username = dataSnapshot.getValue(String::class.java)
               isNewPlayer = username == null
               if (isNewPlayer) {
-                if (PermissionChecker.checkSelfPermission(
-                    context, android.Manifest.permission.BODY_SENSORS) !=
-                    PermissionChecker.PERMISSION_GRANTED) {
+                if (!permissionsAllowed) {
                   launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
+                  launcherBodySensorsPermission.launch(
+                      android.Manifest.permission.ACTIVITY_RECOGNITION)
                 }
                 navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
               } else {
-                if (PermissionChecker.checkSelfPermission(
-                    context, android.Manifest.permission.BODY_SENSORS) !=
-                    PermissionChecker.PERMISSION_GRANTED) {
+                if (!permissionsAllowed) {
                   launcherBodySensorsPermission.launch(android.Manifest.permission.BODY_SENSORS)
+                  launcherBodySensorsPermission.launch(
+                      android.Manifest.permission.ACTIVITY_RECOGNITION)
                 }
                 startService()
                 navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
@@ -70,15 +76,15 @@ fun DatabaseLoadingScreen(
 
             override fun onCancelled(databaseError: DatabaseError) {
               // Handle cancellation
-            }
-          })
-  Column(
-      modifier = Modifier.fillMaxSize(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = "Waiting for database...",
-            modifier = Modifier.padding(32.dp),
-            fontWeight = FontWeight.Bold)
+  }
+})
+Column(
+modifier = Modifier.fillMaxSize(),
+verticalArrangement = Arrangement.Center,
+horizontalAlignment = Alignment.CenterHorizontally) {
+    Text(
+        text = "Waiting for database...",
+        modifier = Modifier.padding(32.dp),
+        fontWeight = FontWeight.Bold)
       }
 }
