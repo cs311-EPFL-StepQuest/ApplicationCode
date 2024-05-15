@@ -124,7 +124,7 @@ class StepCounterService(
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-              // add code when failing to access database
+              Log.e("StepCounterService", "Database error: ${databaseError.message}")
             }
           })
     }
