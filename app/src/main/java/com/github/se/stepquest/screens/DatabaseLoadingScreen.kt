@@ -1,5 +1,8 @@
 package com.github.se.stepquest.screens
 
+import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,11 +29,21 @@ import com.google.firebase.database.ValueEventListener
 fun DatabaseLoadingScreen(
     navigationActions: NavigationActions,
     startService: () -> Unit,
-    userId: String
+    userId: String,
+    context: Context
 ) {
   val database = FirebaseDatabase.getInstance()
   var isNewPlayer by remember { mutableStateOf(false) }
   val databaseRef = database.reference
+  var permissionsGranted by remember { mutableStateOf(false) }
+  val launcherPermission =
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+          permissions ->
+        val bodySensorsGranted = permissions[android.Manifest.permission.BODY_SENSORS] ?: false
+        val activityRecognitionGranted =
+            permissions[android.Manifest.permission.ACTIVITY_RECOGNITION] ?: false
+        permissionsGranted = bodySensorsGranted && activityRecognitionGranted
+      }
   databaseRef
       .child("users")
       .child(userId)
@@ -41,8 +54,20 @@ fun DatabaseLoadingScreen(
               val username = dataSnapshot.getValue(String::class.java)
               isNewPlayer = username == null
               if (isNewPlayer) {
+                if (!permissionsGranted) {
+                  launcherPermission.launch(
+                      arrayOf(
+                          android.Manifest.permission.BODY_SENSORS,
+                          android.Manifest.permission.ACTIVITY_RECOGNITION))
+                }
                 navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
               } else {
+                if (!permissionsGranted) {
+                  launcherPermission.launch(
+                      arrayOf(
+                          android.Manifest.permission.BODY_SENSORS,
+                          android.Manifest.permission.ACTIVITY_RECOGNITION))
+                }
                 startService()
                 navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
               }
