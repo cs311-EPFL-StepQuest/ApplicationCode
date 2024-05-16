@@ -205,6 +205,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   // CALL FUNCTIONS TO SEARCH FOR NEARBY ROUTES
                   locationArea.setArea(locationViewModel.currentLocation.value!!)
                   locationArea.drawRoutesOnMap(map.value!!)
+                  followRoute.drawRouteDetail(map.value!!,context)
                 },
                 modifier =
                     Modifier.padding(16.dp)
