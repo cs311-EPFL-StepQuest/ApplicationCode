@@ -17,6 +17,7 @@ class FollowRoute() {
   fun drawRouteDetail(googleMap: GoogleMap, context: Context) {
     googleMap.setOnMarkerClickListener { clickedMarker ->
       if (clickedMarker.title == "Route") {
+
         val route = clickedMarker.tag as? RouteDetails
         route?.let { it ->
           val routeID = it.routeID
@@ -25,6 +26,8 @@ class FollowRoute() {
           val checkpoints = it.checkpoints
           val points = routedetail?.map { LatLng(it.latitude, it.longitude) }
           if (points != null) {
+            //clean up the map
+            googleMap.clear()
             if (points.isNotEmpty()) {
               // Add a red marker at the start point
               googleMap.addMarker(

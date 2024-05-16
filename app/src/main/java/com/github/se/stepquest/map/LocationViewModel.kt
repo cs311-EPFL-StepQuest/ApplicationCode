@@ -81,6 +81,7 @@ class LocationViewModel : ViewModel() {
     return null
   }
 
+
   fun getAllocations(): List<LocationDetails>? {
     return _allocations.value
   }
