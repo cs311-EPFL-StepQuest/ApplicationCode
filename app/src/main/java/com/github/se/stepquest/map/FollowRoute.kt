@@ -32,7 +32,7 @@ class FollowRoute() {
           val checkpoints = it.checkpoints
           val points = routedetail?.map { LatLng(it.latitude, it.longitude) }
           if (points != null) {
-            followingRoute.value=true
+            followingRoute.postValue(true)
             //clean up the map
             googleMap.clear()
             if (points.isNotEmpty()) {
