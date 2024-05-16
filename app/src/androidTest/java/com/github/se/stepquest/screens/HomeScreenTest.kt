@@ -1,5 +1,6 @@
 package com.github.se.stepquest.screens
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -22,7 +23,10 @@ class HomeScreenTest {
 
     composeTestRule.setContent {
       StepQuestTheme {
-        HomeScreen(navigationActions = NavigationActions(navController = navController), "testUid")
+        HomeScreen(
+            navigationActions = NavigationActions(navController = navController),
+            "testUid",
+            LocalContext.current)
       }
     }
     // Verify that the messages button is displayed
@@ -44,6 +48,7 @@ class HomeScreenTest {
 
     // Verify that the "Challenges" card is displayed
     composeTestRule.onNodeWithText("Challenges").assertIsDisplayed()
+
     composeTestRule.onNodeWithText("No challenges available").assertIsDisplayed()
 
     // Verify that the "Daily Quests" card is displayed
