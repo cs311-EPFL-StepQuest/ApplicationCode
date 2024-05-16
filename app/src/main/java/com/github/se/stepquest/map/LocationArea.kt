@@ -31,6 +31,7 @@ class LocationArea {
     this.center = LatLng(centerLocation.latitude, centerLocation.longitude)
   }
 
+
   fun routesAroundLocation(callback: (List<LocationDetails>, List<RouteDetails>) -> Unit) {
     val routes = database.reference.child("routes")
     val routeList = mutableListOf<LocationDetails>()
@@ -59,6 +60,7 @@ class LocationArea {
               }
             }
             callback(routeList, routeDetailList)
+
           }
 
           override fun onCancelled(error: DatabaseError) {
