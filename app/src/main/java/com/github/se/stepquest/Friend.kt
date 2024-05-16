@@ -1,5 +1,11 @@
 package com.github.se.stepquest
 
-import android.net.Uri
+data class Friend(val name: String = "", val status: Boolean = false) {
+  val _name: String
+    get() = name
 
-data class Friend(val name: String, val profilePicture: Uri?, val status: Boolean)
+  val _status: Boolean
+    get() = status
+
+  constructor() : this(name = "", status = false)
+}
