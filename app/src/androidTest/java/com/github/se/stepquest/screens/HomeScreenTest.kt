@@ -25,7 +25,7 @@ class HomeScreenTest {
       StepQuestTheme {
         HomeScreen(
             navigationActions = NavigationActions(navController = navController),
-            "testUserId",
+            "testUid",
             LocalContext.current)
       }
     }
@@ -48,6 +48,8 @@ class HomeScreenTest {
 
     // Verify that the "Challenges" card is displayed
     composeTestRule.onNodeWithText("Challenges").assertIsDisplayed()
+
+    composeTestRule.onNodeWithText("No challenges available").assertIsDisplayed()
 
     // Verify that the "Daily Quests" card is displayed
     composeTestRule.onNodeWithText("Daily Quests").assertIsDisplayed()

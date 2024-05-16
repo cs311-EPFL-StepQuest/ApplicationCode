@@ -92,7 +92,7 @@ fun AppNavigationHost(
       startDestination = startDestination) {
         composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions, context) }
         composable(Routes.DatabaseLoadingScreen.routName) {
-          DatabaseLoadingScreen(navigationActions, startServiceLambda, userId)
+          DatabaseLoadingScreen(navigationActions, startServiceLambda, userId, context)
         }
         composable(Routes.NewPlayerScreen.routName) {
           NewPlayerScreen(navigationActions, context, userId)
