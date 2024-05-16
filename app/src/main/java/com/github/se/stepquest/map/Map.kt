@@ -102,6 +102,8 @@ fun Map(locationViewModel: LocationViewModel) {
   var showProgression by remember { mutableStateOf(false) }
   var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
 
+  var makingRoute by remember { mutableStateOf(false) }
+
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
           permissionsMap ->
@@ -119,7 +121,7 @@ fun Map(locationViewModel: LocationViewModel) {
           Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
         } else {
           println("Permission Denied")
-          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+          Toast.makeText(context, "Go to settings and activate GPS permission and camera", Toast.LENGTH_SHORT).show()
         }
       }
   val permissions =
@@ -128,7 +130,7 @@ fun Map(locationViewModel: LocationViewModel) {
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
 
-  var makingRoute by remember { mutableStateOf(false) }
+
 
   val keyboardController = LocalSoftwareKeyboardController.current
   Scaffold(
@@ -143,6 +145,9 @@ fun Map(locationViewModel: LocationViewModel) {
                   getMapAsync { googleMap ->
                     map.value = googleMap
                     initMap(map.value!!)
+                    locationPermission(
+                      locationViewModel, context, launcherMultiplePermissions, permissions, {}
+                    )
                   }
                 }
               },
@@ -160,15 +165,16 @@ fun Map(locationViewModel: LocationViewModel) {
             if(!makingRoute) {
                 FloatingActionButton(
                     onClick = {
-                        // Beofre start creating route, make sure map is clean and route list (allocation)
+                        // Before start creating route, make sure map is clean and route list (allocation)
                         // is
                         // empty too
                         cleanGoogleMap(map.value!!, routeEndMarker)
                         locationViewModel.cleanAllocations()
                         locationPermission(
-                            locationViewModel, context, launcherMultiplePermissions, permissions
+                            locationViewModel, context, launcherMultiplePermissions, permissions, {makingRoute = true}
                         )
-                        makingRoute = true
+                        locationViewModel.create_route_start.postValue(true)
+                        //makingRoute = true
                     },
                     modifier =
                     Modifier.size(85.dp)
@@ -185,7 +191,9 @@ fun Map(locationViewModel: LocationViewModel) {
                 }
                 // Button for searching for routes
                 FloatingActionButton(
-                    onClick = { showDialog = true },
+                    onClick = {
+                    //CALL FUNCTIONS TO SEARCH FOR NEARBY ROUTES
+                    },
                     modifier =
                     Modifier.padding(16.dp)
                         .align(Alignment.BottomEnd)
@@ -230,7 +238,6 @@ fun Map(locationViewModel: LocationViewModel) {
                 FloatingActionButton(
                     onClick = {
                         showProgression = true
-                        makingRoute = false
                     },
                     modifier =
                     Modifier.size(85.dp)
@@ -400,8 +407,10 @@ fun Map(locationViewModel: LocationViewModel) {
     RouteProgression(
         stopRoute = {
           showProgression = false
-          locationViewModel.onPause()
+            locationViewModel.locationUpdated.value=false
+            locationViewModel.create_route_start.postValue(true)
           stopCreatingRoute = true
+          makingRoute = false
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
           storeRoute.addRoute(
               storeRoute.getUserid(),
@@ -478,13 +487,15 @@ fun locationPermission(
     locationViewModel: LocationViewModel,
     context: Context,
     launcherMultiplePermissions: ActivityResultLauncher<Array<String>>,
-    permissions: Array<String>
+    permissions: Array<String>,
+    onSucess: () -> Unit,
 ) {
   if (permissions.all {
     PermissionChecker.checkSelfPermission(context, it) == PermissionChecker.PERMISSION_GRANTED
   }) {
     println("Permission successful")
     // Get the location
+    onSucess()
     locationViewModel.startLocationUpdates(context)
   } else {
     println("Ask Permission")
