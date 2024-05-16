@@ -2,6 +2,7 @@ package com.github.se.stepquest.services
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.Uri
 
 fun isOnline(context: Context): Boolean {
 
@@ -40,11 +41,18 @@ fun cacheStepGoals(context: Context, dailyStepGoal: Int, weeklyStepGoal: Int) {
   editor.apply()
 }
 
-fun cacheSteps(context: Context, dailySteps: Int, weeklySteps: Int) {
+fun cacheDailyWeeklySteps(context: Context, dailySteps: Int, weeklySteps: Int) {
   val sharedPreferences = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
   val editor = sharedPreferences.edit()
   editor.putInt("dailySteps", dailySteps)
   editor.putInt("weeklySteps", weeklySteps)
+  editor.apply()
+}
+
+fun cacheTotalSteps(context: Context, totalSteps: Int) {
+  val sharedPreferences = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
+  val editor = sharedPreferences.edit()
+  editor.putInt("totalSteps", totalSteps)
   editor.apply()
 }
 

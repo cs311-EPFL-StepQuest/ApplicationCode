@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.github.se.stepquest.services.cacheSteps
+import com.github.se.stepquest.services.cacheDailyWeeklySteps
 import com.github.se.stepquest.services.cacheStepGoals
 import com.github.se.stepquest.services.getCachedStepInfo
 
@@ -51,7 +51,7 @@ fun ProgressionPage(user: UserRepository, context: Context) {
 
   user.getSteps { steps -> dailyStepsMade = steps[0] }
   user.getSteps { steps -> weeklyStepsMade = steps[1] }
-  cacheSteps(context, dailyStepsMade, weeklyStepsMade)
+  cacheDailyWeeklySteps(context, dailyStepsMade, weeklyStepsMade)
 
   var dailyStepGoal by remember { mutableIntStateOf(stepList["dailyStepGoal"] ?: 5000) }
   var weeklyStepGoal by remember { mutableIntStateOf(stepList["weeklyStepGoal"] ?: 35000) }
