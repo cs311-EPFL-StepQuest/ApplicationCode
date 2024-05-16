@@ -30,7 +30,6 @@ fun DatabaseLoadingScreen(
     navigationActions: NavigationActions,
     startService: () -> Unit,
     userId: String,
-    context: Context
 ) {
   val database = FirebaseDatabase.getInstance()
   var isNewPlayer by remember { mutableStateOf(false) }

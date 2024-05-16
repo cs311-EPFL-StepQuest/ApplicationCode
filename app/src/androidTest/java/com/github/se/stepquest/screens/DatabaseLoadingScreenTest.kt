@@ -56,7 +56,7 @@ class DatabaseLoadingScreenTest {
           listener.onDataChange(mockk { every { getValue(String::class.java) } returns null })
         }
     composeTestRule.setContent {
-      DatabaseLoadingScreen(navigationActions, { startServiceLambda() }, "testUserId", context)
+      DatabaseLoadingScreen(navigationActions, { startServiceLambda() }, "testUserId")
     }
 
     composeTestRule.onNodeWithText("Waiting for database...").assertIsDisplayed()
