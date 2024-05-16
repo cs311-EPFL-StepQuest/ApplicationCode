@@ -39,22 +39,26 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.se.stepquest.services.getCachedSteps
 import com.github.se.stepquest.services.isOnline
+import com.github.se.stepquest.services.cacheDailyWeeklySteps
+import com.github.se.stepquest.services.cacheStepGoals
+import com.github.se.stepquest.services.getCachedStepInfo
 
-// @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun ProgressionPage(user: UserRepository, context: Context) {
-  val levelList = arrayListOf("Current lvl", "Next lvl")
   var progress by remember { mutableFloatStateOf(0.5f) }
   var showDialog by remember { mutableStateOf(false) }
-  var dailyStepsMade by remember { mutableIntStateOf(0) }
-  var weeklyStepsMade by remember { mutableIntStateOf(0) }
+  val stepList = getCachedStepInfo(context)
+  var dailyStepsMade by remember { mutableIntStateOf(stepList["dailySteps"] ?: 0) }
+  var weeklyStepsMade by remember { mutableIntStateOf(stepList["weeklySteps"] ?: 0) }
 
   user.getSteps { steps -> dailyStepsMade = steps[0] }
   user.getSteps { steps -> weeklyStepsMade = steps[1] }
+  cacheDailyWeeklySteps(context, dailyStepsMade, weeklyStepsMade)
 
-  var dailyStepGoal by remember { mutableIntStateOf(5000) }
-  var weeklyStepGoal by remember { mutableIntStateOf(35000) }
+  var dailyStepGoal by remember { mutableIntStateOf(stepList["dailyStepGoal"] ?: 5000) }
+  var weeklyStepGoal by remember { mutableIntStateOf(stepList["weeklyStepGoal"] ?: 35000) }
   var dailyGoalAchieved by remember { mutableStateOf(dailyStepsMade > dailyStepGoal) }
+  val levelList = arrayListOf<String>("Current week progression", "$weeklyStepsMade steps")
 
   @Composable
   fun onlineStats() {
@@ -130,6 +134,7 @@ fun ProgressionPage(user: UserRepository, context: Context) {
                   dailyStepGoal = newDailyStepGoal
                   weeklyStepGoal = newWeeklyStepGoal
                   showDialog = false
+                  cacheStepGoals(context, newDailyStepGoal, newWeeklyStepGoal)
                 })
           }
         }

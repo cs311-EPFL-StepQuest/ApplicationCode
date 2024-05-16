@@ -18,6 +18,7 @@ class LocationViewModel : ViewModel() {
   var _allocations = MutableLiveData<List<LocationDetails>?>()
   var locationUpdated = MutableLiveData<Boolean>()
   var checkpoints = MutableLiveData<List<Checkpoint>>()
+  val isFollowingRoute = MutableLiveData<Boolean>(false)
 
   init {
     locationUpdated.postValue(false)

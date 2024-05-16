@@ -35,7 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.github.se.stepquest.services.cacheTotalSteps
 import com.github.se.stepquest.services.getCachedInfo
+import com.github.se.stepquest.services.getCachedStepInfo
 import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
@@ -53,7 +55,8 @@ fun ProfilePageLayout(
     context: Context
 ) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-  var totalStepsMade by remember { mutableIntStateOf(0) }
+  val stepList = getCachedStepInfo(context)
+  var totalStepsMade by remember { mutableIntStateOf(stepList["totalSteps"] ?: 0) }
   var username by remember { mutableStateOf("No name") }
 
   if (isOnline(context)) {
@@ -64,6 +67,7 @@ fun ProfilePageLayout(
         object : ValueEventListener {
           override fun onDataChange(dataSnapshot: DataSnapshot) {
             totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
+            cacheTotalSteps(context, totalStepsMade)
           }
 
           override fun onCancelled(databaseError: DatabaseError) {
