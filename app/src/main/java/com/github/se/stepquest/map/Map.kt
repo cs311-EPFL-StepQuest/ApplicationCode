@@ -6,7 +6,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
 import android.util.Log
@@ -69,7 +68,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
@@ -206,7 +204,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   // CALL FUNCTIONS TO SEARCH FOR NEARBY ROUTES
                   locationArea.setArea(locationViewModel.currentLocation.value!!)
                   locationArea.drawRoutesOnMap(map.value!!)
-                  followRoute.drawRouteDetail(map.value!!,context)
+                  followRoute.drawRouteDetail(map.value!!, context)
                 },
                 modifier =
                     Modifier.padding(16.dp)
@@ -313,7 +311,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   locationViewModel.onPause()
                   stopCreatingRoute = true
                   makingRoute = false
-                  followRoute.followingRoute.value=false
+                  followRoute.followingRoute.value = false
                   displayButtons = true
                   locationViewModel.cleanAllocations()
                   cleanGoogleMap(map.value!!)
@@ -461,28 +459,29 @@ fun Map(locationViewModel: LocationViewModel) {
         routeLength,
         numCheckpoints)
   }
-//  LaunchedEffect(Unit) {
-//    while (true) {
-//      if (map.value != null && locationViewModel.currentLocation.value != null) {
-//        val customIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)
-//        val customIconScaled = Bitmap.createScaledBitmap(customIcon, 320, 320, false)
-//        val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
-//
-//        val coordinates =
-//            LatLng(
-//                locationViewModel.currentLocation.value!!.latitude,
-//                locationViewModel.currentLocation.value!!.longitude)
-//
-//        map.value!!.addMarker(
-//            MarkerOptions()
-//                .position(coordinates)
-//                .anchor(0.5f, 0.5f)
-//                .icon(icon)
-//                .title("Current location marker"))
-//      }
-//      delay(100)
-//    }
-//  }
+  //  LaunchedEffect(Unit) {
+  //    while (true) {
+  //      if (map.value != null && locationViewModel.currentLocation.value != null) {
+  //        val customIcon = BitmapFactory.decodeResource(context.resources,
+  // R.drawable.location_dot)
+  //        val customIconScaled = Bitmap.createScaledBitmap(customIcon, 320, 320, false)
+  //        val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
+  //
+  //        val coordinates =
+  //            LatLng(
+  //                locationViewModel.currentLocation.value!!.latitude,
+  //                locationViewModel.currentLocation.value!!.longitude)
+  //
+  //        map.value!!.addMarker(
+  //            MarkerOptions()
+  //                .position(coordinates)
+  //                .anchor(0.5f, 0.5f)
+  //                .icon(icon)
+  //                .title("Current location marker"))
+  //      }
+  //      delay(100)
+  //    }
+  //  }
 }
 
 fun updateMap(

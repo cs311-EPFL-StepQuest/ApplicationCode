@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -13,11 +12,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 
 class FollowRoute() {
-    var followingRoute = MutableLiveData<Boolean>()
-    init {
-        followingRoute.postValue(false)
-    }
+  var followingRoute = MutableLiveData<Boolean>()
 
+  init {
+    followingRoute.postValue(false)
+  }
 
   @SuppressLint("PotentialBehaviorOverride")
   fun drawRouteDetail(googleMap: GoogleMap, context: Context) {
@@ -33,7 +32,7 @@ class FollowRoute() {
           val points = routedetail?.map { LatLng(it.latitude, it.longitude) }
           if (points != null) {
             followingRoute.postValue(true)
-            //clean up the map
+            // clean up the map
             googleMap.clear()
             if (points.isNotEmpty()) {
               // Add a red marker at the start point
@@ -91,29 +90,5 @@ class FollowRoute() {
       }
       true // Return true to indicate that we have handled the event
     }
-  }
-
-  fun fakeRouteDetail(googleMap: GoogleMap) {
-    val points =
-        listOf(
-            LocationDetails(37.4220, -122.0841),
-            LocationDetails(37.4230, -122.0851),
-            LocationDetails(37.4240, -122.0861),
-            LocationDetails(37.4250, -122.0871))
-    val checkpoins =
-        listOf(
-            Checkpoint("checkpoint1", LocationDetails(37.4230, -122.0851)),
-            Checkpoint("checkpoint2", LocationDetails(37.4240, -122.0861)),
-        )
-
-    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(points.first().toLatLng(), 15f))
-    val fakeroutedetail = RouteDetails("fakeRoute", points, checkpoins, "fakeUserID")
-    val marker =
-        googleMap.addMarker(
-            MarkerOptions()
-                .position(LatLng(points.first().latitude, points.first().longitude))
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                .title("Route"))
-    marker?.tag = fakeroutedetail
   }
 }
