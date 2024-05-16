@@ -1,5 +1,6 @@
 package com.github.se.stepquest
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,15 +37,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.github.se.stepquest.services.getCachedSteps
+import com.github.se.stepquest.services.isOnline
 
 // @Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun ProgressionPage(user: UserRepository) {
-  val levelList = arrayListOf<String>("Current lvl", "Next lvl")
-  var progress by remember { mutableStateOf(0.5f) }
+fun ProgressionPage(user: UserRepository, context: Context) {
+  val levelList = arrayListOf("Current lvl", "Next lvl")
+  var progress by remember { mutableFloatStateOf(0.5f) }
   var showDialog by remember { mutableStateOf(false) }
-  var dailyStepsMade by remember { mutableStateOf(0) }
-  var weeklyStepsMade by remember { mutableStateOf(0) }
+  var dailyStepsMade by remember { mutableIntStateOf(0) }
+  var weeklyStepsMade by remember { mutableIntStateOf(0) }
 
   user.getSteps { steps -> dailyStepsMade = steps[0] }
   user.getSteps { steps -> weeklyStepsMade = steps[1] }
@@ -51,6 +55,32 @@ fun ProgressionPage(user: UserRepository) {
   var dailyStepGoal by remember { mutableIntStateOf(5000) }
   var weeklyStepGoal by remember { mutableIntStateOf(35000) }
   var dailyGoalAchieved by remember { mutableStateOf(dailyStepsMade > dailyStepGoal) }
+
+  @Composable
+  fun onlineStats() {
+    BuildStats(
+        dailyStepsMade = dailyStepsMade,
+        dailyStepGoal = dailyStepGoal,
+        weeklyStepsMade = weeklyStepsMade,
+        weeklyStepGoal = weeklyStepGoal)
+  }
+
+  @Composable
+  fun offlineStats() {
+    Box(modifier = Modifier.height(40.dp))
+    BuildStatLine(
+        icon = R.drawable.step_icon,
+        title = "Steps taken since offline",
+        value = getCachedSteps(context).toString())
+    Box(modifier = Modifier.height(20.dp))
+    Row(modifier = Modifier.fillMaxWidth().offset(20.dp, 0.dp)) {
+      Text(
+          text = "(Go online to retrieve past step counts)",
+          fontSize = 16.sp,
+          modifier = Modifier.offset(5.dp, 0.dp))
+    }
+    Box(modifier = Modifier.height(60.dp))
+  }
 
   Column(modifier = Modifier.fillMaxSize()) {
     Text(text = "Back", modifier = Modifier.padding(20.dp), fontSize = 20.sp)
@@ -74,11 +104,11 @@ fun ProgressionPage(user: UserRepository) {
               modifier = Modifier.offset(0.dp, 10.dp).fillMaxWidth()) {
                 levelList.forEach { s -> Text(text = s, fontSize = 16.sp) }
               }
-          BuildStats(
-              dailyStepsMade = dailyStepsMade,
-              dailyStepGoal = dailyStepGoal,
-              weeklyStepsMade = weeklyStepsMade,
-              weeklyStepGoal = weeklyStepGoal)
+          if (isOnline(context)) {
+            onlineStats()
+          } else {
+            offlineStats()
+          }
           Button(
               onClick = { showDialog = true },
               colors = ButtonDefaults.buttonColors(colorResource(id = R.color.blueTheme)),

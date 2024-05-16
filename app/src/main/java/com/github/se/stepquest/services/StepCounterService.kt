@@ -1,6 +1,7 @@
 package com.github.se.stepquest.services
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -20,7 +21,8 @@ class StepCounterService(
     private var sensorManager: SensorManager? = null,
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance(),
-    private val userId: String? = firebaseAuth.currentUser?.uid
+    private val userId: String? = firebaseAuth.currentUser?.uid,
+    private var context: Context? = null
 ) : Service(), SensorEventListener {
 
   private var stepSensor: Sensor? = null
@@ -36,11 +38,11 @@ class StepCounterService(
       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
     }
 
+    if (context == null) context = applicationContext
+
     stepSensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
-    if (sensorManager != null) {
-      sensorManager!!.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
-    }
+    sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
   }
 
   override fun onDestroy() {
@@ -49,8 +51,18 @@ class StepCounterService(
   }
 
   override fun onSensorChanged(event: SensorEvent?) {
+
     if (event?.sensor?.type == Sensor.TYPE_STEP_DETECTOR) {
-      saveStepCountToDatabase(1)
+
+      if (isOnline(context!!)) {
+        val cachedSteps = getCachedSteps(context!!)
+
+        saveStepCountToDatabase(cachedSteps + 1)
+
+        if (cachedSteps > 0) deleteCachedSteps(context!!)
+      } else {
+        saveStepLocally(context!!)
+      }
     }
   }
 
@@ -74,7 +86,7 @@ class StepCounterService(
           })
 
       val d = Date()
-      val s: CharSequence = DateFormat.format("MMMM d, yyyy ", d.getTime())
+      val s: CharSequence = DateFormat.format("MMMM d, yyyy ", d.time)
       val stepsRef = database.reference.child("users").child(userId).child("dailySteps $s")
       stepsRef.addListenerForSingleValueEvent(
           object : ValueEventListener {

@@ -1,5 +1,6 @@
 package com.github.se.stepquest.screens
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -14,7 +15,7 @@ class ProgressionPageTest {
 
   @Test
   fun everythingIsDisplayed() {
-    composeTestRule.setContent { ProgressionPage(TestUserRepository1()) }
+    composeTestRule.setContent { ProgressionPage(TestUserRepository1(), LocalContext.current) }
     composeTestRule.onNodeWithTag("CharacterImage").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Daily steps icon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Daily steps text").assertIsDisplayed()
@@ -29,7 +30,7 @@ class ProgressionPageTest {
 
   @Test
   fun dailyGoalAchievementTest() {
-    composeTestRule.setContent { ProgressionPage(TestUserRepository2()) }
+    composeTestRule.setContent { ProgressionPage(TestUserRepository2(), LocalContext.current) }
     composeTestRule.onNodeWithTag("Achieved goal message").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Confirm button").assertIsDisplayed()
   }
