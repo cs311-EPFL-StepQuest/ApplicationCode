@@ -2,7 +2,6 @@ package com.github.se.stepquest.services
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.Uri
 
 fun isOnline(context: Context): Boolean {
 

@@ -55,7 +55,7 @@ fun ProfilePageLayout(
     context: Context
 ) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-    val stepList = getCachedStepInfo(context)
+  val stepList = getCachedStepInfo(context)
   var totalStepsMade by remember { mutableIntStateOf(stepList["totalSteps"] ?: 0) }
   var username by remember { mutableStateOf("No name") }
 
@@ -67,7 +67,7 @@ fun ProfilePageLayout(
         object : ValueEventListener {
           override fun onDataChange(dataSnapshot: DataSnapshot) {
             totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
-              cacheTotalSteps(context, totalStepsMade)
+            cacheTotalSteps(context, totalStepsMade)
           }
 
           override fun onCancelled(databaseError: DatabaseError) {
