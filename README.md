@@ -11,4 +11,8 @@ Add Google map api key to local.properties file
 MAPS_API_KEY=YOUR_API_KEY
 ```
 
+### Maps Search
+Maps search uses Google Places API, requiring building the Build.Config file.
+In case the is error indicating that Build.Config could not be found/resolved, go to Build -> Rebuild Project and it will be generated
+
 
