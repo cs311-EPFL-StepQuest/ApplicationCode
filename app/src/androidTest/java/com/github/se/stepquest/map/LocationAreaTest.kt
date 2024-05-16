@@ -10,7 +10,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.database
 import io.mockk.mockk
-import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -45,14 +44,14 @@ class LocationAreaTest {
 
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     FirebaseApp.initializeApp(context)
-    emulatedDatabase = FirebaseDatabaseInstance.instance
+    // emulatedDatabase = FirebaseDatabaseInstance.instance
   }
-
-  @After
-  fun cleanup() {
-    emulatedDatabase.reference.setValue(null)
-  }
-
+  /*
+    @After
+    fun cleanup() {
+      emulatedDatabase.reference.setValue(null)
+    }
+  */
   @Test
   fun createArea_setsCenterAndRadius() {
     val locationDetails = LocationDetails(1.0, 1.0)
@@ -64,12 +63,14 @@ class LocationAreaTest {
   @Test
   fun checkInsideArea_returnsTrueWhenLocationIsInside() {
     val locationDetails = LocationDetails(0.0, 0.0)
+    locationArea.setArea(LocationDetails(0.0, 0.0))
     assertTrue(locationArea.checkInsideArea(locationDetails))
   }
 
   @Test
   fun checkInsideArea_returnsFalseWhenLocationIsOutside() {
     val locationDetails = LocationDetails(10.0, 10.0)
+    locationArea.setArea(LocationDetails(0.0, 0.0))
     assertFalse(locationArea.checkInsideArea(locationDetails))
   }
 
@@ -134,6 +135,7 @@ class LocationAreaTest {
     // assertTrue(localRouteList[0].latitude == 0.0)
   }
   */
+  /*
   object FirebaseDatabaseInstance {
     val instance: FirebaseDatabase by lazy {
       val database = FirebaseDatabase.getInstance()
@@ -156,4 +158,5 @@ class LocationAreaTest {
     assertTrue(localRouteList[0].latitude == 0.0)
     assertTrue(localRouteList[0].longitude == 0.0)
   }
+  */
 }

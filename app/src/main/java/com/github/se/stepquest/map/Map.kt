@@ -81,7 +81,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var routeEndMarker: Marker? = null
   val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
-  val isFollowingRoute by locationViewModel.isFollowingRoute.observeAsState(initial = false)
+  val locationArea = LocationArea()
 
   // Instantiate all necessary variables to take pictures
   val cameraActionPermission = remember { mutableStateOf(false) }
@@ -116,8 +116,6 @@ fun Map(locationViewModel: LocationViewModel) {
           println("Permission Granted")
           // Start location update only if the permission asked comes from a map action
           if (!cameraActionPermission.value) {
-            locationViewModel.isFollowingRoute.value = true
-
             locationViewModel.startLocationUpdates(context as ComponentActivity)
           } else {
             cameraActionPermission.value = false
@@ -202,6 +200,8 @@ fun Map(locationViewModel: LocationViewModel) {
             FloatingActionButton(
                 onClick = {
                   // CALL FUNCTIONS TO SEARCH FOR NEARBY ROUTES
+                  locationArea.setArea(locationViewModel.currentLocation.value!!)
+                  locationArea.drawRoutesOnMap(map.value!!)
                 },
                 modifier =
                     Modifier.padding(16.dp)
@@ -301,7 +301,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   )
                 }
           }
-          if (isFollowingRoute) {
+          if (makingRoute || !displayButtons) {
             // Button for going back to default map
             FloatingActionButton(
                 onClick = {
@@ -312,7 +312,6 @@ fun Map(locationViewModel: LocationViewModel) {
                   locationViewModel.cleanAllocations()
                   cleanGoogleMap(map.value!!)
                   Log.i("clean", "cleaned")
-                  locationViewModel.isFollowingRoute.value = false
                   numCheckpoints = 0
                   images.value = emptyList()
                 },
@@ -526,7 +525,6 @@ fun locationPermission(
     println("Permission successful")
     // Get the location
     onSucess()
-    locationViewModel.isFollowingRoute.value = true
     locationViewModel.startLocationUpdates(context)
   } else {
     println("Ask Permission")
