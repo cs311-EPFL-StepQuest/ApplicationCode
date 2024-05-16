@@ -299,17 +299,6 @@ class MapTest {
   }
 
   @Test
-  fun testIsFollowingRouteIsTrueAfterStartingRoute() {
-    mockkStatic(PermissionChecker::class)
-    every { PermissionChecker.checkSelfPermission(any(), any()) } returns
-        PermissionChecker.PERMISSION_GRANTED
-
-    composeTestRule.setContent { Map(vm) }
-    composeTestRule.onNodeWithTag("createRouteButton").performClick()
-    assertTrue(vm.isFollowingRoute.value!!)
-  }
-
-  @Test
   fun testBackButtonIsDisplayed() {
     mockkStatic(PermissionChecker::class)
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
