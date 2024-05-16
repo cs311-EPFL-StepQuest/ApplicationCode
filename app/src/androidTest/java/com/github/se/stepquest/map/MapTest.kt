@@ -15,7 +15,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.core.content.PermissionChecker
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.stepquest.ui.theme.StepQuestTheme
@@ -51,10 +50,10 @@ class MapTest {
 
   @get:Rule
   val permissionRule =
-    GrantPermissionRule.grant(
-      Manifest.permission.CAMERA,
-      Manifest.permission.ACCESS_COARSE_LOCATION,
-      Manifest.permission.ACCESS_FINE_LOCATION)
+      GrantPermissionRule.grant(
+          Manifest.permission.CAMERA,
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+          Manifest.permission.ACCESS_FINE_LOCATION)
 
   // Declare vm as a public variable
   private lateinit var vm: LocationViewModel
@@ -297,5 +296,39 @@ class MapTest {
 
     // Assert that numCheckpoints is increased by 1
     assertEquals(numCheckpoints, 1)
+  }
+
+  @Test
+  fun testIsFollowingRouteIsTrueAfterStartingRoute() {
+    mockkStatic(PermissionChecker::class)
+    every { PermissionChecker.checkSelfPermission(any(), any()) } returns
+        PermissionChecker.PERMISSION_GRANTED
+
+    composeTestRule.setContent { Map(vm) }
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
+    assertTrue(vm.isFollowingRoute.value!!)
+  }
+
+  @Test
+  fun testBackButtonIsDisplayed() {
+    mockkStatic(PermissionChecker::class)
+    every { PermissionChecker.checkSelfPermission(any(), any()) } returns
+        PermissionChecker.PERMISSION_GRANTED
+
+    composeTestRule.setContent { Map(vm) }
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
+    composeTestRule.onNodeWithTag("gobackbutton").assertIsDisplayed()
+  }
+
+  @Test
+  fun testBackButtonDisappearsAfterClickingOnIt() {
+    mockkStatic(PermissionChecker::class)
+    every { PermissionChecker.checkSelfPermission(any(), any()) } returns
+        PermissionChecker.PERMISSION_GRANTED
+
+    composeTestRule.setContent { Map(vm) }
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
+    composeTestRule.onNodeWithTag("gobackbutton").performClick()
+    composeTestRule.onNodeWithTag("gobackbutton").assertDoesNotExist()
   }
 }

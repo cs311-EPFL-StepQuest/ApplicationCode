@@ -1,5 +1,6 @@
 package com.github.se.stepquest.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,12 +38,15 @@ import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.activity.Quest
 import com.github.se.stepquest.data.model.ChallengeData
+import com.github.se.stepquest.services.cacheUserInfo
 import com.github.se.stepquest.services.getTopChallenge
+import com.github.se.stepquest.services.getUsername
+import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
 @Composable
-fun HomeScreen(navigationActions: NavigationActions, userId: String) {
+fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Context) {
 
   // Added for testing purposes ------
   var quests: List<Quest> by remember { mutableStateOf(emptyList()) }
@@ -56,6 +60,10 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String) {
   }
 
   // ---------------------------------
+
+  val isOnline = isOnline(context)
+
+  if (isOnline) getUsername(userId) { cacheUserInfo(context, userId, it) }
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),
