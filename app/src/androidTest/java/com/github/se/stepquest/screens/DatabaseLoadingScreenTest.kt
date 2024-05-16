@@ -31,11 +31,11 @@ class DatabaseLoadingScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-    @get:Rule
-    val permissionRule =
-        GrantPermissionRule.grant(
-            android.Manifest.permission.BODY_SENSORS,
-            android.Manifest.permission.ACTIVITY_RECOGNITION)
+  @get:Rule
+  val permissionRule =
+      GrantPermissionRule.grant(
+          android.Manifest.permission.BODY_SENSORS,
+          android.Manifest.permission.ACTIVITY_RECOGNITION)
 
   @Before
   fun setup() {
