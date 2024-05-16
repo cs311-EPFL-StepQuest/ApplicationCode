@@ -108,6 +108,7 @@ fun Map(locationViewModel: LocationViewModel) {
 
   var makingRoute by remember { mutableStateOf(false) }
   var displayButtons by remember { mutableStateOf(true) }
+  val followingRoute by followRoute.followingRoute.observeAsState()
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -305,13 +306,14 @@ fun Map(locationViewModel: LocationViewModel) {
                   )
                 }
           }
-          if (makingRoute || !displayButtons) {
+          if (makingRoute || !displayButtons || followingRoute == true) {
             // Button for going back to default map
             FloatingActionButton(
                 onClick = {
                   locationViewModel.onPause()
                   stopCreatingRoute = true
                   makingRoute = false
+                  followRoute.followingRoute.value=false
                   displayButtons = true
                   locationViewModel.cleanAllocations()
                   cleanGoogleMap(map.value!!)
@@ -459,28 +461,28 @@ fun Map(locationViewModel: LocationViewModel) {
         routeLength,
         numCheckpoints)
   }
-  LaunchedEffect(Unit) {
-    while (true) {
-      if (map.value != null && locationViewModel.currentLocation.value != null) {
-        val customIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)
-        val customIconScaled = Bitmap.createScaledBitmap(customIcon, 320, 320, false)
-        val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
-
-        val coordinates =
-            LatLng(
-                locationViewModel.currentLocation.value!!.latitude,
-                locationViewModel.currentLocation.value!!.longitude)
-
-        map.value!!.addMarker(
-            MarkerOptions()
-                .position(coordinates)
-                .anchor(0.5f, 0.5f)
-                .icon(icon)
-                .title("Current location marker"))
-      }
-      delay(100)
-    }
-  }
+//  LaunchedEffect(Unit) {
+//    while (true) {
+//      if (map.value != null && locationViewModel.currentLocation.value != null) {
+//        val customIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)
+//        val customIconScaled = Bitmap.createScaledBitmap(customIcon, 320, 320, false)
+//        val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
+//
+//        val coordinates =
+//            LatLng(
+//                locationViewModel.currentLocation.value!!.latitude,
+//                locationViewModel.currentLocation.value!!.longitude)
+//
+//        map.value!!.addMarker(
+//            MarkerOptions()
+//                .position(coordinates)
+//                .anchor(0.5f, 0.5f)
+//                .icon(icon)
+//                .title("Current location marker"))
+//      }
+//      delay(100)
+//    }
+//  }
 }
 
 fun updateMap(

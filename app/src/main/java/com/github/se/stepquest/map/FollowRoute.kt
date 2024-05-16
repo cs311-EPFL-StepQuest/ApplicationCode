@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -12,6 +13,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 
 class FollowRoute() {
+    var followingRoute = MutableLiveData<Boolean>()
+    init {
+        followingRoute.postValue(false)
+    }
+
 
   @SuppressLint("PotentialBehaviorOverride")
   fun drawRouteDetail(googleMap: GoogleMap, context: Context) {
@@ -26,6 +32,7 @@ class FollowRoute() {
           val checkpoints = it.checkpoints
           val points = routedetail?.map { LatLng(it.latitude, it.longitude) }
           if (points != null) {
+            followingRoute.value=true
             //clean up the map
             googleMap.clear()
             if (points.isNotEmpty()) {
