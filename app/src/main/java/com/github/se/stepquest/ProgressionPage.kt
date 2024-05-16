@@ -37,11 +37,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.github.se.stepquest.services.getCachedSteps
-import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.services.cacheDailyWeeklySteps
 import com.github.se.stepquest.services.cacheStepGoals
 import com.github.se.stepquest.services.getCachedStepInfo
+import com.github.se.stepquest.services.getCachedSteps
+import com.github.se.stepquest.services.isOnline
 
 @Composable
 fun ProgressionPage(user: UserRepository, context: Context) {

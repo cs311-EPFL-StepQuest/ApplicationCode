@@ -59,7 +59,13 @@ class StepCounterServiceTest {
     every { sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) } returns stepSensor
     every { stepSensor.type } returns Sensor.TYPE_STEP_DETECTOR
 
-    stepCounterService = StepCounterService(sensorManager, firebaseAuth, database, "testUserId", InstrumentationRegistry.getInstrumentation().targetContext)
+    stepCounterService =
+        StepCounterService(
+            sensorManager,
+            firebaseAuth,
+            database,
+            "testUserId",
+            InstrumentationRegistry.getInstrumentation().targetContext)
 
     every { database.reference } returns
         mockk {

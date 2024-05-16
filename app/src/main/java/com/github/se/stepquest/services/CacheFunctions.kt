@@ -54,6 +54,7 @@ fun deleteCachedSteps(context: Context) {
   editor.remove("cachedSteps")
   editor.apply()
 }
+
 fun cacheStepGoals(context: Context, dailyStepGoal: Int, weeklyStepGoal: Int) {
   val sharedPreferences = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
   val editor = sharedPreferences.edit()
