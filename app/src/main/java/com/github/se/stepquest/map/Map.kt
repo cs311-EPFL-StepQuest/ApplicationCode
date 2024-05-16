@@ -393,7 +393,6 @@ fun Map(locationViewModel: LocationViewModel) {
         stopRoute = {
           showProgression = false
           locationViewModel.onPause()
-          locationViewModel.isFollowingRoute.value = false
           stopCreatingRoute = true
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
           storeRoute.addRoute(

@@ -18,21 +18,20 @@ class FriendDialogBoxKtTest {
 
   @Test
   fun friendDialogBoxTest() {
-    // ORIGINAL: val friend = Friend(name = "John Doe", profilePicture = null, status = true)
     val friend = Friend(name = "John Doe", status = true)
 
-    // ORIGINAL: composeTestRule.setContent { FriendDialogBox(friend = friend, onDismiss = {}) }
-    composeTestRule.setContent { FriendDialogBox(friend = friend, userId = "", onDismiss = {}) }
+    composeTestRule.setContent { FriendDialogBox(friend = friend, "testUid", onDismiss = {}) }
 
     // Verify the presence of UI elements
     composeTestRule.onNodeWithText("John Doe").assertExists()
     composeTestRule.onNodeWithContentDescription("Close").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Picture").assertDoesNotExist()
-    // FAILS: composeTestRule.onNodeWithText("Connect").assertExists()
+
+    composeTestRule.onNodeWithText("Connection").assertExists()
     composeTestRule.onNodeWithText("Challenge").assertExists()
 
     // Perform click on Connect button
-    // FAILS: composeTestRule.onNodeWithText("Connect").performClick()
+    composeTestRule.onNodeWithText("Connection").performClick()
 
     // Perform click on Challenge button
     composeTestRule.onNodeWithText("Challenge").performClick()
