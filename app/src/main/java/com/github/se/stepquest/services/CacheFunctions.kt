@@ -40,7 +40,7 @@ fun cacheStepGoals(context: Context, dailyStepGoal: Int, weeklyStepGoal: Int) {
   editor.apply()
 }
 
-fun cacheDailyWeeklySteps(context: Context, dailySteps: Int, weeklySteps: Int) {
+fun cacheSteps(context: Context, dailySteps: Int, weeklySteps: Int) {
   val sharedPreferences = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
   val editor = sharedPreferences.edit()
   editor.putInt("dailySteps", dailySteps)
