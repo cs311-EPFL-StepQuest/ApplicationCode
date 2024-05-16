@@ -162,7 +162,8 @@ class StepCounterService(
                 userRef.child(nodeName).removeValue()
               }
 
-              if(nodeName != null && nodeName.contains("weeklySteps") &&
+              if (nodeName != null &&
+                  nodeName.contains("weeklySteps") &&
                   nodeName != "weeklySteps $current_period") {
                 userRef.child(nodeName).removeValue()
               }
