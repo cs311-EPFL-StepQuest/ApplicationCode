@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -46,10 +47,13 @@ class MapTest {
 
   // This rule automatic initializes lateinit properties with @MockK, @RelaxedMockK, etc.
   @get:Rule val mockkRule = MockKRule(this)
+
   @get:Rule
-  var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_COARSE_LOCATION)
-  @get:Rule
-  var permissionRule2 = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+  val permissionRule =
+      GrantPermissionRule.grant(
+          Manifest.permission.CAMERA,
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+          Manifest.permission.ACCESS_FINE_LOCATION)
 
   // Declare vm as a public variable
   private lateinit var vm: LocationViewModel
@@ -75,16 +79,24 @@ class MapTest {
     composeTestRule.onNodeWithTag("GoogleMap").assertExists()
     composeTestRule.onNodeWithTag("createRouteButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createRouteButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("stopRouteButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("stopRouteButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("routeSearchButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("routeSearchButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("SearchCleanButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("SearchCleanButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("SearchCleanButton").performClick()
-    composeTestRule.onNodeWithTag("SearchButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("SearchButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("SearchButton").performClick()
     composeTestRule.onNodeWithTag("SearchBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("SearchBarTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("stopRouteButton").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("addCheckpointButton").assertIsNotDisplayed()
+
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
+
+    composeTestRule.onNodeWithTag("stopRouteButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("stopRouteButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("addCheckpointButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addCheckpointButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("createRouteButton").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("routeSearchButton").assertIsNotDisplayed()
   }
 
   @Test
@@ -93,7 +105,7 @@ class MapTest {
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
         PermissionChecker.PERMISSION_GRANTED
 
-    locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
+    locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions, {})
 
     verify { locationViewModel.startLocationUpdates(any()) }
   }
@@ -104,7 +116,7 @@ class MapTest {
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
         PermissionChecker.PERMISSION_DENIED
 
-    locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions)
+    locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions, {})
 
     verify { locationViewModel wasNot Called }
   }
@@ -179,12 +191,13 @@ class MapTest {
     composeTestRule.setContent { Map(vm) }
 
     composeTestRule.onNodeWithTag("GoogleMap").assertExists()
-    composeTestRule.onNodeWithContentDescription("Add checkpoint").assertExists()
+    composeTestRule.onNodeWithTag("createRouteButton").assertExists()
   }
 
   @Test
   fun testDialogVisibility() {
     composeTestRule.setContent { Map(vm) }
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
     composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
     composeTestRule.onNodeWithText("New Checkpoint").assertExists()
   }
@@ -192,7 +205,7 @@ class MapTest {
   @Test
   fun testDialogContents() {
     composeTestRule.setContent { Map(vm) }
-
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
     composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
 
     composeTestRule.onNodeWithText("New Checkpoint").assertExists()
@@ -204,6 +217,8 @@ class MapTest {
   fun testDialogDismissal() {
     composeTestRule.setContent { Map(vm) }
 
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
+
     composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
 
     composeTestRule.onNodeWithContentDescription("Close").performClick()
@@ -214,6 +229,7 @@ class MapTest {
   @Test
   fun map_displaysEndRouteButton() {
     composeTestRule.setContent { Map(vm) }
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
     composeTestRule.onNodeWithTag("stopRouteButton").assertExists()
   }
 
@@ -221,6 +237,7 @@ class MapTest {
   fun map_opensRouteProgression_onStopRouteButtonClick() {
     var showProgression = false
     composeTestRule.setContent { Map(vm).apply { showProgression = true } }
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
     composeTestRule.onNodeWithTag("stopRouteButton").performClick()
     assertTrue(showProgression)
   }
@@ -245,14 +262,9 @@ class MapTest {
   }
 
   @Test
-  fun TestpressStartCreateRoute() {
-    composeTestRule.setContent { StepQuestTheme { Map(vm) } }
-    composeTestRule.onNodeWithTag("createRouteButton").performClick()
-  }
-
-  @Test
   fun TestpreeStopCreateRoute() {
     composeTestRule.setContent { StepQuestTheme { Map(vm) } }
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
     composeTestRule.onNodeWithTag("stopRouteButton").performClick()
   }
 
@@ -277,6 +289,7 @@ class MapTest {
     composeTestRule.setContent { Map(vm).apply { numCheckpoints += 1 } }
 
     // Simulate the user interaction to create a checkpoint
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
     composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
     composeTestRule.onNodeWithText("Name:").performTextInput("Test")
     composeTestRule.onNodeWithText("Confirm").performClick()
