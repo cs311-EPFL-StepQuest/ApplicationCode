@@ -99,7 +99,9 @@ fun AppNavigationHost(
         }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions, userId) }
-        composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository(), context) }
+        composable(Routes.ProgressionScreen.routName) {
+          ProgressionPage(IUserRepository(), context)
+        }
         composable(Routes.MapScreen.routName) { Map(locationviewModel) }
         composable(Routes.ProfileScreen.routName) {
           ProfilePageLayout(navigationActions, userId, profilePictureUrl)

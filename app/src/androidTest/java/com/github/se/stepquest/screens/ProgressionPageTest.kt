@@ -8,7 +8,6 @@ import androidx.test.core.app.ApplicationProvider
 import com.github.se.stepquest.ProgressionPage
 import com.github.se.stepquest.TestUserRepository1
 import com.github.se.stepquest.TestUserRepository2
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
