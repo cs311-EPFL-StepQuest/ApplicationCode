@@ -1,6 +1,5 @@
 package com.github.se.stepquest.map
 
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -11,48 +10,45 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class DropDownMenuTest {
 
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    private val testSuggestions = listOf(
-        PlaceSuggestion("Place 1", "1"),
-        PlaceSuggestion("Place 2", "2"),
-        PlaceSuggestion("Place 3", "3")
-    )
+  private val testSuggestions =
+      listOf(
+          PlaceSuggestion("Place 1", "1"),
+          PlaceSuggestion("Place 2", "2"),
+          PlaceSuggestion("Place 3", "3"))
 
-    @Test
-    fun dropDownMenuDisplaysSuggestions() {
-        composeTestRule.setContent {
-            DropDownMenu(suggestions = testSuggestions, onSuggestionSelected = {})
-        }
-
-        testSuggestions.forEach { suggestion ->
-            composeTestRule.onNodeWithText(suggestion.name).assertExists()
-        }
+  @Test
+  fun dropDownMenuDisplaysSuggestions() {
+    composeTestRule.setContent {
+      DropDownMenu(suggestions = testSuggestions, onSuggestionSelected = {})
     }
 
-    @Test
-    fun dropDownMenuCallsOnSuggestionSelected() {
-        var selectedSuggestion: PlaceSuggestion? = null
-        composeTestRule.setContent {
-            DropDownMenu(
-                suggestions = testSuggestions,
-                onSuggestionSelected = { selectedSuggestion = it }
-            )
-        }
+    testSuggestions.forEach { suggestion ->
+      composeTestRule.onNodeWithText(suggestion.name).assertExists()
+    }
+  }
 
-        val suggestionToSelect = testSuggestions[1]
-        composeTestRule.onNodeWithText(suggestionToSelect.name).performClick()
-
-        assert(selectedSuggestion == suggestionToSelect)
+  @Test
+  fun dropDownMenuCallsOnSuggestionSelected() {
+    var selectedSuggestion: PlaceSuggestion? = null
+    composeTestRule.setContent {
+      DropDownMenu(
+          suggestions = testSuggestions, onSuggestionSelected = { selectedSuggestion = it })
     }
 
-    @Test
-    fun dropDownMenuIsEmptyWhenNoSuggestions() {
-        composeTestRule.setContent {
-            DropDownMenu(suggestions = emptyList(), onSuggestionSelected = {})
-        }
+    val suggestionToSelect = testSuggestions[1]
+    composeTestRule.onNodeWithText(suggestionToSelect.name).performClick()
 
-        composeTestRule.onAllNodes(hasClickAction()).assertCountEquals(0)
+    assert(selectedSuggestion == suggestionToSelect)
+  }
+
+  @Test
+  fun dropDownMenuIsEmptyWhenNoSuggestions() {
+    composeTestRule.setContent {
+      DropDownMenu(suggestions = emptyList(), onSuggestionSelected = {})
     }
+
+    composeTestRule.onAllNodes(hasClickAction()).assertCountEquals(0)
+  }
 }

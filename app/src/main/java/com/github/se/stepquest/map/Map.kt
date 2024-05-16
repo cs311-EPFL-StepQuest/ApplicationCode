@@ -167,18 +167,7 @@ fun Map(locationViewModel: LocationViewModel) {
                     initMap(map.value!!)
 
                     locationPermission(
-                        locationViewModel, context, launcherMultiplePermissions, permissions
-                    ) {
-                        if(locationViewModel.currentLocation.value != null)
-                        map.value!!.moveCamera(
-                            CameraUpdateFactory.newLatLngZoom(
-                                LatLng(
-                                    locationViewModel.currentLocation.value!!.latitude,
-                                    locationViewModel.currentLocation.value!!.longitude
-                                ), 15f
-                            )
-                        )
-                    }
+                        locationViewModel, context, launcherMultiplePermissions, permissions, {})
                   }
                 }
               },
@@ -229,9 +218,12 @@ fun Map(locationViewModel: LocationViewModel) {
                   // CALL FUNCTIONS TO SEARCH FOR NEARBY ROUTES
                   locationArea.setArea(locationViewModel.currentLocation.value!!)
                   locationArea.drawRoutesOnMap(map.value!!)
-                    map.value!!.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            LatLng(locationViewModel.currentLocation.value!!.latitude, locationViewModel.currentLocation.value!!.longitude), 15f))
+                  map.value!!.moveCamera(
+                      CameraUpdateFactory.newLatLngZoom(
+                          LatLng(
+                              locationViewModel.currentLocation.value!!.latitude,
+                              locationViewModel.currentLocation.value!!.longitude),
+                          15f))
                 },
                 modifier =
                     Modifier.padding(16.dp)
@@ -332,11 +324,12 @@ fun Map(locationViewModel: LocationViewModel) {
                 IconButton(
                     onClick = {
                       map.value!!.moveCamera(
-                          CameraUpdateFactory.newLatLngZoom(
-                              searchableLocation!!, 15f))
+                          CameraUpdateFactory.newLatLngZoom(searchableLocation!!, 15f))
                       suggestions = listOf()
-                      locationArea.setArea(LocationDetails(searchableLocation!!.latitude, searchableLocation!!.longitude))
-                        locationArea.drawRoutesOnMap(map.value!!)
+                      locationArea.setArea(
+                          LocationDetails(
+                              searchableLocation!!.latitude, searchableLocation!!.longitude))
+                      locationArea.drawRoutesOnMap(map.value!!)
                     },
                     modifier =
                         Modifier.align(Alignment.CenterEnd)

@@ -25,7 +25,10 @@ fun DropDownMenu(
           suggestions.forEach { suggestion ->
             Text(
                 text = suggestion.name,
-                modifier = Modifier.clickable { onSuggestionSelected(suggestion) }.padding(8.dp).testTag("SuggestionItem"))
+                modifier =
+                    Modifier.clickable { onSuggestionSelected(suggestion) }
+                        .padding(8.dp)
+                        .testTag("SuggestionItem"))
           }
         }
   }
