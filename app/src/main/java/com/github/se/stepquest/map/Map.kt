@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -39,7 +40,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -83,6 +83,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var routeEndMarker: Marker? = null
   val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
+  val locationArea = LocationArea()
 
   // Instantiate all necessary variables to take pictures
   val cameraActionPermission = remember { mutableStateOf(false) }
@@ -105,6 +106,9 @@ fun Map(locationViewModel: LocationViewModel) {
   var showProgression by remember { mutableStateOf(false) }
   var numCheckpoints by rememberSaveable { mutableIntStateOf(0) }
 
+  var makingRoute by remember { mutableStateOf(false) }
+  var displayButtons by remember { mutableStateOf(true) }
+
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
           permissionsMap ->
@@ -122,7 +126,11 @@ fun Map(locationViewModel: LocationViewModel) {
           Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
         } else {
           println("Permission Denied")
-          Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+          Toast.makeText(
+                  context,
+                  "Go to settings and activate GPS permission and camera",
+                  Toast.LENGTH_SHORT)
+              .show()
         }
       }
   val permissions =
@@ -130,8 +138,6 @@ fun Map(locationViewModel: LocationViewModel) {
 
   val map = remember { mutableStateOf<GoogleMap?>(null) }
   val locationUpdated by locationViewModel.locationUpdated.observeAsState()
-
-  val coroutineScope = rememberCoroutineScope()
 
   val keyboardController = LocalSoftwareKeyboardController.current
   Scaffold(
@@ -146,13 +152,17 @@ fun Map(locationViewModel: LocationViewModel) {
                   getMapAsync { googleMap ->
                     map.value = googleMap
                     initMap(map.value!!)
+                    locationPermission(
+                        locationViewModel, context, launcherMultiplePermissions, permissions, {})
                   }
                 }
               },
               modifier = Modifier.fillMaxSize().testTag("GoogleMap"))
 
           LaunchedEffect(locationUpdated) {
+            Log.i("LOOKATME", locationUpdated.toString())
             if (locationUpdated == true) {
+
               // Update the map content
               updateMap(map.value!!, locationViewModel)
               locationViewModel.locationUpdated.value = false
@@ -160,61 +170,94 @@ fun Map(locationViewModel: LocationViewModel) {
           }
 
           // Button for creating a route
-          FloatingActionButton(
-              onClick = {
-                // Beofre start creating route, make sure map is clean and route list (allocation)
-                // is
-                // empty too
-                cleanGoogleMap(map.value!!, routeEndMarker)
-                locationViewModel.cleanAllocations()
-                locationPermission(
-                    locationViewModel, context, launcherMultiplePermissions, permissions)
-              },
-              modifier =
-                  Modifier.size(85.dp)
-                      .padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-204).dp)
-                      .testTag("createRouteButton")) {
-                Image(
-                    painter = painterResource(id = R.drawable.addbutton),
-                    contentDescription = "image description",
-                    contentScale = ContentScale.None)
-              }
+          if (!makingRoute && displayButtons) {
+            FloatingActionButton(
+                onClick = {
+                  // Before start creating route, make sure map is clean and route list (allocation)
+                  // is
+                  // empty too
+                  cleanGoogleMap(map.value!!, routeEndMarker)
+                  locationViewModel.cleanAllocations()
+                  locationPermission(
+                      locationViewModel,
+                      context,
+                      launcherMultiplePermissions,
+                      permissions,
+                      { makingRoute = true })
+                  locationViewModel.create_route_start.postValue(true)
+                  // makingRoute = true
+                },
+                modifier =
+                    Modifier.size(85.dp)
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(y = (-150).dp)
+                        .testTag("createRouteButton")) {
+                  Image(
+                      painter = painterResource(id = R.drawable.addbutton),
+                      contentDescription = "image description",
+                      contentScale = ContentScale.None)
+                }
+            // Button for searching for routes
+            FloatingActionButton(
+                onClick = {
+                  // CALL FUNCTIONS TO SEARCH FOR NEARBY ROUTES
+                  locationArea.setArea(locationViewModel.currentLocation.value!!)
+                  locationArea.drawRoutesOnMap(map.value!!)
+                },
+                modifier =
+                    Modifier.padding(16.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(y = (-90).dp)
+                        .size(54.dp)
+                        .testTag("routeSearchButton")) {
+                  Box(
+                      modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
+                      contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(R.drawable.magnifying_icon),
+                            contentDescription = "Button to search for neaby routes",
+                            tint = Color.Black,
+                            modifier = Modifier.size(40.dp))
+                      }
+                }
+          } else if (makingRoute) {
 
-          // Check point button
-          FloatingActionButton(
-              onClick = { showDialog = true },
-              modifier =
-                  Modifier.padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-150).dp)
-                      .size(48.dp)) {
-                Box(
-                    modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
-                    contentAlignment = Alignment.Center) {
-                      Icon(
-                          painter = painterResource(R.drawable.map_marker),
-                          contentDescription = "Add checkpoint",
-                          tint = Color.Red)
-                    }
-              }
+            // Check point button
+            FloatingActionButton(
+                onClick = { showDialog = true },
+                modifier =
+                    Modifier.padding(16.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(y = (-150).dp)
+                        .size(48.dp)
+                        .testTag("addCheckpointButton")) {
+                  Box(
+                      modifier = Modifier.size(48.dp).background(Color(0xff00b3ff), CircleShape),
+                      contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(R.drawable.map_marker),
+                            contentDescription = "Add checkpoint",
+                            tint = Color.Red)
+                      }
+                }
 
-          // Button for stopping a route
-          FloatingActionButton(
-              onClick = { showProgression = true },
-              modifier =
-                  Modifier.size(85.dp)
-                      .padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-90).dp)
-                      .testTag("stopRouteButton"),
-              content = {
-                Image(
-                    painter = painterResource(id = R.drawable.stopbutton),
-                    contentDescription = "stop button to stop create route",
-                    contentScale = ContentScale.None)
-              })
+            // Button for stopping a route
+            FloatingActionButton(
+                onClick = { showProgression = true },
+                modifier =
+                    Modifier.size(85.dp)
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(y = (-90).dp)
+                        .testTag("stopRouteButton"),
+                content = {
+                  Image(
+                      painter = painterResource(id = R.drawable.stopbutton),
+                      contentDescription = "stop button to stop create route",
+                      contentScale = ContentScale.None)
+                })
+          }
 
           // Search bar
           Box(Modifier.align(Alignment.TopCenter).offset(y = 16.dp).testTag("SearchBar")) {
@@ -259,6 +302,34 @@ fun Map(locationViewModel: LocationViewModel) {
                       contentDescription = "Clear search",
                   )
                 }
+          }
+          if (makingRoute || !displayButtons) {
+            // Button for going back to default map
+            FloatingActionButton(
+                onClick = {
+                  locationViewModel.onPause()
+                  stopCreatingRoute = true
+                  makingRoute = false
+                  displayButtons = true
+                  locationViewModel.cleanAllocations()
+                  cleanGoogleMap(map.value!!)
+                  Log.i("clean", "cleaned")
+                  numCheckpoints = 0
+                  images.value = emptyList()
+                },
+                modifier =
+                    Modifier.size(70.dp)
+                        .padding(18.dp)
+                        .offset(y = 1.dp)
+                        .align(Alignment.TopStart)
+                        .testTag("gobackbutton"),
+                containerColor = Color.White,
+                content = {
+                  Image(
+                      painter = painterResource(id = R.drawable.goback),
+                      modifier = Modifier.size(20.dp),
+                      contentDescription = "go back button")
+                })
           }
         }
       },
@@ -368,23 +439,24 @@ fun Map(locationViewModel: LocationViewModel) {
     RouteProgression(
         stopRoute = {
           showProgression = false
-          locationViewModel.onPause()
+          locationViewModel.create_route_start.postValue(false)
+          locationViewModel.locationUpdated.postValue(false)
+          Log.i("finish locationupdate", "finish locationupdate")
+
           stopCreatingRoute = true
+          makingRoute = false
+          displayButtons = false
           routeEndMarker = updateMap(map.value!!, locationViewModel, stopCreatingRoute)
           storeRoute.addRoute(
               storeRoute.getUserid(),
               locationViewModel.getAllocations(),
               locationViewModel.checkpoints.value?.toMutableList() ?: mutableListOf())
           locationViewModel.checkpoints.postValue(mutableListOf())
+          numCheckpoints = 0
         },
         closeProgression = { showProgression = false },
         routeLength,
         numCheckpoints)
-
-    // Reset the number of checkpoints created
-    if (stopCreatingRoute) {
-      numCheckpoints = 0
-    }
   }
   LaunchedEffect(Unit) {
     while (true) {
@@ -468,13 +540,15 @@ fun locationPermission(
     locationViewModel: LocationViewModel,
     context: Context,
     launcherMultiplePermissions: ActivityResultLauncher<Array<String>>,
-    permissions: Array<String>
+    permissions: Array<String>,
+    onSucess: () -> Unit,
 ) {
   if (permissions.all {
     PermissionChecker.checkSelfPermission(context, it) == PermissionChecker.PERMISSION_GRANTED
   }) {
     println("Permission successful")
     // Get the location
+    onSucess()
     locationViewModel.startLocationUpdates(context)
   } else {
     println("Ask Permission")
