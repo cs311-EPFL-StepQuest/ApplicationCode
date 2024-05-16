@@ -138,17 +138,10 @@ fun Map(locationViewModel: LocationViewModel) {
               factory = { context ->
                 MapView(context).apply {
                   onCreate(null) // Lifecycle integration
-                  // TODO: need to move permission to the beginning to login
-                  locationPermission(
-                      locationViewModel, context, launcherMultiplePermissions, permissions)
                   // Get the GoogleMap asynchronously
                   getMapAsync { googleMap ->
                     map.value = googleMap
                     initMap(map.value!!)
-                    // TODO: Could put this here, but maybe add an if for changing different state
-                    // ex. create route, display route, etc.
-                    followRoute.fakeRouteDetail(map.value!!) // TODO: need remove
-                    followRoute.drawRouteDetail(map.value!!, context)
                   }
                 }
               },
