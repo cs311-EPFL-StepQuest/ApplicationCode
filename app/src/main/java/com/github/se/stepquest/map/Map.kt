@@ -267,6 +267,8 @@ fun Map(locationViewModel: LocationViewModel) {
                   locationViewModel.cleanAllocations()
                   cleanGoogleMap(map.value!!)
                   locationViewModel.isFollowingRoute.value = false
+                  numCheckpoints = 0
+                  images.value = emptyList()
                 },
                 modifier =
                     Modifier.size(70.dp)
@@ -399,16 +401,11 @@ fun Map(locationViewModel: LocationViewModel) {
               locationViewModel.getAllocations(),
               locationViewModel.checkpoints.value?.toMutableList() ?: mutableListOf())
           locationViewModel.checkpoints.postValue(mutableListOf())
+          numCheckpoints = 0
         },
         closeProgression = { showProgression = false },
         routeLength,
         numCheckpoints)
-
-    // Reset the number of checkpoints created
-    if (stopCreatingRoute) {
-
-      numCheckpoints = 0
-    }
   }
 }
 
