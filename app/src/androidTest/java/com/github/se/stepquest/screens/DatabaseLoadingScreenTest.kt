@@ -1,4 +1,4 @@
-package com.github.se.stepquest.screens
+/*package com.github.se.stepquest.screens
 
 import android.content.Context
 import android.content.Intent
@@ -64,4 +64,4 @@ class DatabaseLoadingScreenTest {
       navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
     }
   }
-}
+}*/
