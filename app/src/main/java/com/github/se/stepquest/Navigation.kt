@@ -98,12 +98,14 @@ fun AppNavigationHost(
           NewPlayerScreen(navigationActions, context, userId)
         }
         composable(Routes.MainScreen.routName) { BuildMainScreen() }
-        composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions, userId) }
+        composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions, userId, context) }
         composable(Routes.ProgressionScreen.routName) {
           ProgressionPage(IUserRepository(), context)
         }
         composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions, userId, context) }
-        composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository()) }
+        composable(Routes.ProgressionScreen.routName) {
+          ProgressionPage(IUserRepository(), context)
+        }
         composable(Routes.MapScreen.routName) { Map(locationviewModel) }
         composable(Routes.ProfileScreen.routName) {
           ProfilePageLayout(navigationActions, userId, profilePictureUrl, context)
