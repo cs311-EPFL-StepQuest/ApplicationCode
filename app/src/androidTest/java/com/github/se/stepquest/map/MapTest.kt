@@ -378,6 +378,7 @@ class MapTest {
   @Test
   fun testNewCheckpointIsAdded() {
     every { locationViewModel.locationUpdated } returns MutableLiveData()
+    every { locationViewModel.currentLocation.value } returns LocationDetails(0.0, 0.0)
     composeTestRule.setContent { Map(locationViewModel) }
     composeTestRule.onNodeWithTag("createRouteButton").performClick()
     composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
