@@ -1,5 +1,7 @@
 package com.github.se.stepquest
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -35,21 +37,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.edit
 
-// @Preview(showSystemUi = true, showBackground = true)
+private const val SHARED_PREF_NAME = "StepQuestPrefs"
+private const val DAILY_STEP_GOAL_KEY = "daily_step_goal"
+private const val WEEKLY_STEP_GOAL_KEY = "weekly_step_goal"
+
 @Composable
-fun ProgressionPage(user: UserRepository) {
+fun ProgressionPage(user: UserRepository, context : Context) {
   val levelList = arrayListOf<String>("Current lvl", "Next lvl")
   var progress by remember { mutableStateOf(0.5f) }
   var showDialog by remember { mutableStateOf(false) }
+    val sharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE)
   var dailyStepsMade by remember { mutableStateOf(0) }
   var weeklyStepsMade by remember { mutableStateOf(0) }
 
   user.getSteps { steps -> dailyStepsMade = steps[0] }
   user.getSteps { steps -> weeklyStepsMade = steps[1] }
 
-  var dailyStepGoal by remember { mutableIntStateOf(5000) }
-  var weeklyStepGoal by remember { mutableIntStateOf(35000) }
+  var dailyStepGoal by remember { mutableIntStateOf(sharedPreferences.getInt(DAILY_STEP_GOAL_KEY, 5000)) }
+  var weeklyStepGoal by remember { mutableIntStateOf(sharedPreferences.getInt(WEEKLY_STEP_GOAL_KEY, 35000)) }
   var dailyGoalAchieved by remember { mutableStateOf(dailyStepsMade > dailyStepGoal) }
 
   Column(modifier = Modifier.fillMaxSize()) {
@@ -100,6 +107,11 @@ fun ProgressionPage(user: UserRepository) {
                   dailyStepGoal = newDailyStepGoal
                   weeklyStepGoal = newWeeklyStepGoal
                   showDialog = false
+                    sharedPreferences.edit {
+                        putInt(DAILY_STEP_GOAL_KEY, newDailyStepGoal)
+                        putInt(WEEKLY_STEP_GOAL_KEY, newWeeklyStepGoal)
+                        apply()
+                    }
                 })
           }
         }
@@ -167,4 +179,10 @@ fun SetDailyGoalAchievedDialog(onConfirm: () -> Unit) {
               }
         }
   }
+}
+
+private fun SharedPreferences.edit(action: SharedPreferences.Editor.() -> Unit) {
+    val editor = edit()
+    action(editor)
+    editor.apply()
 }
