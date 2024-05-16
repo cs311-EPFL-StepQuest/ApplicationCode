@@ -1,7 +1,9 @@
 package com.github.se.stepquest.screens
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,13 +34,34 @@ import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
+import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
+
+@Composable
+fun FriendsListScreenCheck(
+    navigationActions: NavigationActions,
+    userId: String,
+    testCurrentFriendsList: List<Friend> = emptyList(),
+    context: Context
+) {
+
+  if (isOnline(context)) {
+    FriendsListScreen(navigationActions, userId, testCurrentFriendsList)
+  } else {
+
+    Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+      Text(
+          text = "You must be online to view your friend list.",
+          color = Color.Red,
+          fontSize = 18.sp)
+    }
+  }
+}
 
 @Composable
 fun FriendsListScreen(
@@ -50,16 +73,19 @@ fun FriendsListScreen(
   var showAddFriendScreen by remember { mutableStateOf(false) }
   var showFriendProfile by remember { mutableStateOf(false) }
   var selectedFriend by remember { mutableStateOf<Friend?>(null) }
-  var currentFriendsList: MutableList<Friend> = testCurrentFriendsList.toMutableList()
+  val currentFriendsList by remember { mutableStateOf(testCurrentFriendsList.toMutableList()) }
   val database = FirebaseDatabase.getInstance()
   if (currentFriendsList.isEmpty()) {
     val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
     friendsListRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
           override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-            currentFriendsList =
-                dataSnapshot.getValue<List<Friend>>()?.toMutableList() ?: mutableListOf()
+            for (snapshot in dataSnapshot.getChildren()) {
+              val friend = snapshot.getValue(Friend::class.java)
+              if (friend != null) {
+                currentFriendsList.add(friend)
+              }
+            }
           }
 
           override fun onCancelled(databaseError: DatabaseError) {
@@ -72,6 +98,7 @@ fun FriendsListScreen(
   } else if (showFriendProfile) {
     FriendDialogBox(
         friend = selectedFriend!!,
+        userId,
         onDismiss = {
           selectedFriend = null
           showFriendProfile = false
