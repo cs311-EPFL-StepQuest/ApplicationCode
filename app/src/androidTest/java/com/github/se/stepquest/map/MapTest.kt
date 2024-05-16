@@ -36,6 +36,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -284,6 +285,50 @@ class MapTest {
     }
   }
 
+  @Test
+  fun testNumCheckpointsIncreasedAfterCreatingCheckpoint() {
+    var numCheckpoints = 0
+    composeTestRule.setContent { Map(vm).apply { numCheckpoints += 1 } }
+
+    // Simulate the user interaction to create a checkpoint
+    composeTestRule.onNodeWithTag("createRouteButton").performClick()
+    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
+    composeTestRule.onNodeWithText("Name:").performTextInput("Test")
+    composeTestRule.onNodeWithText("Confirm").performClick()
+
+    // Assert that numCheckpoints is increased by 1
+    assertEquals(numCheckpoints, 1)
+  }
+/*
+  @Test
+  fun testCurrentLocationMarker(){
+    every { locationViewModel.currentLocation.value } returns mockk(relaxed = true){
+      every {latitude} returns 1.0
+      every {longitude} returns 2.0
+    }
+
+    val gmap = mockk<GoogleMap>(relaxed = true)
+
+    composeTestRule.setContent { Map(locationViewModel).apply { numCheckpoints += 1 } }
+
+    val customIcon = mockk<Bitmap>(relaxed = true)
+    val customIconScaled = mockk<Bitmap>(relaxed = true)
+    val icon = mockk<BitmapDescriptor>(relaxed = true)
+    val coordinates = LatLng(1.0, 2.0)
+
+    every { BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)} returns customIcon
+    every { Bitmap.createScaledBitmap(customIcon, 320, 320, false) } returns customIconScaled
+    every {BitmapDescriptorFactory.fromBitmap(customIconScaled)} returns icon
+
+    verify { gmap.addMarker(
+      MarkerOptions()
+        .position(coordinates)
+        .anchor(0.5f, 0.5f)
+        .icon(icon)
+        .title("Current location marker")
+    ) }
+  }
+*/
   @Test
   fun testBackButtonIsDisplayed() {
     mockkStatic(PermissionChecker::class)

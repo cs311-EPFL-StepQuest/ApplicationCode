@@ -7,6 +7,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -64,6 +65,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
@@ -76,7 +78,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var routeEndMarker: Marker? = null
   val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
-  val isFollowingRoute by locationViewModel.isFollowingRoute.observeAsState(initial = false)
+  val locationArea = LocationArea()
 
   // Instantiate all necessary variables to take pictures
   var currentCheckpointHasPicture by remember { mutableStateOf(false) }
@@ -116,8 +118,6 @@ fun Map(locationViewModel: LocationViewModel) {
           println("Permission Granted")
           // Start location update only if the permission asked comes from a map action
           if (!cameraActionPermission.value) {
-            locationViewModel.isFollowingRoute.value = true
-
             locationViewModel.startLocationUpdates(context as ComponentActivity)
           } else {
             cameraActionPermission.value = false
@@ -202,6 +202,8 @@ fun Map(locationViewModel: LocationViewModel) {
             FloatingActionButton(
                 onClick = {
                   // CALL FUNCTIONS TO SEARCH FOR NEARBY ROUTES
+                  locationArea.setArea(locationViewModel.currentLocation.value!!)
+                  locationArea.drawRoutesOnMap(map.value!!)
                 },
                 modifier =
                     Modifier.padding(16.dp)
@@ -301,7 +303,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   )
                 }
           }
-          if (isFollowingRoute) {
+          if (makingRoute || !displayButtons) {
             // Button for going back to default map
             FloatingActionButton(
                 onClick = {
@@ -312,7 +314,6 @@ fun Map(locationViewModel: LocationViewModel) {
                   locationViewModel.cleanAllocations()
                   cleanGoogleMap(map.value!!)
                   Log.i("clean", "cleaned")
-                  locationViewModel.isFollowingRoute.value = false
                   numCheckpoints = 0
                   images.value = emptyList()
                 },
@@ -470,6 +471,28 @@ fun Map(locationViewModel: LocationViewModel) {
         routeLength,
         numCheckpoints)
   }
+  LaunchedEffect(Unit) {
+    while (true) {
+      if (map.value != null && locationViewModel.currentLocation.value != null) {
+        val customIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)
+        val customIconScaled = Bitmap.createScaledBitmap(customIcon, 320, 320, false)
+        val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
+
+        val coordinates =
+            LatLng(
+                locationViewModel.currentLocation.value!!.latitude,
+                locationViewModel.currentLocation.value!!.longitude)
+
+        map.value!!.addMarker(
+            MarkerOptions()
+                .position(coordinates)
+                .anchor(0.5f, 0.5f)
+                .icon(icon)
+                .title("Current location marker"))
+      }
+      delay(100)
+    }
+  }
 }
 
 fun updateMap(
@@ -539,7 +562,6 @@ fun locationPermission(
     println("Permission successful")
     // Get the location
     onSucess()
-    locationViewModel.isFollowingRoute.value = true
     locationViewModel.startLocationUpdates(context)
   } else {
     println("Ask Permission")
