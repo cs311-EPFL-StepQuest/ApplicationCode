@@ -50,7 +50,6 @@ class HomeScreenTest {
     composeTestRule.onNodeWithText("Challenges").assertIsDisplayed()
 
     composeTestRule.onNodeWithText("No challenges available").assertIsDisplayed()
-
     // Verify that the "Daily Quests" card is displayed
     composeTestRule.onNodeWithText("Daily Quests").assertIsDisplayed()
   }

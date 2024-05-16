@@ -30,6 +30,7 @@ class StepCounterServiceTest {
   private lateinit var database: FirebaseDatabase
   private lateinit var stepsRefTotal: DatabaseReference
   private lateinit var stepsRefDaily: DatabaseReference
+  private lateinit var stepsRefWeek: DatabaseReference
   private lateinit var event: SensorEvent
   private lateinit var userRef: DatabaseReference
 
@@ -49,6 +50,7 @@ class StepCounterServiceTest {
     database = mockk(relaxed = true)
     stepsRefTotal = mockk(relaxed = true)
     stepsRefDaily = mockk(relaxed = true)
+    stepsRefWeek = mockk(relaxed = true)
     event = mockSensorEvent()
     event.sensor = stepSensor
     userRef = mockk(relaxed = true)
@@ -64,11 +66,17 @@ class StepCounterServiceTest {
           every { child(any()) } returns
               mockk {
                 every { child(any()) } returns
-                    mockk { every { child(any()) } returns stepsRefTotal andThen stepsRefDaily }
+                    mockk {
+                      every { child(any()) } returns
+                          stepsRefTotal andThen
+                          stepsRefDaily andThen
+                          stepsRefWeek
+                    }
               }
         }
     every { stepsRefTotal.setValue(any()) } returns mockk()
     every { stepsRefDaily.setValue(any()) } returns mockk()
+    every { stepsRefWeek.setValue(any()) } returns mockk()
   }
 
   @Test
@@ -109,11 +117,17 @@ class StepCounterServiceTest {
           val listener = arg<ValueEventListener>(0)
           listener.onDataChange(mockk { every { getValue(Int::class.java) } returns 0 })
         }
+    every { stepsRefWeek.addListenerForSingleValueEvent(any()) } answers
+        {
+          val listener = arg<ValueEventListener>(0)
+          listener.onDataChange(mockk { every { getValue(Int::class.java) } returns 0 })
+        }
 
     stepCounterService.onSensorChanged(event)
 
     verify(exactly = 1) { stepsRefTotal.setValue(any()) }
     verify(exactly = 1) { stepsRefDaily.setValue(any()) }
+    verify(exactly = 1) { stepsRefWeek.setValue(any()) }
   }
 
   @Test
@@ -124,6 +138,11 @@ class StepCounterServiceTest {
           listener.onCancelled(mockk { every { message } returns "testError" })
         }
     every { stepsRefDaily.addListenerForSingleValueEvent(any()) } answers
+        {
+          val listener = arg<ValueEventListener>(0)
+          listener.onCancelled(mockk { every { message } returns "testError" })
+        }
+    every { stepsRefWeek.addListenerForSingleValueEvent(any()) } answers
         {
           val listener = arg<ValueEventListener>(0)
           listener.onCancelled(mockk { every { message } returns "testError" })
