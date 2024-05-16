@@ -28,7 +28,7 @@ import com.github.se.stepquest.map.LocationViewModel
 import com.github.se.stepquest.map.Map
 import com.github.se.stepquest.screens.ChallengesScreen
 import com.github.se.stepquest.screens.DatabaseLoadingScreen
-import com.github.se.stepquest.screens.FriendsListScreen
+import com.github.se.stepquest.screens.FriendsListScreenCheck
 import com.github.se.stepquest.screens.HomeScreen
 import com.github.se.stepquest.screens.LoginScreen
 import com.github.se.stepquest.screens.NewPlayerScreen
@@ -90,7 +90,7 @@ fun AppNavigationHost(
       modifier = modifier,
       navController = navigationController,
       startDestination = startDestination) {
-        composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions) }
+        composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions, context) }
         composable(Routes.DatabaseLoadingScreen.routName) {
           DatabaseLoadingScreen(navigationActions, startServiceLambda, userId, context)
         }
@@ -102,12 +102,14 @@ fun AppNavigationHost(
         composable(Routes.ProgressionScreen.routName) {
           ProgressionPage(IUserRepository(), context)
         }
+        composable(Routes.HomeScreen.routName) { HomeScreen(navigationActions, userId, context) }
+        composable(Routes.ProgressionScreen.routName) { ProgressionPage(IUserRepository()) }
         composable(Routes.MapScreen.routName) { Map(locationviewModel) }
         composable(Routes.ProfileScreen.routName) {
-          ProfilePageLayout(navigationActions, userId, profilePictureUrl)
+          ProfilePageLayout(navigationActions, userId, profilePictureUrl, context)
         }
         composable(Routes.FriendsListScreen.routName) {
-          FriendsListScreen(navigationActions = navigationActions, userId)
+          FriendsListScreenCheck(navigationActions = navigationActions, userId, context = context)
         }
         composable(Routes.NotificationScreen.routName) { NotificationScreen(IUserRepository()) }
         composable(Routes.ChallengeScreen.routName) { ChallengesScreen(userId, navigationActions) }

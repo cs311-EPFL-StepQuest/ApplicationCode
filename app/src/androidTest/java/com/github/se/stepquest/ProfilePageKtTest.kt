@@ -1,5 +1,6 @@
 package com.github.se.stepquest
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -45,7 +46,11 @@ class ProfilePageLayoutTest {
   fun display_profile_layout() {
     composeTestRule.setContent {
       StepQuestTheme {
-        ProfilePageLayout(navigationActions = mockk(relaxed = true), userId = "testUserId", mockk())
+        ProfilePageLayout(
+            navigationActions = mockk(relaxed = true),
+            userId = "testUserId",
+            mockk(),
+            LocalContext.current)
       }
     }
 
@@ -82,7 +87,8 @@ class ProfilePageLayoutTest {
         }
     composeTestRule.setContent {
       StepQuestTheme {
-        ProfilePageLayout(navigationActions = mockk(relaxed = true), "testUserId", mockk())
+        ProfilePageLayout(
+            navigationActions = mockk(relaxed = true), "testUserId", mockk(), LocalContext.current)
       }
     }
 
