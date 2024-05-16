@@ -190,7 +190,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   // Before start creating route, make sure map is clean and route list (allocation)
                   // is
                   // empty too
-                  cleanGoogleMap(map.value!!, routeEndMarker)
+                  cleanGoogleMap(map.value!!, routeEndMarker, onClear = { currentMarker = null })
                   locationViewModel.cleanAllocations()
                   locationPermission(
                       locationViewModel,
@@ -365,7 +365,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   makingRoute = false
                   displayButtons = true
                   locationViewModel.cleanAllocations()
-                  cleanGoogleMap(map.value!!)
+                  cleanGoogleMap(map.value!!, onClear = { currentMarker = null })
                   Log.i("clean", "cleaned")
                   numCheckpoints = 0
                   images.value = emptyList()
@@ -526,12 +526,9 @@ fun Map(locationViewModel: LocationViewModel) {
 
           currentMarker =
               map.value!!.addMarker(
-                  MarkerOptions()
-                      .position(coordinates)
-                      .anchor(0.5f, 0.5f)
-                      .icon(icon)
-                      .title("Current location marker"))
+                  MarkerOptions().position(coordinates).anchor(0.5f, 0.5f).icon(icon))
         } else {
+
           currentMarker!!.position = coordinates
         }
       }
@@ -644,8 +641,9 @@ fun updateMap(
   return routeEndMarker
 }
 
-fun cleanGoogleMap(googleMap: GoogleMap, routeEndMarker: Marker? = null) {
+fun cleanGoogleMap(googleMap: GoogleMap, routeEndMarker: Marker? = null, onClear: () -> Unit) {
   googleMap.clear()
+  onClear()
   if (routeEndMarker != null) {
     routeEndMarker.remove()
   }

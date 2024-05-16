@@ -8,7 +8,7 @@ Figma project : https://www.figma.com/file/r8L5v1avlD0mruSlr6Akvt/StepQuest---Fi
 ### Map
 Add Google map api key to local.properties file
 ```
-MAPS_API_KEY=YOUR_API_KEY
+MAPS_API_KEY="YOUR_API_KEY"
 ```
 
 ### Maps Search
