@@ -1,5 +1,6 @@
 package com.github.se.stepquest.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,30 +36,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Routes
-import com.github.se.stepquest.activity.Challenge
 import com.github.se.stepquest.activity.Quest
+import com.github.se.stepquest.data.model.ChallengeData
+import com.github.se.stepquest.services.cacheUserInfo
+import com.github.se.stepquest.services.getTopChallenge
+import com.github.se.stepquest.services.getUsername
+import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
 @Composable
-fun HomeScreen(navigationActions: NavigationActions) {
+fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Context) {
 
   // Added for testing purposes ------
-  var quests: List<Quest> = emptyList()
-  var challenges: List<Challenge> = emptyList()
-  val firstChallenge =
-      Challenge(
-          challengeId = "1",
-          challengerName = "John_Doe",
-          challengeSteps = "1000",
-          challengeDeadline = "Friday",
-          challengeStatus = "0",
-          completionStatus = "0",
-          challengedId = "2")
-  challenges = challenges.plus(firstChallenge)
-  val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
-  quests = quests.plus(firstQuest)
+  var quests: List<Quest> by remember { mutableStateOf(emptyList()) }
+  var topChallenge: ChallengeData? by remember { mutableStateOf(null) }
+  LaunchedEffect(Unit) {
+    getTopChallenge(userId) { receivedChallenge -> topChallenge = receivedChallenge }
+
+    // Simulated data for testing purposes
+    val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
+    quests = quests.plus(firstQuest)
+  }
+
   // ---------------------------------
+
+  val isOnline = isOnline(context)
+
+  if (isOnline) getUsername(userId) { cacheUserInfo(context, userId, it) }
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),
@@ -70,12 +80,17 @@ fun HomeScreen(navigationActions: NavigationActions) {
           }
           Spacer(Modifier.weight(1f))
           // Notifications icon
-          TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("notifications_button")) {
-            Image(
-                painter = painterResource(com.github.se.stepquest.R.drawable.notification),
-                modifier = Modifier.fillMaxHeight().size(50.dp),
-                contentDescription = "notifications_icon")
-          }
+          TextButton(
+              onClick = {
+                navigationActions.navigateTo(
+                    TopLevelDestination(Routes.NotificationScreen.routName))
+              },
+              modifier = Modifier.testTag("notifications_button")) {
+                Image(
+                    painter = painterResource(com.github.se.stepquest.R.drawable.notification),
+                    modifier = Modifier.fillMaxHeight().size(50.dp),
+                    contentDescription = "notifications_icon")
+              }
           // Profile icon
           TextButton(
               onClick = {
@@ -95,7 +110,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
 
           // Start game button
           Button(
-              onClick = { /*TODO*/},
+              onClick = { /* start game when ready */},
               shape = RoundedCornerShape(20.dp),
               colors = ButtonDefaults.buttonColors(Color.White),
               modifier =
@@ -126,7 +141,7 @@ fun HomeScreen(navigationActions: NavigationActions) {
                       fontWeight = FontWeight.Bold)
                   Column {
                     // Challenge
-                    if (challenges.isEmpty()) {
+                    if (topChallenge == null) {
                       Text(
                           text = "No challenges available",
                           modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 50.dp),
@@ -134,62 +149,45 @@ fun HomeScreen(navigationActions: NavigationActions) {
                           textAlign = TextAlign.Center,
                           fontWeight = FontWeight.Bold)
                     } else {
-
-                      for (challenge in challenges) {
-                        // Challenge details
-                        Row(
-                            modifier = Modifier.padding(top = 20.dp, start = 30.dp).fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically) {
-                              Image(
-                                  painter =
-                                      painterResource(
-                                          com.github.se.stepquest.R.drawable.profile_challenges),
-                                  modifier = Modifier.size(40.dp).fillMaxHeight().fillMaxWidth(),
-                                  contentDescription = "profile_challenges")
-                              Column(
-                                  modifier = Modifier.fillMaxWidth(),
-                                  horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Text(
-                                        text = "${challenge.challengerName} challenges you!",
-                                        fontSize = 18.sp)
-                                    Text(
-                                        text =
-                                            "${challenge.challengeSteps} steps until ${challenge.challengeDeadline}!",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold)
-                                  }
-                            }
-                      }
-                      Row(modifier = Modifier.padding(top = 15.dp)) {
-                        // Accept button
-                        Button(
-                            onClick = { /*TODO*/},
-                            colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
-                            modifier =
-                                Modifier.padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
-                                    .height(35.dp)
-                                    .width(140.dp)) {
-                              Text(
-                                  text = "Accept",
-                                  fontSize = 16.sp,
-                                  modifier = Modifier.padding(0.dp))
-                            }
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        // Reject button
-                        Button(
-                            onClick = { /*TODO*/},
-                            colors = ButtonDefaults.buttonColors(Color.Gray),
-                            modifier =
-                                Modifier.padding(end = 20.dp, top = 10.dp)
-                                    .height(35.dp)
-                                    .width(140.dp)) {
-                              Text(text = "Reject", color = Color.Black, fontSize = 16.sp)
-                            }
-                      }
+                      Row(
+                          modifier = Modifier.padding(top = 20.dp, start = 30.dp).fillMaxWidth(),
+                          horizontalArrangement = Arrangement.Center,
+                          verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                painter =
+                                    painterResource(
+                                        com.github.se.stepquest.R.drawable.profile_challenges),
+                                modifier = Modifier.size(40.dp).fillMaxHeight().fillMaxWidth(),
+                                contentDescription = "profile_challenges")
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally) {
+                                  Spacer(modifier = Modifier.width(10.dp))
+                                  Text(text = "Main challenge", fontSize = 18.sp)
+                                  Text(
+                                      text =
+                                          "${topChallenge!!.stepsToMake} steps until ${topChallenge!!.dateTime}!",
+                                      fontSize = 18.sp,
+                                      fontWeight = FontWeight.Bold)
+                                }
+                          }
+                      Spacer(modifier = Modifier.weight(1f))
+                      Button(
+                          onClick = {
+                            navigationActions.navigateTo(
+                                TopLevelDestination(Routes.ChallengeScreen.routName))
+                          },
+                          colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
+                          modifier =
+                              Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                                  .height(40.dp)
+                                  .fillMaxWidth()
+                                  .align(Alignment.CenterHorizontally)) {
+                            Text(
+                                text = "Check active challenges",
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(0.dp))
+                          }
                     }
                     // Buttons
 
