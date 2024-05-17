@@ -406,14 +406,16 @@ class MapTest {
         Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID2,
         Constants.CAMERA_BUTTON_DONE_ACTION_ID)
     Thread.sleep(2000)
+
     composeTestRule.onNodeWithContentDescription("checkpoint_image").assertIsDisplayed()
   }
   */
 }
 
 object Constants {
-  const val CAMERA_BUTTON_SHUTTER_ACTION_ID = "com.android.camera2:id/shutter_button"
-  const val CAMERA_BUTTON_SHUTTER_ACTION_ID2 = "com.android.camera:id/shutter_button"
-  const val CAMERA_BUTTON_DONE_ACTION_ID = "com.android.camera2:id/done_button"
-  const val CAMERA_BUTTON_DONE_ACTION_ID2 = "com.android.camera:id/done_button"
+  const val CAMERA_BUTTON_SHUTTER_ACTION_ID = "com.android.camera:id/shutter_button"
+  const val CAMERA_BUTTON_DONE_ACTION_ID = "com.android.camera:id/done_button"
+  const val CAMERA_BUTTON_SHUTTER_ACTION_ID2 = "com.android.camera2:id/shutter_button"
+  const val CAMERA_BUTTON_DONE_ACTION_ID2 = "com.android.camera2:id/done_button"
 }
+
