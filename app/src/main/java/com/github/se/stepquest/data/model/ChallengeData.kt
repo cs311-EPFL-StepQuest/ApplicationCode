@@ -3,6 +3,7 @@ package com.github.se.stepquest.data.model
 import com.github.se.stepquest.IUserRepository
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 data class ChallengeData(
@@ -103,7 +104,7 @@ enum class ChallengeType(
       "REGULAR_STEP_CHALLENGE",
       "",
       fun(data: ChallengeData): Boolean {
-        val date = LocalDate.parse(data.dateTime)
+        val date = LocalDate.parse(data.dateTime, DateTimeFormatter.ofPattern("MMMM d, yyyy"))
         var dailySteps = 0
         var totalSteps = 0
         for (i in 0..data.daysToComplete) {
@@ -118,7 +119,7 @@ enum class ChallengeType(
       "DAILY_STEP_CHALLENGE",
       "",
       fun(data: ChallengeData): Boolean {
-        val date = LocalDate.parse(data.dateTime)
+        val date = LocalDate.parse(data.dateTime, DateTimeFormatter.ofPattern("MMMM d, yyyy"))
         var dailySteps = 0
         for (i in 0..data.daysToComplete) {
           val dateOffset = date.plusDays(i.toLong())

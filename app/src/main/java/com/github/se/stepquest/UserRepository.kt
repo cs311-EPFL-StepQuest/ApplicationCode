@@ -47,6 +47,10 @@ class IUserRepository : UserRepository {
   }
 
   override fun getDailyStepsForDate(date: Date, callback: (Int) -> Unit) {
+    if (date > Date()) {
+      callback(0)
+      return
+    }
     var dailySteps = 0
     val d = date
     val s: CharSequence = DateFormat.format("MMMM d, yyyy ", d.time)
