@@ -26,6 +26,7 @@ class FriendDialogBoxKtTest {
     composeTestRule.onNodeWithText("John Doe").assertExists()
     composeTestRule.onNodeWithContentDescription("Close").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Profile Picture").assertDoesNotExist()
+
     composeTestRule.onNodeWithText("Connection").assertExists()
     composeTestRule.onNodeWithText("Challenge").assertExists()
 

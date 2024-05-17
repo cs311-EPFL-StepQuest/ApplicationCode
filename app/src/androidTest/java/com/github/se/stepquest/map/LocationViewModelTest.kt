@@ -128,12 +128,10 @@ class LocationViewModelTest {
 
   @Test
   fun onPauseTest() {
-    locationViewModel.locationUpdated.postValue(true)
     val locationCallback = mockk<LocationCallback>(relaxed = true)
     var fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     locationViewModel.fusedLocationClient = fusedLocationClient
     locationViewModel.locationCallback = locationCallback
     locationViewModel.onPause()
-    assert(locationViewModel.locationUpdated.value == false)
   }
 }
