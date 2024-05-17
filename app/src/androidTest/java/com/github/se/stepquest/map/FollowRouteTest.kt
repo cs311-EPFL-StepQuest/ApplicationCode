@@ -1,6 +1,5 @@
 package com.github.se.stepquest.map
 
-import org.junit.Test
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.maps.GoogleMap
@@ -11,6 +10,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
 import org.junit.Before
+import org.junit.Test
 
 class FollowRouteTest {
   private lateinit var followRoute: FollowRoute
@@ -55,10 +55,11 @@ class FollowRouteTest {
   @Test
   fun TestcreateTrackpoint() {
     val route =
-      listOf(LocationDetails(0.0, 0.0), LocationDetails(0.0, 1.0), LocationDetails(0.0, 2.0))
+        listOf(LocationDetails(0.0, 0.0), LocationDetails(0.0, 1.0), LocationDetails(0.0, 2.0))
     val followRoute = FollowRoute()
     val trackpoints = followRoute.createTrackpoint(route, 1.0)
     assert(trackpoints.size == 2)
     assert(trackpoints[0] == LocationDetails(0.0, 1.0))
     assert(trackpoints[1] == LocationDetails(0.0, 2.0))
+  }
 }
