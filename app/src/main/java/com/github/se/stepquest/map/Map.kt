@@ -190,30 +190,6 @@ fun Map(locationViewModel: LocationViewModel) {
             }
           }
 
-          // Button for creating a route
-<<<<<<< HEAD
-          FloatingActionButton(
-              onClick = {
-                // Before start creating route, make sure map is clean and route list (allocation)
-                // is
-                // empty too
-                cleanGoogleMap(map.value!!, routeEndMarker)
-                locationViewModel.cleanAllocations()
-                locationPermission(
-                    locationViewModel, context, launcherMultiplePermissions, permissions)
-              },
-              modifier =
-                  Modifier.size(85.dp)
-                      .padding(16.dp)
-                      .align(Alignment.BottomEnd)
-                      .offset(y = (-204).dp)
-                      .testTag("createRouteButton")) {
-                Image(
-                    painter = painterResource(id = R.drawable.addbutton),
-                    contentDescription = "image description",
-                    contentScale = ContentScale.None)
-              }
-=======
           if (!makingRoute && displayButtons) {
             FloatingActionButton(
                 onClick = {
@@ -273,7 +249,6 @@ fun Map(locationViewModel: LocationViewModel) {
                       }
                 }
           } else if (makingRoute) {
->>>>>>> main
 
             // Check point button
             FloatingActionButton(
@@ -362,6 +337,7 @@ fun Map(locationViewModel: LocationViewModel) {
                           LocationDetails(
                               searchableLocation!!.latitude, searchableLocation!!.longitude))
                       locationArea.drawRoutesOnMap(map.value!!)
+
                     },
                     modifier =
                         Modifier.align(Alignment.CenterEnd)

@@ -10,6 +10,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
+import android.widget.Toast
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -117,13 +118,18 @@ class FollowRoute() {
             }
             currentLocation = route[i]
         }
+
+        trackpoints.add(route.last())
         return trackpoints
     }
 
     fun checkIfOnRoute(
         locationViewModel: LocationViewModel,
         trackpoints: List<LocationDetails>,
-        threshold: Double = 30.0
+        context: Context,
+        threshold_onRoute: Double = 30.0,
+        threshold_arrived: Double = 5.0,
+        threshold_outRoute: Double = 50.0
     ) {
         // Cancel any existing job before starting a new one
         checkRouteJob?.cancel()
@@ -136,29 +142,74 @@ class FollowRoute() {
                     isActive
                 ) { // Check if the coroutine is still active
                     val trackpoint = remainingTrackpoints[0]
+                    val finish_point= trackpoints.last()
                     val currentLocation = locationViewModel.currentLocation.value
                     if (currentLocation == null) {
                         withContext(Dispatchers.Main) {
+                            AlertDialog.Builder(context)
+                                .apply {
+                                    setTitle("Finish route") // Set the title of the dialog to the checkpoint title
+                                    // put image here
+                                    setPositiveButton("OK") { dialog, which -> dialog.dismiss()
+                                    setMessage("You have reached the finish point. Congratulation!")}
+                                    // If you have an image and want to display it, consider using a custom layout or
+                                    // fetching the image asynchronously
+                                }
+                                .create()
+                                .show()
                             Log.d("FollowRoute", "Current location is null, stopping the coroutine")
+                            followingRoute.postValue(false)
                         }
                     } else {
                         val distance = calculateDistance(trackpoint, currentLocation)
-                        // If the distance is less than 5 meters, the user has passed this point
-                        if (distance <= 5) {
+                        Log.d("FollowRoute","Distance: $distance\n")
+                        val finish_distance = calculateDistance(finish_point, currentLocation)
+                        if (finish_distance <= threshold_arrived) {
+                            //check reach final point or not
                             withContext(Dispatchers.Main) {
                                 userOnRoute.value = true
-                                Log.d("FollowRoute", "You have reached the next point")
+                                Log.d("FollowRoute", "You have reached the finish point. Congrat")
                             }
-                            remainingTrackpoints = remainingTrackpoints.drop(1)
-                        } else if (distance <= threshold && distance > 5) {
-                            withContext(Dispatchers.Main) {
-                                userOnRoute.postValue(true)
-                                Log.d("FollowRoute", "You are on the route")
+                        }
+                        else{
+                            // If the distance is less than 5 meters, the user has passed this point
+                            if (distance <= threshold_arrived) {
+                                withContext(Dispatchers.Main) {
+                                    userOnRoute.value = true
+                                    Log.d("FollowRoute", "You have reached the next point")
+                                }
+                                remainingTrackpoints = remainingTrackpoints.drop(1)
                             }
-                        } else {
-                            withContext(Dispatchers.Main) {
-                                userOnRoute.postValue(false)
-                                Log.d("FollowRoute", "You are off the route")
+                            else if (distance <= threshold_onRoute && distance > threshold_arrived) {
+                                withContext(Dispatchers.Main) {
+                                    userOnRoute.postValue(true)
+                                    Log.d("FollowRoute", "You are on the route")
+                                }
+                            }
+                            else if (distance <= threshold_outRoute && distance > threshold_onRoute) {
+                                withContext(Dispatchers.Main) {
+                                    userOnRoute.postValue(false)
+                                    Toast.makeText(context, "Warning: You are off the route, please go back to route.", Toast.LENGTH_LONG).show()
+                                    Log.d("FollowRoute", "Warning: You are off the route")
+                                }
+                            }
+                            else if (distance > threshold_outRoute) {
+                                withContext(Dispatchers.Main) {
+                                    userOnRoute.postValue(false)
+                                    AlertDialog.Builder(context)
+                                        .apply {
+                                            setTitle("Finish route") // Set the title of the dialog to the checkpoint title
+                                            // put image here
+                                            setPositiveButton("OK") { dialog, which -> dialog.dismiss()
+                                                setMessage("You are off the route. Stop following the route. Bye!")}
+                                            // If you have an image and want to display it, consider using a custom layout or
+                                            // fetching the image asynchronously
+                                        }
+                                        .create()
+                                        .show()
+                                    Log.d("FollowRoute", "You are off the route, Bye")
+                                    followingRoute.postValue(false)
+                                }
                             }
                         }
                     }
