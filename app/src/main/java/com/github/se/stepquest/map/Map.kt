@@ -160,32 +160,32 @@ fun Map(locationViewModel: LocationViewModel) {
 
   val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Define the function with the click logic of Go Back Button
-    val onGoBackBUttonClick: () -> Unit = {
-        // Your click logic here
-        locationViewModel.create_route_start.postValue(false)
-        locationViewModel.locationUpdated.postValue(false)
-        stopCreatingRoute = true
-        makingRoute = false
-        if (followingRoute == true) {
-            followRoute.stopCheckIfOnRoute()
-            Log.d("FollowRoute", "stop check following route")
-        }
-        followRoute.followingRoute.value = false
-        displayButtons = true
-        locationViewModel.cleanAllocations()
-        cleanGoogleMap(map.value!!, onClear = { currentMarker = null })
-        Log.i("clean", "cleaned")
-        numCheckpoints = 0
-        images.value = emptyList()
-        //when go back to default, zoom to current location
-        map.value!!.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    locationViewModel.currentLocation.value!!.latitude,
-                    locationViewModel.currentLocation.value!!.longitude),
-                15f))
+  // Define the function with the click logic of Go Back Button
+  val onGoBackBUttonClick: () -> Unit = {
+    // Your click logic here
+    locationViewModel.create_route_start.postValue(false)
+    locationViewModel.locationUpdated.postValue(false)
+    stopCreatingRoute = true
+    makingRoute = false
+    if (followingRoute == true) {
+      followRoute.stopCheckIfOnRoute()
+      Log.d("FollowRoute", "stop check following route")
     }
+    followRoute.followingRoute.value = false
+    displayButtons = true
+    locationViewModel.cleanAllocations()
+    cleanGoogleMap(map.value!!, onClear = { currentMarker = null })
+    Log.i("clean", "cleaned")
+    numCheckpoints = 0
+    images.value = emptyList()
+    // when go back to default, zoom to current location
+    map.value!!.moveCamera(
+        CameraUpdateFactory.newLatLngZoom(
+            LatLng(
+                locationViewModel.currentLocation.value!!.latitude,
+                locationViewModel.currentLocation.value!!.longitude),
+            15f))
+  }
 
   Scaffold(
       content = {
@@ -216,12 +216,12 @@ fun Map(locationViewModel: LocationViewModel) {
               locationViewModel.locationUpdated.value = false
             }
           }
-            LaunchedEffect(followingRoute){
-                if (followingRoute == true) {
-                    Log.d("FollowRoute", "start check if on route")
-                    followRoute.checkIfOnRoute(locationViewModel, context, onGoBackBUttonClick)
-                }
+          LaunchedEffect(followingRoute) {
+            if (followingRoute == true) {
+              Log.d("FollowRoute", "start check if on route")
+              followRoute.checkIfOnRoute(locationViewModel, context, onGoBackBUttonClick)
             }
+          }
 
           if (!makingRoute && displayButtons) {
             FloatingActionButton(
@@ -263,8 +263,8 @@ fun Map(locationViewModel: LocationViewModel) {
                               locationViewModel.currentLocation.value!!.latitude,
                               locationViewModel.currentLocation.value!!.longitude),
                           15f))
-                    followRoute.drawRouteDetail(map.value!!, context, onClear={ currentMarker = null })
-
+                  followRoute.drawRouteDetail(
+                      map.value!!, context, onClear = { currentMarker = null })
                 },
                 modifier =
                     Modifier.padding(16.dp)
@@ -371,8 +371,8 @@ fun Map(locationViewModel: LocationViewModel) {
                           LocationDetails(
                               searchableLocation!!.latitude, searchableLocation!!.longitude))
                       locationArea.drawRoutesOnMap(map.value!!)
-                      followRoute.drawRouteDetail(map.value!!, context, onClear={ currentMarker = null })
-
+                      followRoute.drawRouteDetail(
+                          map.value!!, context, onClear = { currentMarker = null })
                     },
                     modifier =
                         Modifier.align(Alignment.CenterEnd)
@@ -400,7 +400,7 @@ fun Map(locationViewModel: LocationViewModel) {
             )
           }
 
-            if (makingRoute || !displayButtons || followingRoute == true) {
+          if (makingRoute || !displayButtons || followingRoute == true) {
             // Button for going back to default map
             FloatingActionButton(
                 onClick = onGoBackBUttonClick,
