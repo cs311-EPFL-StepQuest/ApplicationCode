@@ -534,30 +534,30 @@ fun Map(locationViewModel: LocationViewModel) {
         numCheckpoints)
   }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            if (map.value != null && locationViewModel.currentLocation.value != null) {
-                val coordinates =
-                    LatLng(
-                        locationViewModel.currentLocation.value!!.latitude,
-                        locationViewModel.currentLocation.value!!.longitude)
+  LaunchedEffect(Unit) {
+    while (true) {
+      if (map.value != null && locationViewModel.currentLocation.value != null) {
+        val coordinates =
+            LatLng(
+                locationViewModel.currentLocation.value!!.latitude,
+                locationViewModel.currentLocation.value!!.longitude)
 
-                if (currentMarker == null) {
-                    val customIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)
-                    val customIconScaled = Bitmap.createScaledBitmap(customIcon, 320, 320, false)
-                    val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
+        if (currentMarker == null) {
+          val customIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)
+          val customIconScaled = Bitmap.createScaledBitmap(customIcon, 320, 320, false)
+          val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
 
-                    currentMarker =
-                        map.value!!.addMarker(
-                            MarkerOptions().position(coordinates).anchor(0.5f, 0.5f).icon(icon))
-                } else {
+          currentMarker =
+              map.value!!.addMarker(
+                  MarkerOptions().position(coordinates).anchor(0.5f, 0.5f).icon(icon))
+        } else {
 
-                    currentMarker!!.position = coordinates
-                }
-            }
-            delay(100)
+          currentMarker!!.position = coordinates
         }
+      }
+      delay(100)
     }
+  }
 }
 
 fun fetchPlaceSuggestions(
