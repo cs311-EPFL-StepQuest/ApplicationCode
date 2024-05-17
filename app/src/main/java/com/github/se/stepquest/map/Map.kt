@@ -459,29 +459,29 @@ fun Map(locationViewModel: LocationViewModel) {
         routeLength,
         numCheckpoints)
   }
-  //  LaunchedEffect(Unit) {
-  //    while (true) {
-  //      if (map.value != null && locationViewModel.currentLocation.value != null) {
-  //        val customIcon = BitmapFactory.decodeResource(context.resources,
-  // R.drawable.location_dot)
-  //        val customIconScaled = Bitmap.createScaledBitmap(customIcon, 320, 320, false)
-  //        val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
-  //
-  //        val coordinates =
-  //            LatLng(
-  //                locationViewModel.currentLocation.value!!.latitude,
-  //                locationViewModel.currentLocation.value!!.longitude)
-  //
-  //        map.value!!.addMarker(
-  //            MarkerOptions()
-  //                .position(coordinates)
-  //                .anchor(0.5f, 0.5f)
-  //                .icon(icon)
-  //                .title("Current location marker"))
-  //      }
-  //      delay(100)
-  //    }
-  //  }
+    LaunchedEffect(Unit) {
+      while (true) {
+        if (map.value != null && locationViewModel.currentLocation.value != null) {
+          val customIcon = BitmapFactory.decodeResource(context.resources,
+   R.drawable.location_dot)
+          val customIconScaled = Bitmap.createScaledBitmap(customIcon, 320, 320, false)
+          val icon = BitmapDescriptorFactory.fromBitmap(customIconScaled)
+
+          val coordinates =
+              LatLng(
+                  locationViewModel.currentLocation.value!!.latitude,
+                  locationViewModel.currentLocation.value!!.longitude)
+
+          map.value!!.addMarker(
+              MarkerOptions()
+                  .position(coordinates)
+                  .anchor(0.5f, 0.5f)
+                  .icon(icon)
+                  .title("Current location marker"))
+        }
+        delay(100)
+      }
+    }
 }
 
 fun updateMap(
