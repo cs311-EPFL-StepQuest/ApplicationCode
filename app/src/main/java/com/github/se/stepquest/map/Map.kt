@@ -72,7 +72,6 @@ import com.google.android.libraries.places.api.net.FetchPlaceResponse
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse
 import com.google.android.libraries.places.api.net.PlacesClient
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 
 data class PlaceSuggestion(val name: String, val placeId: String)
@@ -554,11 +553,10 @@ fun Map(locationViewModel: LocationViewModel) {
 
           currentMarker!!.position = coordinates
         }
-
       }
     }
+  }
 }
-    }
 
 fun fetchPlaceSuggestions(
     placesClient: PlacesClient,
