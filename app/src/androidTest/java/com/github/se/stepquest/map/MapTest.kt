@@ -238,7 +238,7 @@ class MapTest {
   fun testCleanGoogleMap_withoutrouteEndMarker() {
     val googleMap = mockk<GoogleMap>()
     every { googleMap.clear() } just Runs
-    cleanGoogleMap(googleMap)
+    cleanGoogleMap(googleMap, onClear = {})
     verify { googleMap.clear() }
   }
 
@@ -248,7 +248,7 @@ class MapTest {
     val routeEndMarker = mockk<Marker>(relaxed = true)
     every { routeEndMarker.remove() } just Runs
     every { googleMap.clear() } just Runs
-    cleanGoogleMap(googleMap, routeEndMarker)
+    cleanGoogleMap(googleMap, routeEndMarker, onClear = {})
     verify { googleMap.clear() }
     verify { routeEndMarker.remove() }
   }
