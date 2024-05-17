@@ -228,6 +228,6 @@ class FollowRoute() {
 
   // Function to stop the checkIfOnRoute coroutine
   fun stopCheckIfOnRoute() {
-      checkRouteJob?.cancel()
+    checkRouteJob?.cancel()
   }
 }
