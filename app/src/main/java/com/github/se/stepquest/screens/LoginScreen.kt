@@ -1,6 +1,7 @@
 package com.github.se.stepquest.screens
 
 import android.app.Activity
+import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,13 +35,17 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
+import com.github.se.stepquest.services.getCachedInfo
+import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.services.setOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
 @Composable
-fun LoginScreen(navigationActions: NavigationActions) {
+fun LoginScreen(navigationActions: NavigationActions, context: Context) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
+  val isOnline = isOnline(context)
+  var showError by remember { mutableStateOf(false) }
 
   fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
 
@@ -89,12 +96,37 @@ fun LoginScreen(navigationActions: NavigationActions) {
 
         Spacer(modifier = Modifier.height(150.dp))
 
-        Button(
-            onClick = { signInLauncher.launch(signInIntent) },
-            colors = ButtonDefaults.buttonColors(blueThemeColor),
-            modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
-            shape = RoundedCornerShape(8.dp)) {
-              Text(text = "Authenticate", color = Color.White, fontSize = 24.sp)
-            }
+        if (isOnline) {
+          Button(
+              onClick = { signInLauncher.launch(signInIntent) },
+              colors = ButtonDefaults.buttonColors(blueThemeColor),
+              modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
+              shape = RoundedCornerShape(8.dp)) {
+                Text(text = "Authenticate", color = Color.White, fontSize = 24.sp)
+              }
+        } else {
+          Button(
+              onClick = {
+                val cacheCheck = getCachedInfo(context)
+
+                if (cacheCheck != null) {
+                  navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+                } else {
+                  showError = true
+                }
+              },
+              colors = ButtonDefaults.buttonColors(blueThemeColor),
+              modifier = Modifier.fillMaxWidth().height(72.dp).padding(vertical = 8.dp),
+              shape = RoundedCornerShape(8.dp)) {
+                Text(text = "Enter the app", color = Color.White, fontSize = 24.sp)
+              }
+        }
+
+        if (showError) {
+          Text(
+              text = "Internet connection required.",
+              modifier = Modifier.fillMaxWidth(),
+              color = Color.Red)
+        }
       }
 }

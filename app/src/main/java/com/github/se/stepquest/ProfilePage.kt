@@ -1,5 +1,6 @@
 package com.github.se.stepquest
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.github.se.stepquest.services.cacheTotalSteps
+import com.github.se.stepquest.services.getCachedInfo
+import com.github.se.stepquest.services.getCachedStepInfo
+import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.google.firebase.Firebase
@@ -43,36 +48,50 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 
 @Composable
-fun ProfilePageLayout(navigationActions: NavigationActions, userId: String, profilePicture: Uri?) {
+fun ProfilePageLayout(
+    navigationActions: NavigationActions,
+    userId: String,
+    profilePicture: Uri?,
+    context: Context
+) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-  var totalStepsMade by remember { mutableIntStateOf(0) }
+  val stepList = getCachedStepInfo(context)
+  var totalStepsMade by remember { mutableIntStateOf(stepList["totalSteps"] ?: 0) }
   var username by remember { mutableStateOf("No name") }
-  val database = Firebase.database
-  val databaseRef = database.reference.child("users")
-  val stepsRef = databaseRef.child(userId).child("totalSteps")
-  stepsRef.addListenerForSingleValueEvent(
-      object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-          totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
-        }
 
-        override fun onCancelled(databaseError: DatabaseError) {
-          // add code when failing to access database
-        }
-      })
-  val usernameRef = databaseRef.child(userId).child("username")
+  if (isOnline(context)) {
+    val database = Firebase.database
+    val databaseRef = database.reference.child("users")
+    val stepsRef = databaseRef.child(userId).child("totalSteps")
+    stepsRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(dataSnapshot: DataSnapshot) {
+            totalStepsMade = dataSnapshot.getValue(Int::class.java) ?: 0
+            cacheTotalSteps(context, totalStepsMade)
+          }
 
-  usernameRef.addListenerForSingleValueEvent(
-      object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-          username = dataSnapshot.getValue(String::class.java) ?: "No name"
-        }
+          override fun onCancelled(databaseError: DatabaseError) {
+            // add code when failing to access database
+          }
+        })
+    val usernameRef = databaseRef.child(userId).child("username")
 
-        override fun onCancelled(databaseError: DatabaseError) {
-          // add code when failing to access database
-        }
-      })
-  var showDialog by remember { mutableStateOf(false) }
+    usernameRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(dataSnapshot: DataSnapshot) {
+            username = dataSnapshot.getValue(String::class.java) ?: "No name"
+          }
+
+          override fun onCancelled(databaseError: DatabaseError) {
+            // add code when failing to access database
+          }
+        })
+  } else {
+
+    val userInfo = getCachedInfo(context)
+    if (userInfo != null) username = userInfo.second
+  }
+
   Column(
       modifier = Modifier.padding(32.dp).fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
