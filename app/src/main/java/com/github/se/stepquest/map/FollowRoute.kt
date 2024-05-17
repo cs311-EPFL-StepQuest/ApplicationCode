@@ -23,6 +23,7 @@ class FollowRoute() {
     // Define a Job to manage the coroutine
     private var checkRouteJob: Job? = null
   var followingRoute = MutableLiveData<Boolean>()
+    var RouteDetail = MutableLiveData<RouteDetails>()
 
   init {
     followingRoute.postValue(false)
@@ -35,6 +36,7 @@ class FollowRoute() {
 
         val route = clickedMarker.tag as? RouteDetails
         route?.let { it ->
+          RouteDetail.postValue(it)
           val routeID = it.routeID
           val routedetail = it.routeDetails
           val routeUserID = it.userID
@@ -103,37 +105,42 @@ class FollowRoute() {
   }
     // taking the points on the route with the interval of 20 meters
     fun createTrackpoint(
-        route: List<LocationDetails>,
         interval: Double = 20.0
     ): List<LocationDetails> {
+        val route=RouteDetail.value?.routeDetails
         val trackpoints = mutableListOf<LocationDetails>()
-        var currentLocation = route[0]
-        var totaldistance = 0.0
-        for (i in 1 until route.size) {
-            val distance = calculateDistance(currentLocation, route[i])
-            totaldistance += distance
-            if (totaldistance >= interval) {
-                trackpoints.add(route[i])
-                totaldistance = 0.0
+        if (route is List<LocationDetails> && route.isNotEmpty()) {
+            Log.d("FollowRoute","Route: $route")
+            Log.d("FollowRoute","final point: ${route.last()}")
+            var currentLocation = route[0]
+            var totaldistance = 0.0
+            for (i in 1 until route.size) {
+                val distance = calculateDistance(currentLocation, route[i])
+                totaldistance += distance
+                if (totaldistance >= interval) {
+                    trackpoints.add(route[i])
+                    totaldistance = 0.0
+                }
+                currentLocation = route[i]
             }
-            currentLocation = route[i]
-        }
 
-        trackpoints.add(route.last())
+            trackpoints.add(route.last())
+            Log.d("FollowRoute","trackpoints: $trackpoints")
+        }
         return trackpoints
     }
 
     fun checkIfOnRoute(
         locationViewModel: LocationViewModel,
-        trackpoints: List<LocationDetails>,
         context: Context,
+        onGoBackBUttonClick: () -> Unit,
         threshold_onRoute: Double = 30.0,
         threshold_arrived: Double = 5.0,
         threshold_outRoute: Double = 50.0
     ) {
         // Cancel any existing job before starting a new one
         checkRouteJob?.cancel()
-
+        val trackpoints=createTrackpoint()
         // Launch a new coroutine in the background
         checkRouteJob =
             CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
@@ -158,12 +165,13 @@ class FollowRoute() {
                                 .create()
                                 .show()
                             Log.d("FollowRoute", "Current location is null, stopping the coroutine")
-                            followingRoute.postValue(false)
+                            onGoBackBUttonClick()
                         }
                     } else {
                         val distance = calculateDistance(trackpoint, currentLocation)
                         Log.d("FollowRoute","Distance: $distance\n")
                         val finish_distance = calculateDistance(finish_point, currentLocation)
+                        Log.d("FollowRoute","Finish Distance: $finish_distance\n")
                         if (finish_distance <= threshold_arrived) {
                             //check reach final point or not
                             withContext(Dispatchers.Main) {
@@ -208,7 +216,7 @@ class FollowRoute() {
                                         .create()
                                         .show()
                                     Log.d("FollowRoute", "You are off the route, Bye")
-                                    followingRoute.postValue(false)
+                                    onGoBackBUttonClick()
                                 }
                             }
                         }

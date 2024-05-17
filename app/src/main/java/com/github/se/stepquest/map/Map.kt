@@ -160,6 +160,27 @@ fun Map(locationViewModel: LocationViewModel) {
 
   val keyboardController = LocalSoftwareKeyboardController.current
 
+    // Define the function with the click logic of Go Back Button
+    val onGoBackBUttonClick: () -> Unit = {
+        // Your click logic here
+        locationViewModel.onPause()
+        locationViewModel.create_route_start.postValue(false)
+        locationViewModel.locationUpdated.postValue(false)
+        stopCreatingRoute = true
+        makingRoute = false
+        if (followingRoute == true) {
+            followRoute.stopCheckIfOnRoute()
+            Log.d("FollowRoute", "stop check following route")
+        }
+        followRoute.followingRoute.value = false
+        displayButtons = true
+        locationViewModel.cleanAllocations()
+        cleanGoogleMap(map.value!!, onClear = { currentMarker = null })
+        Log.i("clean", "cleaned")
+        numCheckpoints = 0
+        images.value = emptyList()
+    }
+
   Scaffold(
       content = {
         Box(modifier = Modifier.fillMaxSize().testTag("MapScreen")) {
@@ -231,6 +252,7 @@ fun Map(locationViewModel: LocationViewModel) {
                               locationViewModel.currentLocation.value!!.longitude),
                           15f))
                   followRoute.drawRouteDetail(map.value!!, context)
+                  followRoute.checkIfOnRoute(locationViewModel, context, onGoBackBUttonClick)
                 },
                 modifier =
                     Modifier.padding(16.dp)
@@ -337,6 +359,7 @@ fun Map(locationViewModel: LocationViewModel) {
                           LocationDetails(
                               searchableLocation!!.latitude, searchableLocation!!.longitude))
                       locationArea.drawRoutesOnMap(map.value!!)
+                      followRoute.drawRouteDetail(map.value!!, context)
 
                     },
                     modifier =
@@ -364,21 +387,11 @@ fun Map(locationViewModel: LocationViewModel) {
                 },
             )
           }
-          if (makingRoute || !displayButtons || followingRoute == true) {
+
+            if (makingRoute || !displayButtons || followingRoute == true) {
             // Button for going back to default map
             FloatingActionButton(
-                onClick = {
-                  locationViewModel.onPause()
-                  stopCreatingRoute = true
-                  makingRoute = false
-                  followRoute.followingRoute.value = false
-                  displayButtons = true
-                  locationViewModel.cleanAllocations()
-                  cleanGoogleMap(map.value!!, onClear = { currentMarker = null })
-                  Log.i("clean", "cleaned")
-                  numCheckpoints = 0
-                  images.value = emptyList()
-                },
+                onClick = onGoBackBUttonClick,
                 modifier =
                     Modifier.size(70.dp)
                         .padding(18.dp)
