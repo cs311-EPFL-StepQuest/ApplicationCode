@@ -43,8 +43,12 @@ android {
 
         //fetch the map key
         val apiKey = properties.getProperty("MAPS_API_KEY") ?: ""
+        var apiKey2=apiKey
+        if (apiKey[0] != '\"'){
+            apiKey2="\"" + apiKey + "\""
+        }
 
-        buildConfigField("String", "MAPS_API_KEY", apiKey)
+        buildConfigField("String", "MAPS_API_KEY", apiKey2)
 
         //inject the key dynamically into the manifest
         manifestPlaceholders["GOOGLE_MAP_KEY"] = apiKey

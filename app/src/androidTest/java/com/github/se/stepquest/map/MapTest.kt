@@ -105,7 +105,6 @@ class MapTest {
     mockkStatic(PermissionChecker::class)
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
         PermissionChecker.PERMISSION_GRANTED
-
     locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions, {})
 
     verify { locationViewModel.startLocationUpdates(any()) }
@@ -150,7 +149,7 @@ class MapTest {
 
   @Test
   fun testUpdateMap_multiplelocation() {
-    // Mock the GoogleMap object
+    // Mock the GoogleMap objects
     val googleMap = mockk<GoogleMap>()
 
     // Mock allocation data
