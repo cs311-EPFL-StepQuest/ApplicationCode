@@ -24,13 +24,14 @@ class FollowRoute() {
     private var checkRouteJob: Job? = null
   var followingRoute = MutableLiveData<Boolean>()
     var RouteDetail = MutableLiveData<RouteDetails>()
+    private var currentToast: Toast? = null
 
   init {
     followingRoute.postValue(false)
   }
 
   @SuppressLint("PotentialBehaviorOverride")
-  fun drawRouteDetail(googleMap: GoogleMap, context: Context) {
+  fun drawRouteDetail(googleMap: GoogleMap, context: Context, onClear: () -> Unit) {
     googleMap.setOnMarkerClickListener { clickedMarker ->
       if (clickedMarker.title == "Route") {
 
@@ -45,7 +46,7 @@ class FollowRoute() {
           if (points != null) {
             followingRoute.postValue(true)
             // clean up the map
-            googleMap.clear()
+            cleanGoogleMap(googleMap, onClear = onClear )
             if (points.isNotEmpty()) {
               // Add a red marker at the start point
               googleMap.addMarker(
@@ -112,6 +113,7 @@ class FollowRoute() {
         if (route is List<LocationDetails> && route.isNotEmpty()) {
             Log.d("FollowRoute","Route: $route")
             Log.d("FollowRoute","final point: ${route.last()}")
+            trackpoints.add(route.first())
             var currentLocation = route[0]
             var totaldistance = 0.0
             for (i in 1 until route.size) {
@@ -153,19 +155,7 @@ class FollowRoute() {
                     val currentLocation = locationViewModel.currentLocation.value
                     if (currentLocation == null) {
                         withContext(Dispatchers.Main) {
-                            AlertDialog.Builder(context)
-                                .apply {
-                                    setTitle("Finish route") // Set the title of the dialog to the checkpoint title
-                                    // put image here
-                                    setPositiveButton("OK") { dialog, which -> dialog.dismiss()
-                                    setMessage("You have reached the finish point. Congratulation!")}
-                                    // If you have an image and want to display it, consider using a custom layout or
-                                    // fetching the image asynchronously
-                                }
-                                .create()
-                                .show()
                             Log.d("FollowRoute", "Current location is null, stopping the coroutine")
-                            onGoBackBUttonClick()
                         }
                     } else {
                         val distance = calculateDistance(trackpoint, currentLocation)
@@ -176,7 +166,17 @@ class FollowRoute() {
                             //check reach final point or not
                             withContext(Dispatchers.Main) {
                                 userOnRoute.value = true
+                                AlertDialog.Builder(context)
+                                    .apply {
+                                        setTitle("Finish route")
+                                        setMessage("Congratulation! You have reached the finish point.")
+                                        setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
+
+                                    }
+                                    .create()
+                                    .show()
                                 Log.d("FollowRoute", "You have reached the finish point. Congrat")
+                                onGoBackBUttonClick()
                             }
                         }
                         else{
@@ -197,7 +197,13 @@ class FollowRoute() {
                             else if (distance <= threshold_outRoute && distance > threshold_onRoute) {
                                 withContext(Dispatchers.Main) {
                                     userOnRoute.postValue(false)
-                                    Toast.makeText(context, "Warning: You are off the route, please go back to route.", Toast.LENGTH_LONG).show()
+
+                                    // Check if there is already a Toast being shown and cancel it
+                                    currentToast?.cancel()
+                                    // Show a new Toast
+                                    currentToast = Toast.makeText(context, "Warning: You are off the route, please go back to route.", Toast.LENGTH_LONG)
+                                    currentToast?.show()
+
                                     Log.d("FollowRoute", "Warning: You are off the route")
                                 }
                             }
@@ -206,12 +212,9 @@ class FollowRoute() {
                                     userOnRoute.postValue(false)
                                     AlertDialog.Builder(context)
                                         .apply {
-                                            setTitle("Finish route") // Set the title of the dialog to the checkpoint title
-                                            // put image here
-                                            setPositiveButton("OK") { dialog, which -> dialog.dismiss()
-                                                setMessage("You are off the route. Stop following the route. Bye!")}
-                                            // If you have an image and want to display it, consider using a custom layout or
-                                            // fetching the image asynchronously
+                                            setTitle("Finish route")
+                                            setMessage("You are off the route. Stop following the route. Bye!")
+                                            setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
                                         }
                                         .create()
                                         .show()

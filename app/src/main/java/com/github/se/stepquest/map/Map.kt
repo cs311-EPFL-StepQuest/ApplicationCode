@@ -163,7 +163,6 @@ fun Map(locationViewModel: LocationViewModel) {
     // Define the function with the click logic of Go Back Button
     val onGoBackBUttonClick: () -> Unit = {
         // Your click logic here
-        locationViewModel.onPause()
         locationViewModel.create_route_start.postValue(false)
         locationViewModel.locationUpdated.postValue(false)
         stopCreatingRoute = true
@@ -179,6 +178,13 @@ fun Map(locationViewModel: LocationViewModel) {
         Log.i("clean", "cleaned")
         numCheckpoints = 0
         images.value = emptyList()
+        //when go back to default, zoom to current location
+        map.value!!.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    locationViewModel.currentLocation.value!!.latitude,
+                    locationViewModel.currentLocation.value!!.longitude),
+                15f))
     }
 
   Scaffold(
@@ -210,6 +216,12 @@ fun Map(locationViewModel: LocationViewModel) {
               locationViewModel.locationUpdated.value = false
             }
           }
+            LaunchedEffect(followingRoute){
+                if (followingRoute == true) {
+                    Log.d("FollowRoute", "start check if on route")
+                    followRoute.checkIfOnRoute(locationViewModel, context, onGoBackBUttonClick)
+                }
+            }
 
           if (!makingRoute && displayButtons) {
             FloatingActionButton(
@@ -251,8 +263,8 @@ fun Map(locationViewModel: LocationViewModel) {
                               locationViewModel.currentLocation.value!!.latitude,
                               locationViewModel.currentLocation.value!!.longitude),
                           15f))
-                  followRoute.drawRouteDetail(map.value!!, context)
-                  followRoute.checkIfOnRoute(locationViewModel, context, onGoBackBUttonClick)
+                    followRoute.drawRouteDetail(map.value!!, context, onClear={ currentMarker = null })
+
                 },
                 modifier =
                     Modifier.padding(16.dp)
@@ -359,7 +371,7 @@ fun Map(locationViewModel: LocationViewModel) {
                           LocationDetails(
                               searchableLocation!!.latitude, searchableLocation!!.longitude))
                       locationArea.drawRoutesOnMap(map.value!!)
-                      followRoute.drawRouteDetail(map.value!!, context)
+                      followRoute.drawRouteDetail(map.value!!, context, onClear={ currentMarker = null })
 
                     },
                     modifier =
