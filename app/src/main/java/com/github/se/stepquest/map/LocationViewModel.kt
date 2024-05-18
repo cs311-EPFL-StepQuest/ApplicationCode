@@ -2,14 +2,17 @@ package com.github.se.stepquest.map
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.location.Location
 import android.os.Looper
 import androidx.lifecycle.*
 import com.google.android.gms.location.*
+import com.google.firebase.firestore.Blob
+import java.io.ByteArrayOutputStream
 
 data class LocationDetails(val latitude: Double, val longitude: Double)
 
-data class Checkpoint(val name: String, val location: LocationDetails)
+data class Checkpoint(val name: String, val location: LocationDetails, val image: ByteArray = byteArrayOf())
 
 class LocationViewModel : ViewModel() {
   var locationCallback: LocationCallback? = null
@@ -85,13 +88,20 @@ class LocationViewModel : ViewModel() {
     return _allocations.value
   }
 
-  fun addNewCheckpoint(name: String): Boolean {
+  fun addNewCheckpoint(name: String, image: Bitmap? = null): Boolean {
     val newCheckpointList = checkpoints.value?.toMutableList() ?: mutableListOf()
     val currLocation = currentLocation.value
     return if (currLocation == null) {
       false
     } else {
-      val newCheckpoint = Checkpoint(name, currentLocation.value!!)
+      val baos = ByteArrayOutputStream()
+      var imageData = byteArrayOf()
+      if (image != null) {
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        imageData = baos.toByteArray()
+      }
+
+      val newCheckpoint = Checkpoint(name, currentLocation.value!!, imageData)
       newCheckpointList.add(newCheckpoint)
       checkpoints.postValue(newCheckpointList)
       true
