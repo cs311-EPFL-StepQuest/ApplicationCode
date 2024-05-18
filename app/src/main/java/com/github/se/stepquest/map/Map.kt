@@ -212,6 +212,7 @@ fun Map(locationViewModel: LocationViewModel) {
           LaunchedEffect(followingRoute) {
             if (followingRoute == true) {
               Log.d("FollowRoute", "start check if on route")
+              displayButtons = false
               followRoute.checkIfOnRoute(locationViewModel, context, onGoBackBUttonClick)
             }
           }
