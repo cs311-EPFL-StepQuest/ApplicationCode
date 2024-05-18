@@ -178,15 +178,6 @@ fun Map(locationViewModel: LocationViewModel) {
     Log.i("clean", "cleaned")
     numCheckpoints = 0
     images.value = emptyList()
-    // when go back to default, zoom to current location
-    if (locationViewModel.currentLocation.value!! != null) {
-      map.value!!.moveCamera(
-          CameraUpdateFactory.newLatLngZoom(
-              LatLng(
-                  locationViewModel.currentLocation.value!!.latitude,
-                  locationViewModel.currentLocation.value!!.longitude),
-              15f))
-    }
   }
 
   Scaffold(
