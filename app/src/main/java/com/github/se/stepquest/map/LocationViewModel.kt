@@ -18,10 +18,12 @@ class LocationViewModel : ViewModel() {
   var _allocations = MutableLiveData<List<LocationDetails>?>()
   var locationUpdated = MutableLiveData<Boolean>()
   var checkpoints = MutableLiveData<List<Checkpoint>>()
+  var create_route_start = MutableLiveData<Boolean>()
   val isFollowingRoute = MutableLiveData<Boolean>(false)
 
   init {
     locationUpdated.postValue(false)
+    create_route_start.postValue(false)
   }
 
   @SuppressLint("MissingPermission")
@@ -35,16 +37,17 @@ class LocationViewModel : ViewModel() {
             for (lo in p0.locations) {
               // Update UI with location data
               currentLocation.value = LocationDetails(lo.latitude, lo.longitude)
-
-              val updatedValues =
-                  appendCurrentLocationToAllocations(
-                      _allocations.value ?: emptyList(),
-                      currentLocation.value!!,
-                      locationUpdated.value!!)
-              if (updatedValues != null) {
-                val (updatedAllocations, updatedLocation) = updatedValues
-                _allocations.postValue(updatedAllocations)
-                locationUpdated.postValue(updatedLocation)
+              if (create_route_start.value == true) {
+                val updatedValues =
+                    appendCurrentLocationToAllocations(
+                        _allocations.value ?: emptyList(),
+                        currentLocation.value!!,
+                        locationUpdated.value!!)
+                if (updatedValues != null) {
+                  val (updatedAllocations, updatedLocation) = updatedValues
+                  _allocations.postValue(updatedAllocations)
+                  locationUpdated.postValue(updatedLocation)
+                }
               }
             }
           }
@@ -104,7 +107,6 @@ class LocationViewModel : ViewModel() {
     if (fusedLocationClient == null || locationCallback == null) {
       return
     } else {
-      locationUpdated.postValue(false)
       locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
     }
   }

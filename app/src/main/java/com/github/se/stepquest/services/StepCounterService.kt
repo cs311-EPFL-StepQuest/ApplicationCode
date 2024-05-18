@@ -148,6 +148,7 @@ class StepCounterService(
     // clean up old daily steps
     val userRef = database.reference.child("users").child(userId)
     val d = Date()
+    val s: CharSequence = DateFormat.format("MMMM d, yyyy ", d.getTime())
     val calendar = Calendar.getInstance()
     // Set the calendar to the current date
     calendar.time = d
@@ -169,6 +170,12 @@ class StepCounterService(
           override fun onDataChange(dataSnapshot: DataSnapshot) {
             for (child in dataSnapshot.children) {
               val nodeName = child.key
+              if (nodeName != null &&
+                  nodeName.contains("dailySteps") &&
+                  nodeName != "dailySteps $s") {
+                userRef.child(nodeName).removeValue()
+              }
+
               if (nodeName != null &&
                   nodeName.contains("weeklySteps") &&
                   nodeName != "weeklySteps $current_period") {

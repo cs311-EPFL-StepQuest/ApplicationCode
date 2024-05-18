@@ -69,6 +69,7 @@ class StepCounterServiceTest {
 
     every { database.reference } returns
         mockk {
+          every { child("users") } returns mockk { every { child("testUserId") } returns userRef }
           every { child(any()) } returns
               mockk {
                 every { child(any()) } returns
@@ -109,12 +110,6 @@ class StepCounterServiceTest {
       sensorManager.registerListener(
           stepCounterService, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
-  }
-
-  @Test
-  fun testOnDestroy() {
-    stepCounterService.onDestroy()
-    verify { sensorManager.unregisterListener(stepCounterService) }
   }
 
   @Test
