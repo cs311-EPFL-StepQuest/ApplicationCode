@@ -40,6 +40,8 @@ import androidx.compose.ui.window.Dialog
 import com.github.se.stepquest.services.cacheDailyWeeklySteps
 import com.github.se.stepquest.services.cacheStepGoals
 import com.github.se.stepquest.services.getCachedStepInfo
+import com.github.se.stepquest.services.getCachedSteps
+import com.github.se.stepquest.services.isOnline
 
 @Composable
 fun ProgressionPage(user: UserRepository, context: Context) {
@@ -57,6 +59,32 @@ fun ProgressionPage(user: UserRepository, context: Context) {
   var weeklyStepGoal by remember { mutableIntStateOf(stepList["weeklyStepGoal"] ?: 35000) }
   var dailyGoalAchieved by remember { mutableStateOf(dailyStepsMade > dailyStepGoal) }
   val levelList = arrayListOf<String>("Current week progression", "$weeklyStepsMade steps")
+
+  @Composable
+  fun onlineStats() {
+    BuildStats(
+        dailyStepsMade = dailyStepsMade,
+        dailyStepGoal = dailyStepGoal,
+        weeklyStepsMade = weeklyStepsMade,
+        weeklyStepGoal = weeklyStepGoal)
+  }
+
+  @Composable
+  fun offlineStats() {
+    Box(modifier = Modifier.height(40.dp))
+    BuildStatLine(
+        icon = R.drawable.step_icon,
+        title = "Steps taken since offline",
+        value = getCachedSteps(context).toString())
+    Box(modifier = Modifier.height(20.dp))
+    Row(modifier = Modifier.fillMaxWidth().offset(20.dp, 0.dp)) {
+      Text(
+          text = "(Go online to retrieve past step counts)",
+          fontSize = 16.sp,
+          modifier = Modifier.offset(5.dp, 0.dp))
+    }
+    Box(modifier = Modifier.height(60.dp))
+  }
 
   Column(modifier = Modifier.fillMaxSize()) {
     Text(text = "Back", modifier = Modifier.padding(20.dp), fontSize = 20.sp)
@@ -80,11 +108,11 @@ fun ProgressionPage(user: UserRepository, context: Context) {
               modifier = Modifier.offset(0.dp, 10.dp).fillMaxWidth()) {
                 levelList.forEach { s -> Text(text = s, fontSize = 16.sp) }
               }
-          BuildStats(
-              dailyStepsMade = dailyStepsMade,
-              dailyStepGoal = dailyStepGoal,
-              weeklyStepsMade = weeklyStepsMade,
-              weeklyStepGoal = weeklyStepGoal)
+          if (isOnline(context)) {
+            onlineStats()
+          } else {
+            offlineStats()
+          }
           Button(
               onClick = { showDialog = true },
               colors = ButtonDefaults.buttonColors(colorResource(id = R.color.blueTheme)),
