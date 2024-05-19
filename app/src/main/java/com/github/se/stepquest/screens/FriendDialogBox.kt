@@ -79,16 +79,20 @@ fun FriendDialogBox(friend: Friend, userId: String, onDismiss: () -> Unit) {
                 ButtonElement(
                     buttonText = "Regular Step Challenge",
                     onClick = {
-                        getUsername(userId) { currentUsername ->
-                            getUserId(friend.name) { friendUserId ->
-                                val challenge =
-                                    createChallengeItem(
-                                        userId, currentUsername, friendUserId, friend.name, ChallengeType.REGULAR_STEP_CHALLENGE)
-                                sendPendingChallenge(challenge)
-                                challengeSentVisible = true
-                                challengeMode = false
-                            }
+                      getUsername(userId) { currentUsername ->
+                        getUserId(friend.name) { friendUserId ->
+                          val challenge =
+                              createChallengeItem(
+                                  userId,
+                                  currentUsername,
+                                  friendUserId,
+                                  friend.name,
+                                  ChallengeType.REGULAR_STEP_CHALLENGE)
+                          sendPendingChallenge(challenge)
+                          challengeSentVisible = true
+                          challengeMode = false
                         }
+                      }
                     })
                 ButtonElement(
                     buttonText = "Daily Step Challenge", onClick = { /* to be added soon */})
