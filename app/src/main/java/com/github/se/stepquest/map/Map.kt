@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -88,6 +87,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var routeEndMarker: Marker? = null
   val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
+  val followRoute = FollowRoute()
   val locationArea = LocationArea()
 
   // Instantiate all necessary variables to take pictures
@@ -118,6 +118,7 @@ fun Map(locationViewModel: LocationViewModel) {
 
   var makingRoute by remember { mutableStateOf(false) }
   var displayButtons by remember { mutableStateOf(true) }
+  val followingRoute by followRoute.followingRoute.observeAsState()
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -128,7 +129,7 @@ fun Map(locationViewModel: LocationViewModel) {
           println("Permission Granted")
           // Start location update only if the permission asked comes from a map action
           if (!cameraActionPermission.value) {
-            locationViewModel.startLocationUpdates(context as ComponentActivity)
+            locationViewModel.startLocationUpdates(context)
           } else {
             cameraActionPermission.value = false
             resultLauncher.launch(takePicture)
@@ -158,6 +159,27 @@ fun Map(locationViewModel: LocationViewModel) {
   var currentMarker: Marker? by remember { mutableStateOf(null) }
 
   val keyboardController = LocalSoftwareKeyboardController.current
+
+  // Define the function with the click logic of Go Back Button
+  val onGoBackBUttonClick: () -> Unit = {
+    // Your click logic here
+    locationViewModel.create_route_start.postValue(false)
+    locationViewModel.locationUpdated.postValue(false)
+    stopCreatingRoute = true
+    makingRoute = false
+    if (followingRoute == true) {
+      followRoute.stopCheckIfOnRoute()
+      Log.d("FollowRoute", "stop check following route")
+    }
+    followRoute.followingRoute.value = false
+    displayButtons = true
+    locationViewModel.cleanAllocations()
+    cleanGoogleMap(map.value!!, onClear = { currentMarker = null })
+    Log.i("clean", "cleaned")
+    numCheckpoints = 0
+    images.value = emptyList()
+  }
+
   Scaffold(
       content = {
         Box(modifier = Modifier.fillMaxSize().testTag("MapScreen")) {
@@ -169,8 +191,8 @@ fun Map(locationViewModel: LocationViewModel) {
                   // Get the GoogleMap asynchronously
                   getMapAsync { googleMap ->
                     map.value = googleMap
+                    Log.i("LOOKATME", "init map")
                     initMap(map.value!!)
-
                     locationPermission(
                         locationViewModel, context, launcherMultiplePermissions, permissions, {})
                   }
@@ -187,8 +209,14 @@ fun Map(locationViewModel: LocationViewModel) {
               locationViewModel.locationUpdated.value = false
             }
           }
+          LaunchedEffect(followingRoute) {
+            if (followingRoute == true) {
+              Log.d("FollowRoute", "start check if on route")
+              displayButtons = false
+              followRoute.checkIfOnRoute(locationViewModel, context, onGoBackBUttonClick)
+            }
+          }
 
-          // Button for creating a route
           if (!makingRoute && displayButtons) {
             FloatingActionButton(
                 onClick = {
@@ -229,6 +257,8 @@ fun Map(locationViewModel: LocationViewModel) {
                               locationViewModel.currentLocation.value!!.latitude,
                               locationViewModel.currentLocation.value!!.longitude),
                           15f))
+                  followRoute.drawRouteDetail(
+                      map.value!!, context, onClear = { currentMarker = null })
                 },
                 modifier =
                     Modifier.padding(16.dp)
@@ -335,6 +365,8 @@ fun Map(locationViewModel: LocationViewModel) {
                           LocationDetails(
                               searchableLocation!!.latitude, searchableLocation!!.longitude))
                       locationArea.drawRoutesOnMap(map.value!!)
+                      followRoute.drawRouteDetail(
+                          map.value!!, context, onClear = { currentMarker = null })
                     },
                     modifier =
                         Modifier.align(Alignment.CenterEnd)
@@ -361,20 +393,11 @@ fun Map(locationViewModel: LocationViewModel) {
                 },
             )
           }
-          if (makingRoute || !displayButtons) {
+
+          if (makingRoute || !displayButtons || followingRoute == true) {
             // Button for going back to default map
             FloatingActionButton(
-                onClick = {
-                  locationViewModel.onPause()
-                  stopCreatingRoute = true
-                  makingRoute = false
-                  displayButtons = true
-                  locationViewModel.cleanAllocations()
-                  cleanGoogleMap(map.value!!, onClear = { currentMarker = null })
-                  Log.i("clean", "cleaned")
-                  numCheckpoints = 0
-                  images.value = emptyList()
-                },
+                onClick = onGoBackBUttonClick,
                 modifier =
                     Modifier.size(70.dp)
                         .padding(18.dp)
@@ -514,7 +537,6 @@ fun Map(locationViewModel: LocationViewModel) {
           locationViewModel.create_route_start.postValue(false)
           locationViewModel.locationUpdated.postValue(false)
           Log.i("finish locationupdate", "finish locationupdate")
-
           stopCreatingRoute = true
           makingRoute = false
           displayButtons = false
@@ -530,6 +552,7 @@ fun Map(locationViewModel: LocationViewModel) {
         routeLength,
         numCheckpoints)
   }
+
   LaunchedEffect(Unit) {
     while (true) {
       if (map.value != null && locationViewModel.currentLocation.value != null) {

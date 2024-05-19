@@ -37,6 +37,7 @@ class LocationViewModel : ViewModel() {
             for (lo in p0.locations) {
               // Update UI with location data
               currentLocation.value = LocationDetails(lo.latitude, lo.longitude)
+
               if (create_route_start.value == true) {
                 val updatedValues =
                     appendCurrentLocationToAllocations(

@@ -43,8 +43,12 @@ android {
 
         //fetch the map key
         val apiKey = properties.getProperty("MAPS_API_KEY") ?: ""
+        var apiKey2=apiKey
+        if (apiKey[0] != '\"'){
+            apiKey2="\"" + apiKey + "\""
+        }
 
-        buildConfigField("String", "MAPS_API_KEY", apiKey)
+        buildConfigField("String", "MAPS_API_KEY", apiKey2)
 
         //inject the key dynamically into the manifest
         manifestPlaceholders["GOOGLE_MAP_KEY"] = apiKey
@@ -200,8 +204,11 @@ dependencies {
 
     implementation("androidx.camera:camera-view:$cameraxVersion")
     implementation("androidx.camera:camera-extensions:$cameraxVersion")
+
+    androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
     implementation("com.google.android.libraries.places:places:2.6.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
+
 }
 
 tasks.register("jacocoTestReport", JacocoReport::class) {
