@@ -34,6 +34,8 @@ import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
 import com.github.se.stepquest.data.model.ChallengeType
 import com.github.se.stepquest.services.createChallengeItem
+import com.github.se.stepquest.services.getUserId
+import com.github.se.stepquest.services.getUsername
 import com.github.se.stepquest.services.sendPendingChallenge
 import kotlinx.coroutines.delay
 
@@ -77,12 +79,16 @@ fun FriendDialogBox(friend: Friend, userId: String, onDismiss: () -> Unit) {
                 ButtonElement(
                     buttonText = "Regular Step Challenge",
                     onClick = {
-                      val challenge =
-                          createChallengeItem(
-                              userId, friend.name, ChallengeType.REGULAR_STEP_CHALLENGE)
-                      sendPendingChallenge(challenge)
-                      challengeSentVisible = true
-                      challengeMode = false
+                        getUsername(userId) { currentUsername ->
+                            getUserId(friend.name) { friendUserId ->
+                                val challenge =
+                                    createChallengeItem(
+                                        userId, currentUsername, friendUserId, friend.name, ChallengeType.REGULAR_STEP_CHALLENGE)
+                                sendPendingChallenge(challenge)
+                                challengeSentVisible = true
+                                challengeMode = false
+                            }
+                        }
                     })
                 ButtonElement(
                     buttonText = "Daily Step Challenge", onClick = { /* to be added soon */})

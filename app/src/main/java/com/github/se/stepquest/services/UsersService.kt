@@ -23,14 +23,14 @@ fun getUsername(userId: String, callback: (String) -> Unit) {
 }
 
 fun getUserId(username: String, callback: (String) -> Unit) {
-  var uid: String
+  var uid: String?
   val database = FirebaseDatabase.getInstance()
   val usernamesRef = database.reference.child("usernames").child(username)
   usernamesRef.addListenerForSingleValueEvent(
       object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-          uid = snapshot.getValue(String::class.java).toString()
-          callback(uid)
+          uid = snapshot.getValue(String::class.java)
+          uid?.let { callback(it) }
         }
 
         override fun onCancelled(error: DatabaseError) {

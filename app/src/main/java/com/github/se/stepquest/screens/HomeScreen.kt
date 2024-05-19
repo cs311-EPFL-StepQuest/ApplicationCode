@@ -42,6 +42,7 @@ import com.github.se.stepquest.services.cacheUserInfo
 import com.github.se.stepquest.services.getTopChallenge
 import com.github.se.stepquest.services.getUsername
 import com.github.se.stepquest.services.isOnline
+import com.github.se.stepquest.services.sendPendingChallenge
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
@@ -110,7 +111,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
 
           // Start game button
           Button(
-              onClick = { /* start game when ready */},
+              onClick = { /* start game when ready */ },
               shape = RoundedCornerShape(20.dp),
               colors = ButtonDefaults.buttonColors(Color.White),
               modifier =
