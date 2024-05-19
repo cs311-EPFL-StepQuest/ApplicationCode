@@ -39,6 +39,7 @@ import com.github.se.stepquest.Routes
 import com.github.se.stepquest.activity.Quest
 import com.github.se.stepquest.data.model.ChallengeData
 import com.github.se.stepquest.services.cacheUserInfo
+import com.github.se.stepquest.services.checkChallengesCompletion
 import com.github.se.stepquest.services.getTopChallenge
 import com.github.se.stepquest.services.getUsername
 import com.github.se.stepquest.services.isOnline
@@ -64,6 +65,8 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
   val isOnline = isOnline(context)
 
   if (isOnline) getUsername(userId) { cacheUserInfo(context, userId, it) }
+
+  checkChallengesCompletion(userId)
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),
