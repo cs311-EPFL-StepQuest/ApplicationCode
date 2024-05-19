@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -73,7 +74,7 @@ fun FriendsListScreen(
   var showAddFriendScreen by remember { mutableStateOf(false) }
   var showFriendProfile by remember { mutableStateOf(false) }
   var selectedFriend by remember { mutableStateOf<Friend?>(null) }
-  val currentFriendsList by remember { mutableStateOf(testCurrentFriendsList.toMutableList()) }
+    val currentFriendsList = remember { mutableStateListOf<Friend>().apply { addAll(testCurrentFriendsList) } }
   val database = FirebaseDatabase.getInstance()
   if (currentFriendsList.isEmpty()) {
     val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
