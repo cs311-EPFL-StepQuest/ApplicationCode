@@ -7,12 +7,15 @@ import android.location.Location
 import android.os.Looper
 import androidx.lifecycle.*
 import com.google.android.gms.location.*
-import com.google.firebase.firestore.Blob
 import java.io.ByteArrayOutputStream
 
 data class LocationDetails(val latitude: Double, val longitude: Double)
 
-data class Checkpoint(val name: String, val location: LocationDetails, val image: ByteArray = byteArrayOf())
+data class Checkpoint(
+  val name: String,
+  val location: LocationDetails,
+  var image: ByteArray = byteArrayOf()
+)
 
 class LocationViewModel : ViewModel() {
   var locationCallback: LocationCallback? = null
@@ -22,7 +25,6 @@ class LocationViewModel : ViewModel() {
   var locationUpdated = MutableLiveData<Boolean>()
   var checkpoints = MutableLiveData<List<Checkpoint>>()
   var create_route_start = MutableLiveData<Boolean>()
-  val isFollowingRoute = MutableLiveData<Boolean>(false)
 
   init {
     locationUpdated.postValue(false)
@@ -97,7 +99,7 @@ class LocationViewModel : ViewModel() {
       val baos = ByteArrayOutputStream()
       var imageData = byteArrayOf()
       if (image != null) {
-        image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        image.compress(Bitmap.CompressFormat.JPEG, 50, baos)
         imageData = baos.toByteArray()
       }
 

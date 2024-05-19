@@ -3,8 +3,15 @@ package com.github.se.stepquest.map
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.view.LayoutInflater
+import android.widget.ImageView
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.MutableLiveData
+import com.github.se.stepquest.R
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -76,16 +83,20 @@ class FollowRoute() {
         // Handle checkpoint click, show image and title
         val checkpoint = clickedMarker.tag as? Checkpoint
         checkpoint?.let {
-          AlertDialog.Builder(context)
-              .apply {
-                setTitle(it.name) // Set the title of the dialog to the checkpoint title
-                // put image here
-                setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
-                // If you have an image and want to display it, consider using a custom layout or
-                // fetching the image asynchronously
-              }
-              .create()
-              .show()
+            val builder = AlertDialog.Builder(context)
+            val inflater = LayoutInflater.from(context)
+            val view = inflater.inflate(R.layout.dialog_image, null)
+
+            val imageView: ImageView = view.findViewById(R.id.dialog_image)
+
+            val imageBitmap: Bitmap = BitmapFactory.decodeByteArray(it.image, 0, it.image.size)
+            imageView.setImageBitmap(imageBitmap)
+
+            builder.setView(view)
+                .setTitle(it.name) // Set the title of the dialog to the checkpoint title
+                .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
+                .create()
+                .show()
         }
       }
       true // Return true to indicate that we have handled the event

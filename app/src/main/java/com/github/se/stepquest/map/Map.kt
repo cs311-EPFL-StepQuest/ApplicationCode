@@ -39,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
@@ -73,7 +72,6 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 
 data class PlaceSuggestion(val name: String, val placeId: String)
 
@@ -413,7 +411,7 @@ fun Map(locationViewModel: LocationViewModel) {
                         showDialog = false
                         checkpointTitle = ""
                         currentCheckpointHasPicture = false
-                          currentImage.value = null
+                        currentImage.value = null
                       },
                       modifier = Modifier.size(36.dp)) {
                         Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.Black)
@@ -476,14 +474,17 @@ fun Map(locationViewModel: LocationViewModel) {
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp)) {
                   Button(
                       onClick = {
-                          if (locationViewModel.addNewCheckpoint(checkpointTitle, if (currentCheckpointHasPicture) currentImage.value else null)) {
-                              // Increase checkpoint number
-                              numCheckpoints++
-                              // Show picture button for next checkpoint
-                              currentCheckpointHasPicture = false
-                          } else {
-                              Toast.makeText(context, "Could not save checkpoint", Toast.LENGTH_SHORT).show()
-                          }
+                        if (locationViewModel.addNewCheckpoint(
+                            checkpointTitle,
+                            if (currentCheckpointHasPicture) currentImage.value else null)) {
+                          // Increase checkpoint number
+                          numCheckpoints++
+                          // Show picture button for next checkpoint
+                          currentCheckpointHasPicture = false
+                        } else {
+                          Toast.makeText(context, "Could not save checkpoint", Toast.LENGTH_SHORT)
+                              .show()
+                        }
                         showDialog = false
                         checkpointTitle = ""
                       },
