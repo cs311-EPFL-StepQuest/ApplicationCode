@@ -151,44 +151,47 @@ fun getPendingChallenge(userId: String, challengeUuid: String, callback: (Challe
 }
 
 fun acceptChallenge(challenge: ChallengeData) {
-    val database = FirebaseDatabase.getInstance()
-    val firstUserRef = database.reference
-        .child("users")
-        .child(challenge.challengedUserUuid)
-        .child("acceptedChallenges")
-        .child(challenge.uuid)
-    val secondUserRef = database.reference
-        .child("users")
-        .child(challenge.senderUserUuid)
-        .child("acceptedChallenges")
-        .child(challenge.uuid)
+  val database = FirebaseDatabase.getInstance()
+  val firstUserRef =
+      database.reference
+          .child("users")
+          .child(challenge.challengedUserUuid)
+          .child("acceptedChallenges")
+          .child(challenge.uuid)
+  val secondUserRef =
+      database.reference
+          .child("users")
+          .child(challenge.senderUserUuid)
+          .child("acceptedChallenges")
+          .child(challenge.uuid)
 
-    // First, ensure the challenge is accepted by the first user
-    firstUserRef.setValue(challenge).addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-            // If successful, proceed to set the challenge for the second user
-            secondUserRef.setValue(challenge).addOnCompleteListener { task2 ->
-                if (task2.isSuccessful) {
-                    // Both updates are successful, remove from pending list and add to global challenges list
-                    val challengeRef = database.reference
-                        .child("users")
-                        .child(challenge.challengedUserUuid)
-                        .child("pendingChallenges")
-                        .child(challenge.uuid)
-                    challengeRef.removeValue()
+  // First, ensure the challenge is accepted by the first user
+  firstUserRef.setValue(challenge).addOnCompleteListener { task ->
+    if (task.isSuccessful) {
+      // If successful, proceed to set the challenge for the second user
+      secondUserRef.setValue(challenge).addOnCompleteListener { task2 ->
+        if (task2.isSuccessful) {
+          // Both updates are successful, remove from pending list and add to global challenges list
+          val challengeRef =
+              database.reference
+                  .child("users")
+                  .child(challenge.challengedUserUuid)
+                  .child("pendingChallenges")
+                  .child(challenge.uuid)
+          challengeRef.removeValue()
 
-                    val challengeListRef = database.reference.child("challenges").child(challenge.uuid)
-                    challengeListRef.setValue(challenge)
-                } else {
-                    // Handle failure for second user update
-                    println("Failed to update challenge for the sender user: ${task2.exception?.message}")
-                }
-            }
+          val challengeListRef = database.reference.child("challenges").child(challenge.uuid)
+          challengeListRef.setValue(challenge)
         } else {
-            // Handle failure for first user update
-            println("Failed to update challenge for the challenged user: ${task.exception?.message}")
+          // Handle failure for second user update
+          println("Failed to update challenge for the sender user: ${task2.exception?.message}")
         }
+      }
+    } else {
+      // Handle failure for first user update
+      println("Failed to update challenge for the challenged user: ${task.exception?.message}")
     }
+  }
 }
 
 fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {

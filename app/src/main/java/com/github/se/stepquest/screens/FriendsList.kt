@@ -75,12 +75,14 @@ fun FriendsListScreen(
   var showAddFriendScreen by remember { mutableStateOf(false) }
   var showFriendProfile by remember { mutableStateOf(false) }
   var selectedFriend by remember { mutableStateOf<Friend?>(null) }
-    val currentFriendsList = remember { mutableStateListOf<Friend>().apply { addAll(testCurrentFriendsList) } }
-    LaunchedEffect(Unit) {
-        if (currentFriendsList.isEmpty()) {
-            fetchFriendsListFromDatabase(userId, currentFriendsList)
-        }
+  val currentFriendsList = remember {
+    mutableStateListOf<Friend>().apply { addAll(testCurrentFriendsList) }
+  }
+  LaunchedEffect(Unit) {
+    if (currentFriendsList.isEmpty()) {
+      fetchFriendsListFromDatabase(userId, currentFriendsList)
     }
+  }
   if (showAddFriendScreen) {
     AddFriendScreen(onDismiss = { showAddFriendScreen = false }, userId)
   } else if (showFriendProfile) {
@@ -172,20 +174,19 @@ fun FriendItem(friend: Friend, onClick: () -> Unit) {
 }
 
 private fun fetchFriendsListFromDatabase(userId: String, currentFriendsList: MutableList<Friend>) {
-    val database = FirebaseDatabase.getInstance()
-    val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
-    friendsListRef.addListenerForSingleValueEvent(object : ValueEventListener {
+  val database = FirebaseDatabase.getInstance()
+  val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
+  friendsListRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
-            for (snapshot in dataSnapshot.children) {
-                val friend = snapshot.getValue(Friend::class.java)
-                friend?.let {
-                    currentFriendsList.add(it)
-                }
-            }
+          for (snapshot in dataSnapshot.children) {
+            val friend = snapshot.getValue(Friend::class.java)
+            friend?.let { currentFriendsList.add(it) }
+          }
         }
 
         override fun onCancelled(databaseError: DatabaseError) {
-            // Handle error
+          // Handle error
         }
-    })
+      })
 }
