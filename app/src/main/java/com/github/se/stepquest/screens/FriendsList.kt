@@ -20,7 +20,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -73,25 +75,13 @@ fun FriendsListScreen(
   var showAddFriendScreen by remember { mutableStateOf(false) }
   var showFriendProfile by remember { mutableStateOf(false) }
   var selectedFriend by remember { mutableStateOf<Friend?>(null) }
-  val currentFriendsList by remember { mutableStateOf(testCurrentFriendsList.toMutableList()) }
-  val database = FirebaseDatabase.getInstance()
-  if (currentFriendsList.isEmpty()) {
-    val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
-    friendsListRef.addListenerForSingleValueEvent(
-        object : ValueEventListener {
-          override fun onDataChange(dataSnapshot: DataSnapshot) {
-            for (snapshot in dataSnapshot.getChildren()) {
-              val friend = snapshot.getValue(Friend::class.java)
-              if (friend != null) {
-                currentFriendsList.add(friend)
-              }
-            }
-          }
-
-          override fun onCancelled(databaseError: DatabaseError) {
-            // add code when failing to access database
-          }
-        })
+  val currentFriendsList = remember {
+    mutableStateListOf<Friend>().apply { addAll(testCurrentFriendsList) }
+  }
+  LaunchedEffect(Unit) {
+    if (currentFriendsList.isEmpty()) {
+      fetchFriendsListFromDatabase(userId, currentFriendsList)
+    }
   }
   if (showAddFriendScreen) {
     AddFriendScreen(onDismiss = { showAddFriendScreen = false }, userId)
@@ -181,4 +171,22 @@ fun FriendItem(friend: Friend, onClick: () -> Unit) {
                   style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold))
             }
       }
+}
+
+private fun fetchFriendsListFromDatabase(userId: String, currentFriendsList: MutableList<Friend>) {
+  val database = FirebaseDatabase.getInstance()
+  val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
+  friendsListRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+          for (snapshot in dataSnapshot.children) {
+            val friend = snapshot.getValue(Friend::class.java)
+            friend?.let { currentFriendsList.add(it) }
+          }
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+          // Handle error
+        }
+      })
 }

@@ -23,14 +23,12 @@ import java.util.UUID
 
 fun createChallengeItem(
     currentUserId: String,
+    currentUsername: String,
+    friendUserId: String,
     friendUsername: String,
     type: ChallengeType
 ): ChallengeData {
   val currentDate = Date()
-  var friendUid = ""
-  getUserId(friendUsername) { fUserid -> friendUid = fUserid }
-  var currentUsername = ""
-  getUsername(currentUserId) { cUsername -> currentUsername = cUsername }
   return when (type) {
     ChallengeType.REGULAR_STEP_CHALLENGE ->
         ChallengeData(
@@ -42,10 +40,10 @@ fun createChallengeItem(
             daysToComplete = 10,
             getEndDate(currentDate, 10),
             friendUsername,
-            friendUid,
+            friendUserId,
             currentUsername,
             currentUserId,
-            ChallengeProgression(friendUid, 0, 0),
+            ChallengeProgression(friendUserId, 0, 0),
             ChallengeProgression(currentUserId, 0, 0))
     ChallengeType.DAILY_STEP_CHALLENGE ->
         ChallengeData(
@@ -57,10 +55,10 @@ fun createChallengeItem(
             daysToComplete = 1,
             getEndDate(currentDate, 1),
             friendUsername,
-            friendUid,
+            friendUserId,
             currentUsername,
             currentUserId,
-            ChallengeProgression(friendUid, 0, 0),
+            ChallengeProgression(friendUserId, 0, 0),
             ChallengeProgression(currentUserId, 0, 0))
     ChallengeType.ROUTE_CHALLENGE ->
         ChallengeData(
@@ -72,10 +70,10 @@ fun createChallengeItem(
             daysToComplete = 1,
             getEndDate(currentDate, 1),
             friendUsername,
-            friendUid,
+            friendUserId,
             currentUsername,
             currentUserId,
-            ChallengeProgression(friendUid, 0, 0),
+            ChallengeProgression(friendUserId, 0, 0),
             ChallengeProgression(currentUserId, 0, 0))
   }
 }
@@ -111,7 +109,7 @@ fun sendPendingChallenge(challenge: ChallengeData) {
                         notificationRepository.createNotification(
                             receiverUserId,
                             NotificationData(
-                                "$senderUsername sent you the following challenge : $messageText",
+                                "$senderUsername sent a new challenge! : $messageText",
                                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm")),
                                 UUID.randomUUID().toString(),
                                 receiverUserId,
@@ -153,7 +151,6 @@ fun getPendingChallenge(userId: String, challengeUuid: String, callback: (Challe
 }
 
 fun acceptChallenge(challenge: ChallengeData) {
-  // initialize the challenge
   val database = FirebaseDatabase.getInstance()
   val firstUserRef =
       database.reference
@@ -167,29 +164,34 @@ fun acceptChallenge(challenge: ChallengeData) {
           .child(challenge.senderUserUuid)
           .child("acceptedChallenges")
           .child(challenge.uuid)
-  firstUserRef.addListenerForSingleValueEvent(
-      object : ValueEventListener {
-        override fun onDataChange(snapshot: DataSnapshot) {
-          firstUserRef.setValue(challenge)
-          secondUserRef.setValue(challenge)
+
+  // First, ensure the challenge is accepted by the first user
+  firstUserRef.setValue(challenge).addOnCompleteListener { task ->
+    if (task.isSuccessful) {
+      // If successful, proceed to set the challenge for the second user
+      secondUserRef.setValue(challenge).addOnCompleteListener { task2 ->
+        if (task2.isSuccessful) {
+          // Both updates are successful, remove from pending list and add to global challenges list
+          val challengeRef =
+              database.reference
+                  .child("users")
+                  .child(challenge.challengedUserUuid)
+                  .child("pendingChallenges")
+                  .child(challenge.uuid)
+          challengeRef.removeValue()
+
+          val challengeListRef = database.reference.child("challenges").child(challenge.uuid)
+          challengeListRef.setValue(challenge)
+        } else {
+          // Handle failure for second user update
+          println("Failed to update challenge for the sender user: ${task2.exception?.message}")
         }
-
-        override fun onCancelled(error: DatabaseError) {}
-      })
-
-  // Remove challenge from pending list
-  val challengeRef =
-      database.reference
-          .child("users")
-          .child(challenge.challengedUserUuid)
-          .child("pendingChallenges")
-          .child(challenge.uuid)
-  challengeRef.removeValue()
-
-  // Add challenge to global challenges list
-  val challengeListRef = database.reference.child("challenges").child(challenge.uuid)
-  val newChallengeRef = challengeListRef.child(challenge.uuid)
-  newChallengeRef.setValue(challenge)
+      }
+    } else {
+      // Handle failure for first user update
+      println("Failed to update challenge for the challenged user: ${task.exception?.message}")
+    }
+  }
 }
 
 fun getTopChallenge(userId: String, callback: (ChallengeData?) -> Unit) {
