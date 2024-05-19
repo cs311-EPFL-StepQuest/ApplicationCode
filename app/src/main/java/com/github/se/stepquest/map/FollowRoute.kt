@@ -88,9 +88,9 @@ class FollowRoute() {
             val view = inflater.inflate(R.layout.dialog_image, null)
 
             val imageView: ImageView = view.findViewById(R.id.dialog_image)
-
-            val imageBitmap: Bitmap = BitmapFactory.decodeByteArray(it.image, 0, it.image.size)
-            imageView.setImageBitmap(imageBitmap)
+            BitmapFactory.decodeStream(it.image.inputStream()).also { bitmap ->
+              imageView.setImageBitmap(bitmap)
+            }
 
             builder.setView(view)
                 .setTitle(it.name) // Set the title of the dialog to the checkpoint title
