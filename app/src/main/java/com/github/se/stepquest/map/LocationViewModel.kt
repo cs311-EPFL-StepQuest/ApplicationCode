@@ -12,9 +12,9 @@ import java.io.ByteArrayOutputStream
 data class LocationDetails(val latitude: Double, val longitude: Double)
 
 data class Checkpoint(
-  val name: String,
-  val location: LocationDetails,
-  var image: ByteArray = byteArrayOf()
+    val name: String,
+    val location: LocationDetails,
+    var image: ByteArray = byteArrayOf()
 )
 
 class LocationViewModel : ViewModel() {
@@ -42,6 +42,7 @@ class LocationViewModel : ViewModel() {
             for (lo in p0.locations) {
               // Update UI with location data
               currentLocation.value = LocationDetails(lo.latitude, lo.longitude)
+
               if (create_route_start.value == true) {
                 val updatedValues =
                     appendCurrentLocationToAllocations(

@@ -3,6 +3,7 @@ package com.github.se.stepquest.services
 import com.github.se.stepquest.Friend
 import com.github.se.stepquest.IUserRepository
 import com.github.se.stepquest.data.model.NotificationData
+import com.github.se.stepquest.data.model.NotificationType
 import com.github.se.stepquest.data.repository.INotificationRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -235,7 +236,8 @@ fun sendFriendRequest(currentUsername: String, friendName: String) {
                                           .format(DateTimeFormatter.ofPattern("HH:mm")),
                                       UUID.randomUUID().toString(),
                                       receiverUserId,
-                                      senderUserId))
+                                      senderUserId,
+                                      type = NotificationType.FRIEND_REQUEST))
                             }
 
                             override fun onCancelled(error: DatabaseError) {

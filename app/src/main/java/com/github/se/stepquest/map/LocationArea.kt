@@ -1,6 +1,5 @@
 package com.github.se.stepquest.map
 
-import android.net.Uri
 import android.util.Log
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
