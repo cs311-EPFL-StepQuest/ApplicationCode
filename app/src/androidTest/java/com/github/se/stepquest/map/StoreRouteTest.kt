@@ -23,8 +23,8 @@ class StoreRouteTest {
         listOf(LocationDetails(1.0, 2.0), LocationDetails(3.0, 4.0), LocationDetails(5.0, 6.0))
     val checkpoints =
         listOf(
-            Checkpoint("Checkpoint 1", routeDetails[0]),
-            Checkpoint("Checkpoint 2", routeDetails[1]))
+            CheckpointURL("Checkpoint 1", routeDetails[0]),
+            CheckpointURL("Checkpoint 2", routeDetails[1]))
     val route = StoreRoute.Route(routeDetails, checkpoints)
     assertEquals(routeDetails, route.route)
     assertEquals(checkpoints, route.checkpoints)
@@ -36,8 +36,8 @@ class StoreRouteTest {
         listOf(LocationDetails(1.0, 2.0), LocationDetails(3.0, 4.0), LocationDetails(5.0, 6.0))
     val checkpoints =
         listOf(
-            Checkpoint("Checkpoint 1", routeDetails[0]),
-            Checkpoint("Checkpoint 2", routeDetails[1]))
+            CheckpointURL("Checkpoint 1", routeDetails[0]),
+            CheckpointURL("Checkpoint 2", routeDetails[1]))
     val userId = "testUserId"
     val globalRoute = StoreRoute.GlobalRoute(routeDetails, checkpoints, userId)
     assertEquals(routeDetails, globalRoute.route)
