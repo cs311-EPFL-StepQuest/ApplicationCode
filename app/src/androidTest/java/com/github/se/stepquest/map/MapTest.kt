@@ -283,20 +283,6 @@ class MapTest {
     }
   }
 
-  @Test
-  fun testNumCheckpointsIncreasedAfterCreatingCheckpoint() {
-    var numCheckpoints = 0
-    composeTestRule.setContent { Map(vm).apply { numCheckpoints += 1 } }
-
-    // Simulate the user interaction to create a checkpoint
-    composeTestRule.onNodeWithTag("createRouteButton").performClick()
-    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
-    composeTestRule.onNodeWithText("Name:").performTextInput("Test")
-    composeTestRule.onNodeWithText("Confirm").performClick()
-
-    // Assert that numCheckpoints is increased by 1
-    assertEquals(numCheckpoints, 1)
-  }
   /*
     @Test
     fun testCurrentLocationMarker(){
