@@ -242,13 +242,21 @@ fun getEndDate(startDate: Date, daysToAdd: Int): String {
   return dateFormat.format(calendar.time)
 }
 
-fun checkChallengesCompletion(userId: String) {
-  var challenges = listOf<ChallengeData>()
-  getChallenges(userId) { v -> challenges = v }
-  challenges.forEach { challenge ->
-    if (challenge.type.completionFunction(challenge)) {
-      deleteCompletedChallenge(challenge)
+fun someChallengesCompleted(userId: String, callback: (Boolean) -> Unit) {
+  Log.d("someChallengesCompleted", "userId: $userId")
+  var challenges: List<ChallengeData>
+  var result = false
+  getChallenges(userId) { v ->
+    challenges = v
+    Log.d("someChallengesCompleted", "vListSize: ${v.size}")
+    challenges.forEach { challenge ->
+      Log.d("someChallengesCompleted", "Challenge: $challenge")
+      if (challenge.type.completionFunction(challenge)) {
+        result = true
+        deleteCompletedChallenge(challenge)
+      }
     }
+    callback(result)
   }
 }
 
@@ -260,7 +268,7 @@ fun deleteCompletedChallenge(challenge: ChallengeData) {
       .reference
       .child("users")
       .child(challenge.challengedUserUuid)
-      .child("pendingChallenges")
+      .child("acceptedChallenges")
       .child(challenge.uuid)
       .ref
       .removeValue()
