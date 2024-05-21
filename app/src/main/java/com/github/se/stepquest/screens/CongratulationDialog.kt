@@ -24,7 +24,12 @@ import androidx.compose.ui.window.Dialog
 import com.github.se.stepquest.R
 
 @Composable
-fun ChallengeCompletionDialog(onConfirm: () -> Unit) {
+fun CongratulationDialog(
+    titleText: String,
+    mainText: String,
+    xpNumber: Int,
+    onConfirm: () -> Unit
+) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
 
   Dialog(onDismissRequest = { onConfirm() }) {
@@ -36,14 +41,14 @@ fun ChallengeCompletionDialog(onConfirm: () -> Unit) {
           Column(
               modifier = Modifier.padding(16.dp).fillMaxWidth(),
               horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Challenges", fontSize = 20.sp)
+                Text(text = titleText, fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    text = "Congratulations! You have completed some challenges!",
+                    text = mainText,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.testTag("Completed challenges message"))
+                    modifier = Modifier.testTag("main congratulation dialog text"))
                 Spacer(modifier = Modifier.height(15.dp))
-                Text(text = "You receive 100 XP", textAlign = TextAlign.Center)
+                Text(text = "You receive $xpNumber XP", textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(
                     onClick = { onConfirm() },

@@ -69,7 +69,12 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
 
   someChallengesCompleted(userId) { result -> if (result) showChallengeCompletionPopUp = true }
   if (showChallengeCompletionPopUp)
-      ChallengeCompletionDialog { showChallengeCompletionPopUp = false }
+      CongratulationDialog(
+          titleText = "Challenges",
+          mainText = "Congratulations! You have completed some challenges!",
+          xpNumber = 100) {
+            showChallengeCompletionPopUp = false
+          }
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),
