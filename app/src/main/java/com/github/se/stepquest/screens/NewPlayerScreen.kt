@@ -46,6 +46,7 @@ fun addUsername(username: String, userId: String, database: FirebaseDatabase) {
           databaseRef.child("users").child(userId).child("username").setValue(username)
           val usernamesRef = databaseRef.child("usernames").child(username)
           usernamesRef.setValue(userId)
+            databaseRef.child("leaderboard").child(username).setValue(0)
         }
 
         override fun onCancelled(databaseError: DatabaseError) {
