@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
+import com.github.se.stepquest.services.fetchFriendsListFromDatabase
 import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
@@ -171,22 +172,4 @@ fun FriendItem(friend: Friend, onClick: () -> Unit) {
                   style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold))
             }
       }
-}
-
-private fun fetchFriendsListFromDatabase(userId: String, currentFriendsList: MutableList<Friend>) {
-  val database = FirebaseDatabase.getInstance()
-  val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
-  friendsListRef.addListenerForSingleValueEvent(
-      object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-          for (snapshot in dataSnapshot.children) {
-            val friend = snapshot.getValue(Friend::class.java)
-            friend?.let { currentFriendsList.add(it) }
-          }
-        }
-
-        override fun onCancelled(databaseError: DatabaseError) {
-          // Handle error
-        }
-      })
 }

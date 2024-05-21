@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,6 +29,7 @@ import com.github.se.stepquest.screens.ChallengesScreen
 import com.github.se.stepquest.screens.DatabaseLoadingScreen
 import com.github.se.stepquest.screens.FriendsListScreenCheck
 import com.github.se.stepquest.screens.HomeScreen
+import com.github.se.stepquest.screens.Leaderboards
 import com.github.se.stepquest.screens.LoginScreen
 import com.github.se.stepquest.screens.NewPlayerScreen
 import com.github.se.stepquest.screens.NotificationScreen
@@ -115,10 +115,10 @@ fun AppNavigationHost(
         }
         composable(Routes.NotificationScreen.routName) { NotificationScreen(IUserRepository()) }
         composable(Routes.ChallengeScreen.routName) { ChallengesScreen(userId, navigationActions) }
+        composable(Routes.Leaderboard.routName) { Leaderboards(userId, navigationActions) }
       }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BuildMainScreen() {
   val navigationController: NavHostController = rememberNavController()

@@ -41,6 +41,7 @@ import com.github.se.stepquest.data.model.ChallengeData
 import com.github.se.stepquest.services.cacheUserInfo
 import com.github.se.stepquest.services.getTopChallenge
 import com.github.se.stepquest.services.getTopLeaderboard
+import com.github.se.stepquest.services.getUserPlacement
 import com.github.se.stepquest.services.getUserScore
 import com.github.se.stepquest.services.getUsername
 import com.github.se.stepquest.services.isOnline
@@ -55,17 +56,17 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
   var leaderboard: List<Pair<String, Int>>? by remember { mutableStateOf(emptyList()) }
   var topChallenge: ChallengeData? by remember { mutableStateOf(null) }
   var showChallengeCompletionPopUp: Boolean by remember { mutableStateOf(false) }
-    var userScore: Int by remember {
-        mutableIntStateOf(0)
-    }
-    var username: String by remember {
-        mutableStateOf("No name")
-    }
+  var userScore: Int by remember { mutableIntStateOf(0) }
+  var username: String by remember { mutableStateOf("No name") }
+  var currentPosition: Int? by remember { mutableStateOf(0) }
   LaunchedEffect(Unit) {
     getTopChallenge(userId) { receivedChallenge -> topChallenge = receivedChallenge }
-    getTopLeaderboard { topLeaderboard -> leaderboard = topLeaderboard }
-      getUsername(userId) {cUsername -> username = cUsername
-          getUserScore(cUsername) {} }
+    getTopLeaderboard(5) { topLeaderboard -> leaderboard = topLeaderboard }
+    getUsername(userId) { cUsername ->
+      username = cUsername
+      getUserScore(cUsername) { score -> userScore = score }
+      getUserPlacement(cUsername) { currentPlacement -> currentPosition = currentPlacement }
+    }
   }
 
   // ---------------------------------
@@ -88,17 +89,12 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
 
       // Three main icons
       topBar = {
-        Row(modifier = Modifier
-            .height(100.dp)
-            .fillMaxWidth()
-            .padding(start = 15.dp, end = 15.dp)) {
+        Row(modifier = Modifier.height(100.dp).fillMaxWidth().padding(start = 15.dp, end = 15.dp)) {
           // Messages icon
           TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("messages_button")) {
             Image(
                 painter = painterResource(com.github.se.stepquest.R.drawable.messages),
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .size(50.dp),
+                modifier = Modifier.fillMaxHeight().size(50.dp),
                 contentDescription = "messages_icon")
           }
           Spacer(Modifier.weight(1f))
@@ -111,9 +107,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
               modifier = Modifier.testTag("notifications_button")) {
                 Image(
                     painter = painterResource(com.github.se.stepquest.R.drawable.notification),
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .size(50.dp),
+                    modifier = Modifier.fillMaxHeight().size(50.dp),
                     contentDescription = "notifications_icon")
               }
           // Profile icon
@@ -124,18 +118,14 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
               modifier = Modifier.testTag("profile_button")) {
                 Image(
                     painter = painterResource(com.github.se.stepquest.R.drawable.profile),
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .size(50.dp),
+                    modifier = Modifier.fillMaxHeight().size(50.dp),
                     contentDescription = "profile_icon")
               }
         }
       },
       bottomBar = {}) { innerPadding ->
         // Main content of the home screen
-        Column(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxWidth()) {
+        Column(modifier = Modifier.padding(innerPadding).fillMaxWidth()) {
 
           // Start game button
           Button(
@@ -143,10 +133,9 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
               shape = RoundedCornerShape(20.dp),
               colors = ButtonDefaults.buttonColors(Color.White),
               modifier =
-              Modifier
-                  .fillMaxWidth()
-                  .padding(start = 25.dp, end = 25.dp, top = 5.dp)
-                  .height(70.dp)) {
+                  Modifier.fillMaxWidth()
+                      .padding(start = 25.dp, end = 25.dp, top = 5.dp)
+                      .height(70.dp)) {
                 Text(
                     text = "Start Game",
                     color = Color.Black,
@@ -161,10 +150,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
 
           // Challenges tab
           Card(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(25.dp)
-                  .height(190.dp),
+              modifier = Modifier.fillMaxWidth().padding(25.dp).height(190.dp),
               colors = CardDefaults.cardColors(containerColor = Color.White)) {
                 Column {
                   Text(
@@ -177,28 +163,20 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                     if (topChallenge == null) {
                       Text(
                           text = "No challenges available",
-                          modifier = Modifier
-                              .fillMaxWidth()
-                              .fillMaxHeight()
-                              .padding(top = 50.dp),
+                          modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 50.dp),
                           fontSize = 16.sp,
                           textAlign = TextAlign.Center,
                           fontWeight = FontWeight.Bold)
                     } else {
                       Row(
-                          modifier = Modifier
-                              .padding(top = 20.dp, start = 30.dp)
-                              .fillMaxWidth(),
+                          modifier = Modifier.padding(top = 20.dp, start = 30.dp).fillMaxWidth(),
                           horizontalArrangement = Arrangement.Center,
                           verticalAlignment = Alignment.CenterVertically) {
                             Image(
                                 painter =
                                     painterResource(
                                         com.github.se.stepquest.R.drawable.profile_challenges),
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .fillMaxHeight()
-                                    .fillMaxWidth(),
+                                modifier = Modifier.size(40.dp).fillMaxHeight().fillMaxWidth(),
                                 contentDescription = "profile_challenges")
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
@@ -220,11 +198,10 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                           },
                           colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
                           modifier =
-                          Modifier
-                              .padding(horizontal = 5.dp, vertical = 10.dp)
-                              .height(40.dp)
-                              .fillMaxWidth()
-                              .align(Alignment.CenterHorizontally)) {
+                              Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                                  .height(40.dp)
+                                  .fillMaxWidth()
+                                  .align(Alignment.CenterHorizontally)) {
                             Text(
                                 text = "Check active challenges",
                                 fontSize = 16.sp,
@@ -240,10 +217,9 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
           // Leaderboard
           Card(
               modifier =
-              Modifier
-                  .fillMaxWidth()
-                  .padding(start = 25.dp, end = 25.dp, bottom = 30.dp)
-                  .height(270.dp),
+                  Modifier.fillMaxWidth()
+                      .padding(start = 25.dp, end = 25.dp, bottom = 30.dp)
+                      .height(260.dp),
               colors = CardDefaults.cardColors(containerColor = Color.White)) {
                 Text(
                     text = "Leaderboard",
@@ -254,21 +230,16 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                   if (leaderboard == null) {
                     Text(
                         text = "Leaderboard is not accessible",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(top = 70.dp),
+                        modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 70.dp),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold)
                   } else {
-                      var i = 0
+                    var i = 0
                     for (user in leaderboard!!) {
-                        i++
+                      i++
                       Row(
-                          modifier = Modifier
-                              .padding(top = 10.dp, start = 30.dp)
-                              .fillMaxWidth(),
+                          modifier = Modifier.padding(top = 10.dp, start = 30.dp).fillMaxWidth(),
                           horizontalArrangement = Arrangement.Center,
                           verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -278,38 +249,42 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                                 modifier = Modifier.weight(1f))
                           }
                     }
-                      Button(
-                          onClick = {
-                              navigationActions.navigateTo(
-                                  TopLevelDestination(Routes.ChallengeScreen.routName))
-                          },
-                          colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
-                          modifier =
-                          Modifier
-                              .padding(horizontal = 5.dp, vertical = 10.dp)
-                              .height(40.dp)
-                              .fillMaxWidth()
-                              .align(Alignment.CenterHorizontally)) {
+                    Button(
+                        onClick = {
+                          navigationActions.navigateTo(
+                              TopLevelDestination(Routes.Leaderboard.routName))
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
+                        modifier =
+                            Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                                .height(40.dp)
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally)) {
                           Text(
                               text = "Check the leaderboard",
                               fontSize = 16.sp,
                               modifier = Modifier.padding(0.dp))
-                      }
+                        }
                   }
                 }
               }
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 25.dp, end = 25.dp, top = 10.dp)
-                    .height(60.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)) {
+          Card(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(start = 25.dp, end = 25.dp, top = 10.dp)
+                      .height(100.dp),
+              colors = CardDefaults.cardColors(containerColor = Color.White)) {
                 Text(
-                    text = "Your current score: ${userScore ?: "Loading..."}",
+                    text = "Your current score is $userScore",
                     modifier = Modifier.padding(start = 20.dp, top = 15.dp),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold)
-            }
+                Text(
+                    text = "which makes you number $currentPosition",
+                    modifier = Modifier.padding(start = 20.dp, top = 15.dp),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold)
+              }
         }
       }
 }
