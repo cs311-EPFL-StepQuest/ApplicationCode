@@ -227,23 +227,25 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold)
                 Column {
-                  if (leaderboard == null) {
+                  if (leaderboard!!.isEmpty()) {
                     Text(
-                        text = "Leaderboard is not accessible",
+                        text = "Leaderboard is not available",
                         modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 70.dp),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold)
                   } else {
-                    var i = 0
-                    for (user in leaderboard!!) {
-                      i++
-                      Row(
+                      for ((i, user) in leaderboard!!.withIndex()) {
+                          var uScore = user.second.toString()
+                          if (user.second > 99999) {
+                              uScore = "+99999"
+                          }
+                          Row(
                           modifier = Modifier.padding(top = 10.dp, start = 30.dp).fillMaxWidth(),
                           horizontalArrangement = Arrangement.Center,
                           verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "$i. ${user.first} :  ${user.second}",
+                                text = "${i+1}. ${user.first} : $uScore",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 modifier = Modifier.weight(1f))
@@ -268,23 +270,25 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                   }
                 }
               }
-          Card(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .padding(start = 25.dp, end = 25.dp, top = 10.dp)
-                      .height(100.dp),
-              colors = CardDefaults.cardColors(containerColor = Color.White)) {
-                Text(
-                    text = "Your current score is $userScore",
-                    modifier = Modifier.padding(start = 20.dp, top = 15.dp),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold)
-                Text(
-                    text = "which makes you number $currentPosition",
-                    modifier = Modifier.padding(start = 20.dp, top = 15.dp),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold)
-              }
+            if (isOnline) {
+                Card(
+                    modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(start = 25.dp, end = 25.dp, top = 10.dp)
+                        .height(100.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                    Text(
+                        text = "Your current score is $userScore",
+                        modifier = Modifier.padding(start = 20.dp, top = 15.dp),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "which makes you number $currentPosition",
+                        modifier = Modifier.padding(start = 20.dp, top = 15.dp),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+            }
         }
       }
 }

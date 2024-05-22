@@ -54,7 +54,7 @@ fun FriendsListScreenCheck(
 ) {
 
   if (isOnline(context)) {
-    FriendsListScreen(navigationActions, userId, testCurrentFriendsList)
+    FriendsListScreen(navigationActions, userId)
   } else {
 
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
@@ -69,20 +69,17 @@ fun FriendsListScreenCheck(
 @Composable
 fun FriendsListScreen(
     navigationActions: NavigationActions,
-    userId: String,
-    testCurrentFriendsList: List<Friend> = emptyList()
+    userId: String
 ) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
   var showFriendProfile by remember { mutableStateOf(false) }
   var selectedFriend by remember { mutableStateOf<Friend?>(null) }
-  val currentFriendsList = remember {
-    mutableStateListOf<Friend>().apply { addAll(testCurrentFriendsList) }
+  var currentFriendsList by remember {
+    mutableStateOf<List<Friend>?>(emptyList())
   }
   LaunchedEffect(Unit) {
-    if (currentFriendsList.isEmpty()) {
-      fetchFriendsListFromDatabase(userId, currentFriendsList)
-    }
+      fetchFriendsListFromDatabase(userId) {friendsList -> currentFriendsList = friendsList}
   }
   if (showAddFriendScreen) {
     AddFriendScreen(onDismiss = { showAddFriendScreen = false }, userId)
@@ -128,11 +125,11 @@ fun FriendsListScreen(
                       text = "Add Friends", fontSize = 24.sp, color = Color.White)
                 }
             Spacer(modifier = Modifier.height(16.dp))
-            if (currentFriendsList.isEmpty()) {
+            if (currentFriendsList!!.isEmpty()) {
               Text(text = "No friends yet", fontWeight = FontWeight.Bold, fontSize = 24.sp)
             } else {
               LazyColumn {
-                items(currentFriendsList) { friend ->
+                items(currentFriendsList!!) { friend ->
                   FriendItem(
                       friend = friend,
                       onClick = {

@@ -46,26 +46,21 @@ fun Leaderboards(userId: String, navigationActions: NavigationActions) {
     val blueThemeColor = colorResource(id = R.color.blueTheme)
     var leaderboard: List<Pair<String, Int>>? by remember { mutableStateOf(emptyList()) }
     var friendsLeaderboard: List<Pair<String, Int>>? by remember { mutableStateOf(emptyList()) }
-    val currentFriendsList = remember { mutableStateListOf<Friend>() }
     var userScore: Int by remember { mutableIntStateOf(0) }
     var currentPosition: Int? by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         getTopLeaderboard(10) { topLeaderboard -> leaderboard = topLeaderboard }
-        fetchFriendsListFromDatabase(userId, currentFriendsList)
+        fetchFriendsListFromDatabase(userId) {friendsList ->
+            if (friendsList != null) {
+                getFriendsLeaderboard(friendsList) { topFriendsLeaderboard ->
+                    friendsLeaderboard = topFriendsLeaderboard
+                }
+            }
+        }
         getUsername(userId) { cUsername ->
             getUserScore(cUsername) { score -> userScore = score }
             getUserPlacement(cUsername) { currentPlacement -> currentPosition = currentPlacement }
-        }
-    }
-
-    LaunchedEffect(currentFriendsList) {
-        if (currentFriendsList.isNotEmpty()) {
-            getFriendsLeaderboard(currentFriendsList) { topFriendsLeaderboard ->
-                friendsLeaderboard = topFriendsLeaderboard
-            }
-        } else {
-            friendsLeaderboard = emptyList()
         }
     }
 
@@ -128,8 +123,12 @@ fun Leaderboards(userId: String, navigationActions: NavigationActions) {
                             LazyColumn {
                                 items(leaderboard!!.size) { index ->
                                     val user = leaderboard!![index]
+                                    var uScore = user.second.toString()
+                                    if (user.second > 99999) {
+                                        uScore = "+99999"
+                                    }
                                     Text(
-                                        text = "${index + 1}. ${user.first} :  ${user.second}",
+                                        text = "${index + 1}. ${user.first} : $uScore",
                                         color = Color.White,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,

@@ -31,7 +31,7 @@ fun getTopLeaderboard(top: Int, callback: (List<Pair<String, Int>>?) -> Unit) {
           })
 }
 
-fun getFriendsLeaderboard(currentFriendsList: MutableList<Friend>, callback: (List<Pair<String, Int>>?) -> Unit) {
+fun getFriendsLeaderboard(currentFriendsList: List<Friend>, callback: (List<Pair<String, Int>>?) -> Unit) {
     val database = FirebaseDatabase.getInstance()
     val leaderboardRef = database.reference.child("leaderboard")
     val friendsScores = mutableListOf<Pair<String, Int>>()

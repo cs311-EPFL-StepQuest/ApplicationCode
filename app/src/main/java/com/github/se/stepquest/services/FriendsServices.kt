@@ -284,8 +284,9 @@ fun deletePendingFriendRequest(
       })
 }
 
-fun fetchFriendsListFromDatabase(userId: String, currentFriendsList: MutableList<Friend>) {
+fun fetchFriendsListFromDatabase(userId: String, callback: (List<Friend>?) -> Unit) {
     val database = FirebaseDatabase.getInstance()
+    val currentFriendsList = mutableListOf<Friend>()
     val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
     friendsListRef.addListenerForSingleValueEvent(
         object : ValueEventListener {
@@ -294,10 +295,11 @@ fun fetchFriendsListFromDatabase(userId: String, currentFriendsList: MutableList
                     val friend = snapshot.getValue(Friend::class.java)
                     friend?.let { currentFriendsList.add(it) }
                 }
+                callback(currentFriendsList)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Handle error
+                callback(null)
             }
         })
 }
