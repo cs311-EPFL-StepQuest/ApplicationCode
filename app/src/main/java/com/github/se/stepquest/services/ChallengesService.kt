@@ -1,6 +1,7 @@
 package com.github.se.stepquest.services
 
 import android.text.format.DateFormat
+import android.util.Log
 import com.github.se.stepquest.IUserRepository
 import com.github.se.stepquest.data.model.ChallengeData
 import com.github.se.stepquest.data.model.ChallengeProgression
@@ -12,7 +13,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -240,4 +240,36 @@ fun getEndDate(startDate: Date, daysToAdd: Int): String {
   calendar.add(Calendar.DAY_OF_YEAR, daysToAdd)
   val dateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
   return dateFormat.format(calendar.time)
+}
+
+fun someChallengesCompleted(userId: String, callback: (Boolean) -> Unit) {
+  Log.d("someChallengesCompleted", "userId: $userId")
+  var challenges: List<ChallengeData>
+  var result = false
+  getChallenges(userId) { v ->
+    challenges = v
+    Log.d("someChallengesCompleted", "vListSize: ${v.size}")
+    challenges.forEach { challenge ->
+      Log.d("someChallengesCompleted", "Challenge: $challenge")
+      if (challenge.type.completionFunction(challenge)) {
+        result = true
+        deleteCompletedChallenge(challenge)
+      }
+    }
+    callback(result)
+  }
+}
+
+fun deleteCompletedChallenge(challenge: ChallengeData) {
+  Log.d(
+      "deleteCompletedChallenge",
+      "challengedUserUuid: ${challenge.challengedUserUuid}, UUID: ${challenge.uuid}")
+  FirebaseDatabase.getInstance()
+      .reference
+      .child("users")
+      .child(challenge.challengedUserUuid)
+      .child("acceptedChallenges")
+      .child(challenge.uuid)
+      .ref
+      .removeValue()
 }

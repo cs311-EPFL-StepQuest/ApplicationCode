@@ -41,7 +41,7 @@ class ProgressionPageTest {
   @Test
   fun dailyGoalAchievementTest() {
     composeTestRule.setContent { ProgressionPage(TestUserRepository2(), context) }
-    composeTestRule.onNodeWithTag("Achieved goal message").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("main congratulation dialog text").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Confirm button").assertIsDisplayed()
   }
 }
