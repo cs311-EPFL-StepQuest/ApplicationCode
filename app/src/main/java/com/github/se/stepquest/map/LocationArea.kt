@@ -3,7 +3,6 @@ package com.github.se.stepquest.map
 import android.content.Context
 import android.util.Log
 import com.github.se.stepquest.services.cacheRouteData
-import com.github.se.stepquest.services.getRouteData
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -103,9 +102,9 @@ class LocationArea(context: Context) {
 
             cacheRouteData(context, routeList, routeDetailList)
 
-//            getRouteData(context).let { (routeList, routeDetailList) ->
-//              callback(routeList, routeDetailList)
-//            }
+            //            getcacheRouteData(context).let { (routeList, routeDetailList) ->
+            //              callback(routeList, routeDetailList)
+            //            }
 
             // Call the callback with the collected data
             callback(routeList, routeDetailList)

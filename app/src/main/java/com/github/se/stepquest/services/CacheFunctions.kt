@@ -98,7 +98,11 @@ fun getCachedStepInfo(context: Context): Map<String, Int> {
       "totalSteps" to totalSteps)
 }
 
-fun cacheRouteData(context: Context, routeList: List<LocationDetails>, routeDetailList: List<RouteDetails>) {
+fun cacheRouteData(
+    context: Context,
+    routeList: List<LocationDetails>,
+    routeDetailList: List<RouteDetails>
+) {
   val sharedPreferences = context.getSharedPreferences("RouteData", Context.MODE_PRIVATE)
   val editor = sharedPreferences.edit()
   val gson = Gson()
@@ -113,7 +117,7 @@ fun cacheRouteData(context: Context, routeList: List<LocationDetails>, routeDeta
   editor.apply()
 }
 
-fun getRouteData(context: Context): Pair<List<LocationDetails>, List<RouteDetails>> {
+fun getcacheRouteData(context: Context): Pair<List<LocationDetails>, List<RouteDetails>> {
   val sharedPreferences = context.getSharedPreferences("RouteData", Context.MODE_PRIVATE)
   val gson = Gson()
 
@@ -126,7 +130,8 @@ fun getRouteData(context: Context): Pair<List<LocationDetails>, List<RouteDetail
   val routeDetailListType = object : TypeToken<List<RouteDetails>>() {}.type
 
   val routeList: List<LocationDetails> = gson.fromJson(routeListJson, routeListType) ?: emptyList()
-  val routeDetailList: List<RouteDetails> = gson.fromJson(routeDetailListJson, routeDetailListType) ?: emptyList()
+  val routeDetailList: List<RouteDetails> =
+      gson.fromJson(routeDetailListJson, routeDetailListType) ?: emptyList()
 
   return Pair(routeList, routeDetailList)
 }
