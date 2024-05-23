@@ -214,7 +214,7 @@ class FollowRoute() {
                         }
                         .create()
                         .show()
-                    Log.d("FollowRoute", "You are off the route, Bye")
+                    Log.d("FollowRoute", "You are too far from the route. Bye")
                     onGoBackBUttonClick()
                   }
                 }

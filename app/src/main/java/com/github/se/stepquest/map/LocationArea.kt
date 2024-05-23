@@ -1,6 +1,9 @@
 package com.github.se.stepquest.map
 
+import android.content.Context
 import android.util.Log
+import com.github.se.stepquest.services.cacheRouteData
+import com.github.se.stepquest.services.getRouteData
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -15,11 +18,12 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sqrt
 
-class LocationArea {
+class LocationArea(context: Context) {
   var firebaseAuth: FirebaseAuth
   var database: FirebaseDatabase
   lateinit var center: LatLng
   var radius: Double = 1000.0
+  val context = context
 
   init {
     firebaseAuth = FirebaseAuth.getInstance()
@@ -96,6 +100,13 @@ class LocationArea {
             }
             Log.i("Location Area", "RouteList: $routeList")
             Log.i("Location Area", "RouteDetailList: $routeDetailList")
+
+            cacheRouteData(context, routeList, routeDetailList)
+
+//            getRouteData(context).let { (routeList, routeDetailList) ->
+//              callback(routeList, routeDetailList)
+//            }
+
             // Call the callback with the collected data
             callback(routeList, routeDetailList)
           }

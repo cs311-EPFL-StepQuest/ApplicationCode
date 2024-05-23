@@ -1,5 +1,6 @@
 package com.github.se.stepquest.map
 
+import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
@@ -24,12 +25,14 @@ class LocationAreaTest {
   private lateinit var mockDatabaseReference: DatabaseReference
   private lateinit var mockDatabase: FirebaseDatabase
   private lateinit var mockTask: Task<DataSnapshot>
+  private lateinit var context: Context
 
   private lateinit var emulatedDatabase: FirebaseDatabase
 
   @Before
   fun setUp() {
-    locationArea = LocationArea()
+    context = mockk<Context>(relaxed = true)
+    locationArea = LocationArea(context)
 
     firebaseAuth = mockk()
     mockRouteID = mockk(relaxed = true)
