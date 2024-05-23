@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
@@ -102,6 +103,11 @@ class FollowRoute() {
             imageView.setImageBitmap(bitmap)
           }
 
+            val button: Button = view.findViewById(R.id.dialog_button)
+            button.setOnClickListener {
+                // Perform your action here
+                Toast.makeText(context, "Button clicked!", Toast.LENGTH_SHORT).show()
+            }
           builder
               .setView(view)
               .setTitle(it.name) // Set the title of the dialog to the checkpoint title
@@ -180,7 +186,7 @@ class FollowRoute() {
                       }
                       .create()
                       .show()
-                  Log.d("FollowRoute", "You have reached the finish point. Congrat")
+                  Log.d("FollowRoute", "You have reached the finish point. Congrats")
                   onGoBackBUttonClick()
                 }
               } else {
