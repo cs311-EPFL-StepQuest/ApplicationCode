@@ -12,20 +12,20 @@ fun addPoints(
     database: FirebaseDatabase = FirebaseDatabase.getInstance()
 ) {
 
-    val userPointsRef = database.reference.child("leaderboard").child(username)
+  val userPointsRef = database.reference.child("leaderboard").child(username)
 
-    userPointsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+  userPointsRef.addListenerForSingleValueEvent(
+      object : ValueEventListener {
 
         override fun onDataChange(snapshot: DataSnapshot) {
 
-            val curr = snapshot.getValue(Int::class.java) ?: 0
-            val newPoints = curr + points
-            userPointsRef.setValue(newPoints)
+          val curr = snapshot.getValue(Int::class.java) ?: 0
+          val newPoints = curr + points
+          userPointsRef.setValue(newPoints)
         }
 
         override fun onCancelled(error: DatabaseError) {
-            Log.e("ScoreServices", "Database error: ${error.message}")
+          Log.e("ScoreServices", "Database error: ${error.message}")
         }
-
-    })
+      })
 }
