@@ -42,6 +42,7 @@ import com.github.se.stepquest.services.cacheUserInfo
 import com.github.se.stepquest.services.getTopChallenge
 import com.github.se.stepquest.services.getUsername
 import com.github.se.stepquest.services.isOnline
+import com.github.se.stepquest.services.someChallengesCompleted
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
@@ -51,6 +52,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
   // Added for testing purposes ------
   var quests: List<Quest> by remember { mutableStateOf(emptyList()) }
   var topChallenge: ChallengeData? by remember { mutableStateOf(null) }
+  var showChallengeCompletionPopUp: Boolean by remember { mutableStateOf(false) }
   LaunchedEffect(Unit) {
     getTopChallenge(userId) { receivedChallenge -> topChallenge = receivedChallenge }
 
@@ -64,6 +66,15 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
   val isOnline = isOnline(context)
 
   if (isOnline) getUsername(userId) { cacheUserInfo(context, userId, it) }
+
+  someChallengesCompleted(userId) { result -> if (result) showChallengeCompletionPopUp = true }
+  if (showChallengeCompletionPopUp)
+      CongratulationDialog(
+          titleText = "Challenges",
+          mainText = "Congratulations! You have completed some challenges!",
+          xpNumber = 100) {
+            showChallengeCompletionPopUp = false
+          }
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),

@@ -5,6 +5,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorManager
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import io.mockk.every
@@ -58,7 +59,13 @@ class StepCounterServiceTest {
     every { sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) } returns stepSensor
     every { stepSensor.type } returns Sensor.TYPE_STEP_DETECTOR
 
-    stepCounterService = StepCounterService(sensorManager, firebaseAuth, database, "testUserId")
+    stepCounterService =
+        StepCounterService(
+            sensorManager,
+            firebaseAuth,
+            database,
+            "testUserId",
+            InstrumentationRegistry.getInstrumentation().targetContext)
 
     every { database.reference } returns
         mockk {

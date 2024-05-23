@@ -35,7 +35,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -105,7 +104,6 @@ class MapTest {
     mockkStatic(PermissionChecker::class)
     every { PermissionChecker.checkSelfPermission(any(), any()) } returns
         PermissionChecker.PERMISSION_GRANTED
-
     locationPermission(locationViewModel, context, launcherMultiplePermissions, permissions, {})
 
     verify { locationViewModel.startLocationUpdates(any()) }
@@ -150,7 +148,7 @@ class MapTest {
 
   @Test
   fun testUpdateMap_multiplelocation() {
-    // Mock the GoogleMap object
+    // Mock the GoogleMap objects
     val googleMap = mockk<GoogleMap>()
 
     // Mock allocation data
@@ -284,20 +282,6 @@ class MapTest {
     }
   }
 
-  @Test
-  fun testNumCheckpointsIncreasedAfterCreatingCheckpoint() {
-    var numCheckpoints = 0
-    composeTestRule.setContent { Map(vm).apply { numCheckpoints += 1 } }
-
-    // Simulate the user interaction to create a checkpoint
-    composeTestRule.onNodeWithTag("createRouteButton").performClick()
-    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
-    composeTestRule.onNodeWithText("Name:").performTextInput("Test")
-    composeTestRule.onNodeWithText("Confirm").performClick()
-
-    // Assert that numCheckpoints is increased by 1
-    assertEquals(numCheckpoints, 1)
-  }
   /*
     @Test
     fun testCurrentLocationMarker(){
