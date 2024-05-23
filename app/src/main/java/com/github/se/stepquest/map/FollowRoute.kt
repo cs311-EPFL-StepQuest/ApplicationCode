@@ -103,11 +103,11 @@ class FollowRoute() {
             imageView.setImageBitmap(bitmap)
           }
 
-            val button: Button = view.findViewById(R.id.dialog_button)
-            button.setOnClickListener {
-                // Perform your action here
-                Toast.makeText(context, "Button clicked!", Toast.LENGTH_SHORT).show()
-            }
+          val button: Button = view.findViewById(R.id.dialog_button)
+          button.setOnClickListener {
+            // Perform your action here
+            Toast.makeText(context, "Button clicked!", Toast.LENGTH_SHORT).show()
+          }
           builder
               .setView(view)
               .setTitle(it.name) // Set the title of the dialog to the checkpoint title
