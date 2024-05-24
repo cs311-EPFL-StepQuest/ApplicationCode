@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
+import com.github.se.stepquest.services.fetchFriendsListFromDatabase
 import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
@@ -53,7 +54,7 @@ fun FriendsListScreenCheck(
 ) {
 
   if (isOnline(context)) {
-    FriendsListScreen(navigationActions, userId, testCurrentFriendsList)
+    FriendsListScreen(navigationActions, userId)
   } else {
 
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
@@ -68,20 +69,17 @@ fun FriendsListScreenCheck(
 @Composable
 fun FriendsListScreen(
     navigationActions: NavigationActions,
-    userId: String,
-    testCurrentFriendsList: List<Friend> = emptyList()
+    userId: String
 ) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
   var showAddFriendScreen by remember { mutableStateOf(false) }
   var showFriendProfile by remember { mutableStateOf(false) }
   var selectedFriend by remember { mutableStateOf<Friend?>(null) }
-  val currentFriendsList = remember {
-    mutableStateListOf<Friend>().apply { addAll(testCurrentFriendsList) }
+  var currentFriendsList by remember {
+    mutableStateOf<List<Friend>?>(emptyList())
   }
   LaunchedEffect(Unit) {
-    if (currentFriendsList.isEmpty()) {
-      fetchFriendsListFromDatabase(userId, currentFriendsList)
-    }
+      fetchFriendsListFromDatabase(userId) {friendsList -> currentFriendsList = friendsList}
   }
   if (showAddFriendScreen) {
     AddFriendScreen(onDismiss = { showAddFriendScreen = false }, userId)
@@ -127,11 +125,11 @@ fun FriendsListScreen(
                       text = "Add Friends", fontSize = 24.sp, color = Color.White)
                 }
             Spacer(modifier = Modifier.height(16.dp))
-            if (currentFriendsList.isEmpty()) {
+            if (currentFriendsList!!.isEmpty()) {
               Text(text = "No friends yet", fontWeight = FontWeight.Bold, fontSize = 24.sp)
             } else {
               LazyColumn {
-                items(currentFriendsList) { friend ->
+                items(currentFriendsList!!) { friend ->
                   FriendItem(
                       friend = friend,
                       onClick = {
@@ -171,22 +169,4 @@ fun FriendItem(friend: Friend, onClick: () -> Unit) {
                   style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold))
             }
       }
-}
-
-private fun fetchFriendsListFromDatabase(userId: String, currentFriendsList: MutableList<Friend>) {
-  val database = FirebaseDatabase.getInstance()
-  val friendsListRef = database.reference.child("users").child(userId).child("friendsList")
-  friendsListRef.addListenerForSingleValueEvent(
-      object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-          for (snapshot in dataSnapshot.children) {
-            val friend = snapshot.getValue(Friend::class.java)
-            friend?.let { currentFriendsList.add(it) }
-          }
-        }
-
-        override fun onCancelled(databaseError: DatabaseError) {
-          // Handle error
-        }
-      })
 }

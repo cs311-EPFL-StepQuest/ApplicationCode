@@ -23,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,10 +37,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.stepquest.Routes
-import com.github.se.stepquest.activity.Quest
 import com.github.se.stepquest.data.model.ChallengeData
 import com.github.se.stepquest.services.cacheUserInfo
 import com.github.se.stepquest.services.getTopChallenge
+import com.github.se.stepquest.services.getTopLeaderboard
+import com.github.se.stepquest.services.getUserPlacement
+import com.github.se.stepquest.services.getUserScore
 import com.github.se.stepquest.services.getUsername
 import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.services.someChallengesCompleted
@@ -50,15 +53,20 @@ import com.github.se.stepquest.ui.navigation.TopLevelDestination
 fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Context) {
 
   // Added for testing purposes ------
-  var quests: List<Quest> by remember { mutableStateOf(emptyList()) }
+  var leaderboard: List<Pair<String, Int>>? by remember { mutableStateOf(emptyList()) }
   var topChallenge: ChallengeData? by remember { mutableStateOf(null) }
   var showChallengeCompletionPopUp: Boolean by remember { mutableStateOf(false) }
+  var userScore: Int by remember { mutableIntStateOf(0) }
+  var username: String by remember { mutableStateOf("No name") }
+  var currentPosition: Int? by remember { mutableStateOf(0) }
   LaunchedEffect(Unit) {
     getTopChallenge(userId) { receivedChallenge -> topChallenge = receivedChallenge }
-
-    // Simulated data for testing purposes
-    val firstQuest = Quest("1", "0", "1000", "500", "Walk 1000 steps", "0")
-    quests = quests.plus(firstQuest)
+    getTopLeaderboard(5) { topLeaderboard -> leaderboard = topLeaderboard }
+    getUsername(userId) { cUsername ->
+      username = cUsername
+      getUserScore(cUsername) { score -> userScore = score }
+      getUserPlacement(cUsername) { currentPlacement -> currentPosition = currentPlacement }
+    }
   }
 
   // ---------------------------------
@@ -206,57 +214,81 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                 }
               }
 
-          // Daily quests tab
+          // Leaderboard
           Card(
               modifier =
                   Modifier.fillMaxWidth()
                       .padding(start = 25.dp, end = 25.dp, bottom = 30.dp)
-                      .height(250.dp),
+                      .height(260.dp),
               colors = CardDefaults.cardColors(containerColor = Color.White)) {
                 Text(
-                    text = "Daily Quests",
+                    text = "Leaderboard",
                     modifier = Modifier.padding(start = 18.dp, top = 14.dp),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold)
                 Column {
-                  if (quests.isEmpty()) {
+                  if (leaderboard!!.isEmpty()) {
                     Text(
-                        text = "No daily quests available",
+                        text = "Leaderboard is not available",
                         modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 70.dp),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold)
                   } else {
-                    for (quest in quests) {
-                      // Quest details
-                      Row(
-                          modifier = Modifier.padding(top = 40.dp, start = 30.dp).fillMaxWidth(),
+                      for ((i, user) in leaderboard!!.withIndex()) {
+                          var uScore = user.second.toString()
+                          if (user.second > 99999) {
+                              uScore = "+99999"
+                          }
+                          Row(
+                          modifier = Modifier.padding(top = 10.dp, start = 30.dp).fillMaxWidth(),
                           horizontalArrangement = Arrangement.Center,
                           verticalAlignment = Alignment.CenterVertically) {
-                            // Icon of a blue dot
-
-                            Image(
-                                painter =
-                                    painterResource(
-                                        com.github.se.stepquest.R.drawable.quest_not_finished),
-                                modifier = Modifier.size(20.dp).fillMaxHeight().fillMaxWidth(),
-                                contentDescription = "profile_challenges")
-                            Row(modifier = Modifier.fillMaxWidth()) {
-                              Spacer(modifier = Modifier.width(10.dp))
-                              Text(
-                                  text = "${quest.currentState}/${quest.questGoal}",
-                                  fontSize = 18.sp)
-                              Spacer(modifier = Modifier.padding(10.dp))
-                              Text(
-                                  text = quest.questDescription,
-                                  fontSize = 18.sp,
-                                  fontWeight = FontWeight.Bold)
-                            }
+                            Text(
+                                text = "${i+1}. ${user.first} : $uScore",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                modifier = Modifier.weight(1f))
                           }
                     }
+                    Button(
+                        onClick = {
+                          navigationActions.navigateTo(
+                              TopLevelDestination(Routes.Leaderboard.routName))
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
+                        modifier =
+                            Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                                .height(40.dp)
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally)) {
+                          Text(
+                              text = "Check the leaderboard",
+                              fontSize = 16.sp,
+                              modifier = Modifier.padding(0.dp))
+                        }
                   }
                 }
               }
+            if (isOnline) {
+                Card(
+                    modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(start = 25.dp, end = 25.dp, top = 10.dp)
+                        .height(100.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                    Text(
+                        text = "Your current score is $userScore",
+                        modifier = Modifier.padding(start = 20.dp, top = 15.dp),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "which makes you number $currentPosition",
+                        modifier = Modifier.padding(start = 20.dp, top = 15.dp),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+            }
         }
       }
 }
