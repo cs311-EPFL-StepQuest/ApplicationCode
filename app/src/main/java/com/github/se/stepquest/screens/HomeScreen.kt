@@ -2,92 +2,47 @@ package com.github.se.stepquest.screens
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.stepquest.Routes
-import com.github.se.stepquest.data.model.ChallengeData
-import com.github.se.stepquest.services.cacheUserInfo
-import com.github.se.stepquest.services.getTopChallenge
-import com.github.se.stepquest.services.getTopLeaderboard
-import com.github.se.stepquest.services.getUserPlacement
-import com.github.se.stepquest.services.getUserScore
-import com.github.se.stepquest.services.getUsername
-import com.github.se.stepquest.services.isOnline
-import com.github.se.stepquest.services.someChallengesCompleted
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
 @Composable
-fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Context) {
+fun HomeScreen(
+    navigationActions: NavigationActions,
+    userId: String,
+    context: Context = LocalContext.current,
+    viewModel: HomeViewModel = viewModel()
+) {
+  val state by viewModel.state.collectAsState()
 
-  // Added for testing purposes ------
-  var leaderboard: List<Pair<String, Int>>? by remember { mutableStateOf(emptyList()) }
-  var topChallenge: ChallengeData? by remember { mutableStateOf(null) }
-  var showChallengeCompletionPopUp: Boolean by remember { mutableStateOf(false) }
-  var userScore: Int by remember { mutableIntStateOf(0) }
-  var username: String by remember { mutableStateOf("No name") }
-  var currentPosition: Int? by remember { mutableStateOf(0) }
-  LaunchedEffect(Unit) {
-    getTopChallenge(userId) { receivedChallenge -> topChallenge = receivedChallenge }
-    getTopLeaderboard(5) { topLeaderboard -> leaderboard = topLeaderboard }
-    getUsername(userId) { cUsername ->
-      username = cUsername
-      getUserScore(cUsername) { score -> userScore = score }
-      getUserPlacement(cUsername) { currentPlacement -> currentPosition = currentPlacement }
-    }
+  LaunchedEffect(userId) { viewModel.initialize(userId, context) }
+
+  if (state.showChallengeCompletionPopUp) {
+    CongratulationDialog(
+        titleText = "Challenges",
+        mainText = "Congratulations! You have completed some challenges!",
+        xpNumber = 100) {
+          viewModel.dismissChallengeCompletionPopUp()
+        }
   }
-
-  // ---------------------------------
-
-  val isOnline = isOnline(context)
-
-  if (isOnline) getUsername(userId) { cacheUserInfo(context, userId, it) }
-
-  someChallengesCompleted(userId) { result -> if (result) showChallengeCompletionPopUp = true }
-  if (showChallengeCompletionPopUp)
-      CongratulationDialog(
-          titleText = "Challenges",
-          mainText = "Congratulations! You have completed some challenges!",
-          xpNumber = 100) {
-            showChallengeCompletionPopUp = false
-          }
 
   Scaffold(
       containerColor = Color(0xFF0D99FF),
-
-      // Three main icons
       topBar = {
         Row(modifier = Modifier.height(100.dp).fillMaxWidth().padding(start = 15.dp, end = 15.dp)) {
           // Messages icon
@@ -126,7 +81,6 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
       bottomBar = {}) { innerPadding ->
         // Main content of the home screen
         Column(modifier = Modifier.padding(innerPadding).fillMaxWidth()) {
-
           // Start game button
           Button(
               onClick = { /* start game when ready */},
@@ -160,7 +114,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                       fontWeight = FontWeight.Bold)
                   Column {
                     // Challenge
-                    if (topChallenge == null) {
+                    if (state.topChallenge == null) {
                       Text(
                           text = "No challenges available",
                           modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 50.dp),
@@ -185,7 +139,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                                   Text(text = "Main challenge", fontSize = 18.sp)
                                   Text(
                                       text =
-                                          "${topChallenge!!.stepsToMake} steps until ${topChallenge!!.dateTime}!",
+                                          "${state.topChallenge!!.stepsToMake} steps until ${state.topChallenge!!.dateTime}!",
                                       fontSize = 18.sp,
                                       fontWeight = FontWeight.Bold)
                                 }
@@ -208,8 +162,6 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                                 modifier = Modifier.padding(0.dp))
                           }
                     }
-                    // Buttons
-
                   }
                 }
               }
@@ -227,7 +179,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold)
                 Column {
-                  if (leaderboard!!.isEmpty()) {
+                  if (state.leaderboard.isEmpty()) {
                     Text(
                         text = "Leaderboard is not available",
                         modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 70.dp),
@@ -235,7 +187,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold)
                   } else {
-                    for ((i, user) in leaderboard!!.withIndex()) {
+                    for ((i, user) in state.leaderboard.withIndex()) {
                       var uScore = user.second.toString()
                       if (user.second > 99999) {
                         uScore = "+99999"
@@ -245,7 +197,7 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                           horizontalArrangement = Arrangement.Center,
                           verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "${i+1}. ${user.first} : $uScore",
+                                text = "${i + 1}. ${user.first} : $uScore",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 modifier = Modifier.weight(1f))
@@ -270,7 +222,8 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                   }
                 }
               }
-          if (isOnline) {
+
+          if (state.isOnline) {
             Card(
                 modifier =
                     Modifier.fillMaxWidth()
@@ -278,12 +231,12 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                         .height(100.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)) {
                   Text(
-                      text = "Your current score is $userScore",
+                      text = "Your current score is ${state.userScore}",
                       modifier = Modifier.padding(start = 20.dp, top = 15.dp),
                       fontSize = 18.sp,
                       fontWeight = FontWeight.Bold)
                   Text(
-                      text = "which makes you number $currentPosition",
+                      text = "which makes you number ${state.currentPosition}",
                       modifier = Modifier.padding(start = 20.dp, top = 15.dp),
                       fontSize = 18.sp,
                       fontWeight = FontWeight.Bold)
