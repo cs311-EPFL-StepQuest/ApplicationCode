@@ -31,29 +31,33 @@ fun getTopLeaderboard(top: Int, callback: (List<Pair<String, Int>>?) -> Unit) {
           })
 }
 
-fun getFriendsLeaderboard(currentFriendsList: List<Friend>, callback: (List<Pair<String, Int>>?) -> Unit) {
-    val database = FirebaseDatabase.getInstance()
-    val leaderboardRef = database.reference.child("leaderboard")
-    val friendsScores = mutableListOf<Pair<String, Int>>()
-    if (currentFriendsList.isEmpty()) {
-        callback(emptyList())
-        return
-    }
-    for (friend in currentFriendsList) {
-        val userRef = leaderboardRef.child(friend.name)
-        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val score = dataSnapshot.getValue(Int::class.java) ?: 0
-                friendsScores.add(Pair(friend.name, score))
-                friendsScores.sortByDescending { it.second }
-                callback(friendsScores)
-            }
+fun getFriendsLeaderboard(
+    currentFriendsList: List<Friend>,
+    callback: (List<Pair<String, Int>>?) -> Unit
+) {
+  val database = FirebaseDatabase.getInstance()
+  val leaderboardRef = database.reference.child("leaderboard")
+  val friendsScores = mutableListOf<Pair<String, Int>>()
+  if (currentFriendsList.isEmpty()) {
+    callback(emptyList())
+    return
+  }
+  for (friend in currentFriendsList) {
+    val userRef = leaderboardRef.child(friend.name)
+    userRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+          override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val score = dataSnapshot.getValue(Int::class.java) ?: 0
+            friendsScores.add(Pair(friend.name, score))
+            friendsScores.sortByDescending { it.second }
+            callback(friendsScores)
+          }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                callback(emptyList())
-            }
+          override fun onCancelled(databaseError: DatabaseError) {
+            callback(emptyList())
+          }
         })
-    }
+  }
 }
 
 fun getUserScore(username: String, callback: (Int) -> Unit) {

@@ -2,15 +2,7 @@ package com.github.se.stepquest.screens
 
 import android.content.Context
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,13 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,30 +19,25 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
-import com.github.se.stepquest.services.fetchFriendsListFromDatabase
 import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.github.se.stepquest.viewModels.FriendsViewModel
 
 @Composable
 fun FriendsListScreenCheck(
     navigationActions: NavigationActions,
     userId: String,
-    testCurrentFriendsList: List<Friend> = emptyList(),
-    context: Context
+    context: Context,
+    friendsViewModel: FriendsViewModel = viewModel()
 ) {
-
   if (isOnline(context)) {
-    FriendsListScreen(navigationActions, userId)
+    FriendsListScreen(navigationActions, userId, friendsViewModel)
   } else {
-
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
       Text(
           text = "You must be online to view your friend list.",
@@ -69,28 +50,19 @@ fun FriendsListScreenCheck(
 @Composable
 fun FriendsListScreen(
     navigationActions: NavigationActions,
-    userId: String
+    userId: String,
+    friendsViewModel: FriendsViewModel
 ) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-  var showAddFriendScreen by remember { mutableStateOf(false) }
-  var showFriendProfile by remember { mutableStateOf(false) }
-  var selectedFriend by remember { mutableStateOf<Friend?>(null) }
-  var currentFriendsList by remember {
-    mutableStateOf<List<Friend>?>(emptyList())
-  }
-  LaunchedEffect(Unit) {
-      fetchFriendsListFromDatabase(userId) {friendsList -> currentFriendsList = friendsList}
-  }
-  if (showAddFriendScreen) {
-    AddFriendScreen(onDismiss = { showAddFriendScreen = false }, userId)
-  } else if (showFriendProfile) {
+  val state by friendsViewModel.state.collectAsState()
+
+  LaunchedEffect(Unit) { friendsViewModel.fetchFriends(userId) }
+
+  if (state.showAddFriendScreen) {
+    AddFriendScreen(onDismiss = { friendsViewModel.toggleAddFriendScreen(false) }, userId)
+  } else if (state.showFriendProfile) {
     FriendDialogBox(
-        friend = selectedFriend!!,
-        userId,
-        onDismiss = {
-          selectedFriend = null
-          showFriendProfile = false
-        })
+        friend = state.selectedFriend!!, userId, onDismiss = { friendsViewModel.deselectFriend() })
   } else {
     Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
       Column(
@@ -113,7 +85,7 @@ fun FriendsListScreen(
             Text(text = "Friends", fontWeight = FontWeight.Bold, fontSize = 40.sp)
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { showAddFriendScreen = true },
+                onClick = { friendsViewModel.toggleAddFriendScreen(true) },
                 colors = ButtonDefaults.buttonColors(blueThemeColor),
                 modifier =
                     Modifier.fillMaxWidth()
@@ -125,17 +97,12 @@ fun FriendsListScreen(
                       text = "Add Friends", fontSize = 24.sp, color = Color.White)
                 }
             Spacer(modifier = Modifier.height(16.dp))
-            if (currentFriendsList!!.isEmpty()) {
+            if (state.currentFriendsList!!.isEmpty()) {
               Text(text = "No friends yet", fontWeight = FontWeight.Bold, fontSize = 24.sp)
             } else {
               LazyColumn {
-                items(currentFriendsList!!) { friend ->
-                  FriendItem(
-                      friend = friend,
-                      onClick = {
-                        showFriendProfile = true
-                        selectedFriend = friend
-                      })
+                items(state.currentFriendsList!!) { friend ->
+                  FriendItem(friend = friend, onClick = { friendsViewModel.selectFriend(friend) })
                 }
               }
             }
@@ -157,7 +124,6 @@ fun FriendItem(friend: Friend, onClick: () -> Unit) {
         Row(
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically) {
-              // Display friend's profile picture here if needed
               Text(
                   text = friend.name,
                   modifier = Modifier.weight(1f),

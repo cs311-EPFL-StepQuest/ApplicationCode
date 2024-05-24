@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,7 +28,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.se.stepquest.Friend
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.services.fetchFriendsListFromDatabase
@@ -43,148 +41,127 @@ import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
 @Composable
 fun Leaderboards(userId: String, navigationActions: NavigationActions) {
-    val blueThemeColor = colorResource(id = R.color.blueTheme)
-    var leaderboard: List<Pair<String, Int>>? by remember { mutableStateOf(emptyList()) }
-    var friendsLeaderboard: List<Pair<String, Int>>? by remember { mutableStateOf(emptyList()) }
-    var userScore: Int by remember { mutableIntStateOf(0) }
-    var currentPosition: Int? by remember { mutableStateOf(0) }
+  val blueThemeColor = colorResource(id = R.color.blueTheme)
+  var leaderboard: List<Pair<String, Int>>? by remember { mutableStateOf(emptyList()) }
+  var friendsLeaderboard: List<Pair<String, Int>>? by remember { mutableStateOf(emptyList()) }
+  var userScore: Int by remember { mutableIntStateOf(0) }
+  var currentPosition: Int? by remember { mutableStateOf(0) }
 
-    LaunchedEffect(Unit) {
-        getTopLeaderboard(10) { topLeaderboard -> leaderboard = topLeaderboard }
-        fetchFriendsListFromDatabase(userId) {friendsList ->
-            if (friendsList != null) {
-                getFriendsLeaderboard(friendsList) { topFriendsLeaderboard ->
-                    friendsLeaderboard = topFriendsLeaderboard
-                }
-            }
+  LaunchedEffect(Unit) {
+    getTopLeaderboard(10) { topLeaderboard -> leaderboard = topLeaderboard }
+    fetchFriendsListFromDatabase(userId) { friendsList ->
+      if (friendsList != null) {
+        getFriendsLeaderboard(friendsList) { topFriendsLeaderboard ->
+          friendsLeaderboard = topFriendsLeaderboard
         }
-        getUsername(userId) { cUsername ->
-            getUserScore(cUsername) { score -> userScore = score }
-            getUserPlacement(cUsername) { currentPlacement -> currentPosition = currentPlacement }
-        }
+      }
     }
+    getUsername(userId) { cUsername ->
+      getUserScore(cUsername) { score -> userScore = score }
+      getUserPlacement(cUsername) { currentPlacement -> currentPosition = currentPlacement }
+    }
+  }
 
-    Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Back",
-                        fontSize = 20.sp,
-                        modifier = Modifier.clickable {
+  Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+          item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically) {
+                  Text(
+                      text = "Back",
+                      fontSize = 20.sp,
+                      modifier =
+                          Modifier.clickable {
                             navigationActions.navigateTo(
-                                TopLevelDestination(Routes.HomeScreen.routName)
-                            )
-                        }
-                    )
+                                TopLevelDestination(Routes.HomeScreen.routName))
+                          })
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Leaderboard", fontWeight = FontWeight.Bold, fontSize = 40.sp)
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Leaderboard", fontWeight = FontWeight.Bold, fontSize = 40.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+          }
 
-            item {
-                // General Leaderboard Card
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .height(370.dp),
-                    colors = CardDefaults.cardColors(containerColor = blueThemeColor)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+          item {
+            // General Leaderboard Card
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(16.dp).height(370.dp),
+                colors = CardDefaults.cardColors(containerColor = blueThemeColor)) {
+                  Column(
+                      modifier = Modifier.padding(16.dp),
+                      horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = "General Leaderboard",
                             color = Color.White,
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                            fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(16.dp))
                         if (leaderboard!!.isEmpty()) {
-                            Text(
-                                text = "Not available",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                          Text(
+                              text = "Not available",
+                              color = Color.White,
+                              fontSize = 16.sp,
+                              fontWeight = FontWeight.Bold)
                         } else {
-                            LazyColumn {
-                                items(leaderboard!!.size) { index ->
-                                    val user = leaderboard!![index]
-                                    var uScore = user.second.toString()
-                                    if (user.second > 99999) {
-                                        uScore = "+99999"
-                                    }
-                                    Text(
-                                        text = "${index + 1}. ${user.first} : $uScore",
-                                        color = Color.White,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(vertical = 4.dp)
-                                    )
-                                }
+                          LazyColumn {
+                            items(leaderboard!!.size) { index ->
+                              val user = leaderboard!![index]
+                              var uScore = user.second.toString()
+                              if (user.second > 99999) {
+                                uScore = "+99999"
+                              }
+                              Text(
+                                  text = "${index + 1}. ${user.first} : $uScore",
+                                  color = Color.White,
+                                  fontSize = 16.sp,
+                                  fontWeight = FontWeight.Bold,
+                                  modifier = Modifier.padding(vertical = 4.dp))
                             }
+                          }
                         }
-                    }
+                      }
                 }
-            }
+          }
 
-            item {
-                // Friends Leaderboard Card
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .height(300.dp),
-                    colors = CardDefaults.cardColors(containerColor = blueThemeColor)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+          item {
+            // Friends Leaderboard Card
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(16.dp).height(300.dp),
+                colors = CardDefaults.cardColors(containerColor = blueThemeColor)) {
+                  Column(
+                      modifier = Modifier.padding(16.dp),
+                      horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = "Friends Leaderboard",
                             color = Color.White,
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                            fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(16.dp))
                         if (friendsLeaderboard!!.isEmpty()) {
-                            Text(
-                                text = "Not available",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                          Text(
+                              text = "Not available",
+                              color = Color.White,
+                              fontSize = 16.sp,
+                              fontWeight = FontWeight.Bold)
                         } else {
-                            LazyColumn {
-                                items(friendsLeaderboard!!.size) { index ->
-                                    val user = friendsLeaderboard!![index]
-                                    Text(
-                                        text = "${index + 1}. ${user.first} :  ${user.second}",
-                                        color = Color.White,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(vertical = 4.dp)
-                                    )
-                                }
+                          LazyColumn {
+                            items(friendsLeaderboard!!.size) { index ->
+                              val user = friendsLeaderboard!![index]
+                              Text(
+                                  text = "${index + 1}. ${user.first} :  ${user.second}",
+                                  color = Color.White,
+                                  fontSize = 16.sp,
+                                  fontWeight = FontWeight.Bold,
+                                  modifier = Modifier.padding(vertical = 4.dp))
                             }
+                          }
                         }
-                    }
+                      }
                 }
-            }
+          }
         }
-    }
+  }
 }

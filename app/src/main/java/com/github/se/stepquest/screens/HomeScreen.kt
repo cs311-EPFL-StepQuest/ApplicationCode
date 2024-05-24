@@ -235,12 +235,12 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold)
                   } else {
-                      for ((i, user) in leaderboard!!.withIndex()) {
-                          var uScore = user.second.toString()
-                          if (user.second > 99999) {
-                              uScore = "+99999"
-                          }
-                          Row(
+                    for ((i, user) in leaderboard!!.withIndex()) {
+                      var uScore = user.second.toString()
+                      if (user.second > 99999) {
+                        uScore = "+99999"
+                      }
+                      Row(
                           modifier = Modifier.padding(top = 10.dp, start = 30.dp).fillMaxWidth(),
                           horizontalArrangement = Arrangement.Center,
                           verticalAlignment = Alignment.CenterVertically) {
@@ -270,25 +270,25 @@ fun HomeScreen(navigationActions: NavigationActions, userId: String, context: Co
                   }
                 }
               }
-            if (isOnline) {
-                Card(
-                    modifier =
+          if (isOnline) {
+            Card(
+                modifier =
                     Modifier.fillMaxWidth()
                         .padding(start = 25.dp, end = 25.dp, top = 10.dp)
                         .height(100.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)) {
-                    Text(
-                        text = "Your current score is $userScore",
-                        modifier = Modifier.padding(start = 20.dp, top = 15.dp),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold)
-                    Text(
-                        text = "which makes you number $currentPosition",
-                        modifier = Modifier.padding(start = 20.dp, top = 15.dp),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold)
+                colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                  Text(
+                      text = "Your current score is $userScore",
+                      modifier = Modifier.padding(start = 20.dp, top = 15.dp),
+                      fontSize = 18.sp,
+                      fontWeight = FontWeight.Bold)
+                  Text(
+                      text = "which makes you number $currentPosition",
+                      modifier = Modifier.padding(start = 20.dp, top = 15.dp),
+                      fontSize = 18.sp,
+                      fontWeight = FontWeight.Bold)
                 }
-            }
+          }
         }
       }
 }
