@@ -1,11 +1,16 @@
 package com.github.se.stepquest.viewModels
 
 import android.Manifest
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.ViewModel
 import com.github.se.stepquest.Routes
+import com.github.se.stepquest.services.checkUserExistsOnLeaderboard
+import com.github.se.stepquest.services.getUsername
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -17,9 +22,9 @@ data class DatabaseLoadingState(
 class DatabaseLoadingViewModel : ViewModel() {
   private val _state = MutableStateFlow(DatabaseLoadingState())
   val state: StateFlow<DatabaseLoadingState> = _state
+  private val database = FirebaseDatabase.getInstance()
 
   fun checkUser(userId: String, navigationActions: NavigationActions, startService: () -> Unit) {
-    val database = FirebaseDatabase.getInstance()
     val databaseRef = database.reference
 
     databaseRef
@@ -32,7 +37,7 @@ class DatabaseLoadingViewModel : ViewModel() {
                 val username = dataSnapshot.getValue(String::class.java)
                 val isNewPlayer = username == null
                 _state.value = _state.value.copy(isNewPlayer = isNewPlayer)
-                handleNavigation(isNewPlayer, navigationActions, startService)
+                handleNavigation(userId, isNewPlayer, navigationActions, startService)
               }
 
               override fun onCancelled(databaseError: com.google.firebase.database.DatabaseError) {
@@ -49,6 +54,7 @@ class DatabaseLoadingViewModel : ViewModel() {
   }
 
   private fun handleNavigation(
+      userId: String,
       isNewPlayer: Boolean,
       navigationActions: NavigationActions,
       startService: () -> Unit
@@ -56,8 +62,15 @@ class DatabaseLoadingViewModel : ViewModel() {
     if (isNewPlayer) {
       navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
     } else {
+      getUsername(userId) { username -> checkUserExistsOnLeaderboard(username) }
       startService()
-      navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+      runAfterDelay(1000) {
+        navigationActions.navigateTo(TopLevelDestination(Routes.MainScreen.routName))
+      }
     }
+  }
+
+  private fun runAfterDelay(delayMillis: Long, action: () -> Unit) {
+    Handler(Looper.getMainLooper()).postDelayed(action, delayMillis)
   }
 }
