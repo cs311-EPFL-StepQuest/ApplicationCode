@@ -26,7 +26,7 @@ fun getTopLeaderboard(top: Int, callback: (List<Pair<String, Int>>?) -> Unit) {
             }
 
             override fun onCancelled(error: DatabaseError) {
-              callback(null)
+              callback(emptyList())
             }
           })
 }
@@ -50,7 +50,7 @@ fun getFriendsLeaderboard(currentFriendsList: List<Friend>, callback: (List<Pair
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-
+                callback(emptyList())
             }
         })
     }
@@ -106,7 +106,7 @@ fun getUserPlacement(username: String, callback: (Int?) -> Unit) {
 
             override fun onCancelled(error: DatabaseError) {
               // Handle the error if the retrieval is canceled
-              callback(null)
+              callback(0)
             }
           })
 }
