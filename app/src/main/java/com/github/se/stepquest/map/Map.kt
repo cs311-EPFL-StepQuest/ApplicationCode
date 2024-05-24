@@ -427,6 +427,8 @@ fun Map(locationViewModel: LocationViewModel) {
                 onClick = {
                   followRoute.followingRoute.value = true
                   followRoute.show_follow_route_button.value = false
+                  Toast.makeText(context, "Start Following Route! Have Fun!", Toast.LENGTH_LONG)
+                      .show()
                 },
                 modifier =
                     Modifier.size(85.dp)
