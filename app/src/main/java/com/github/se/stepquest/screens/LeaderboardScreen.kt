@@ -15,12 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.viewModels.LeaderboardsViewModel
 
 @Composable
 fun Leaderboards(
@@ -92,7 +95,10 @@ fun LeaderboardCard(
                 text = "Not available",
                 color = Color.White,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold)
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 4.dp).semantics {
+                    testTag = "NotAv"
+                })
           } else {
             LazyColumn {
               items(leaderboard.size) { index ->
@@ -103,7 +109,9 @@ fun LeaderboardCard(
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp))
+                    modifier = Modifier.padding(vertical = 4.dp).semantics {
+                        testTag = "${index + 1}"
+                    })
               }
             }
           }
