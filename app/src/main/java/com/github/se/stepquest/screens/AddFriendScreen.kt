@@ -53,10 +53,6 @@ fun AddFriendScreen(
                         text = "Back",
                         fontSize = 20.sp,
                         modifier = Modifier.clickable { onDismiss() })
-                    Spacer(modifier = Modifier.weight(0.3f))
-                    IconButton(onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)) {
-                      Icon(Icons.Default.Close, contentDescription = "Close")
-                    }
                   }
               Text(
                   text = "Friends",
