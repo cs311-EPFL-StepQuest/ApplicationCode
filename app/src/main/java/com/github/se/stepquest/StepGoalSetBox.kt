@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,60 +29,53 @@ fun SetStepGoalsDialog(
     onConfirm: (dailyStepGoal: Int, weeklyStepGoal: Int) -> Unit,
     viewModel: StepGoalsViewModel = viewModel()
 ) {
-    val state by viewModel.state.collectAsState()
-    val blueThemeColor = colorResource(id = R.color.blueTheme)
+  val state by viewModel.state.collectAsState()
+  val blueThemeColor = colorResource(id = R.color.blueTheme)
 
-    Dialog(onDismissRequest = { onDismiss() }) {
-        Surface(
-            color = Color.White,
-            border = BorderStroke(1.dp, Color.Black),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+  Dialog(onDismissRequest = { onDismiss() }) {
+    Surface(
+        color = Color.White,
+        border = BorderStroke(1.dp, Color.Black),
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.padding(16.dp)) {
+          Column(
+              modifier = Modifier.padding(16.dp).fillMaxWidth(),
+              horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "Set New Step Goals", fontSize = 20.sp)
-                    IconButton(onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)) {
+                    verticalAlignment = Alignment.CenterVertically) {
+                      Text(text = "Set New Step Goals", fontSize = 20.sp)
+                      IconButton(onClick = { onDismiss() }, modifier = Modifier.padding(8.dp)) {
                         Icon(Icons.Default.Close, contentDescription = "Close")
+                      }
                     }
-                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(text = "Daily steps")
                 Spacer(modifier = Modifier.height(2.dp))
                 TextField(
                     modifier = Modifier.testTag("daily_steps_setter"),
                     value = state.newDailyStepGoal,
-                    onValueChange = { viewModel.updateDailyStepGoal(it.filter { it.isDigit() }.take(5)) },
+                    onValueChange = {
+                      viewModel.updateDailyStepGoal(it.filter { it.isDigit() }.take(5))
+                    },
                     label = { Text("Enter your daily step goal") },
                     placeholder = { Text("5000") },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            viewModel.calculateAndConfirmGoals(onConfirm, onDismiss)
-                        }
-                    )
-                )
+                    keyboardOptions =
+                        KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
+                    keyboardActions =
+                        KeyboardActions(
+                            onDone = { viewModel.calculateAndConfirmGoals(onConfirm, onDismiss) }))
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = {
-                        viewModel.calculateAndConfirmGoals(onConfirm, onDismiss)
-                    },
+                    onClick = { viewModel.calculateAndConfirmGoals(onConfirm, onDismiss) },
                     colors = ButtonDefaults.buttonColors(blueThemeColor),
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.padding(horizontal = 4.dp)
-                ) {
-                    Text(text = "Confirm")
-                }
-            }
+                    modifier = Modifier.padding(horizontal = 4.dp)) {
+                      Text(text = "Confirm")
+                    }
+              }
         }
-    }
+  }
 }

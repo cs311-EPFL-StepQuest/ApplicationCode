@@ -46,7 +46,9 @@ class FriendsListKtTest {
   @Test
   fun everything_is_displayed() {
     composeTestRule.setContent {
-      StepQuestTheme { FriendsListScreen(navigationActions = navigationActions, "testUserId") }
+      StepQuestTheme {
+        FriendsListScreen(navigationActions = navigationActions, "testUid", mockk(relaxed = true))
+      }
     }
     composeTestRule.onNodeWithText("No friends yet").assertExists()
   }
@@ -64,9 +66,7 @@ class FriendsListKtTest {
     composeTestRule.setContent {
       StepQuestTheme {
         FriendsListScreen(
-            navigationActions = navigationActions,
-            "testUserId",
-            testCurrentFriendsList = fakeFriendsList)
+            navigationActions = navigationActions, "testUserId", mockk(relaxed = true))
       }
     }
 
@@ -90,9 +90,7 @@ class FriendsListKtTest {
     composeTestRule.setContent {
       StepQuestTheme {
         FriendsListScreen(
-            navigationActions = navigationActions,
-            "testUserId",
-            testCurrentFriendsList = fakeFriendsList)
+            navigationActions = navigationActions, "testUserId", mockk(relaxed = true))
       }
     }
     composeTestRule.onNodeWithText("Friends").assertIsDisplayed()

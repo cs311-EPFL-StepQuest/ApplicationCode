@@ -35,32 +35,28 @@ fun ProfilePageLayout(
     context: Context,
     viewModel: ProfilePageViewModel = viewModel()
 ) {
-    val blueThemeColor = colorResource(id = R.color.blueTheme)
-    val state by viewModel.state.collectAsState()
+  val blueThemeColor = colorResource(id = R.color.blueTheme)
+  val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.initialize(userId, context)
-    }
+  LaunchedEffect(Unit) { viewModel.initialize(userId, context) }
 
-    Column(
-        modifier = Modifier.padding(32.dp).fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
+  Column(
+      modifier = Modifier.padding(32.dp).fillMaxSize(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Spacer(modifier = Modifier.weight(1f))
-            Image(
-                painter = painterResource(id = R.drawable.settings),
-                contentDescription = "Settings",
-                modifier = Modifier.size(30.dp),
-            )
+          Spacer(modifier = Modifier.weight(1f))
+          Image(
+              painter = painterResource(id = R.drawable.settings),
+              contentDescription = "Settings",
+              modifier = Modifier.size(30.dp),
+          )
         }
         Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 40.sp)
         Image(
             painter = rememberAsyncImagePainter(profilePicture),
             contentDescription = "Profile Picture",
-            modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp))
-        )
+            modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = state.username,
@@ -70,20 +66,19 @@ fun ProfilePageLayout(
         Text(
             text = "Total Steps: ${state.totalStepsMade}",
             fontSize = 24.sp,
-            modifier = Modifier.padding(top = 16.dp)
-        )
+            modifier = Modifier.padding(top = 16.dp))
         Button(
             onClick = {
-                navigationActions.navigateTo(TopLevelDestination(Routes.FriendsListScreen.routName))
+              navigationActions.navigateTo(TopLevelDestination(Routes.FriendsListScreen.routName))
             },
             colors = ButtonDefaults.buttonColors(blueThemeColor),
-            modifier = Modifier.fillMaxWidth()
-                .height(72.dp)
-                .padding(vertical = 8.dp)
-                .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text(text = "Friends List", fontSize = 24.sp, color = Color.White)
-        }
-    }
+            modifier =
+                Modifier.fillMaxWidth()
+                    .height(72.dp)
+                    .padding(vertical = 8.dp)
+                    .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(8.dp)) {
+              Text(text = "Friends List", fontSize = 24.sp, color = Color.White)
+            }
+      }
 }
