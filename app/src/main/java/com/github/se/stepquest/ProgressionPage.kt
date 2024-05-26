@@ -18,6 +18,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -38,6 +39,7 @@ import com.github.se.stepquest.services.cacheStepGoals
 import com.github.se.stepquest.services.getCachedStepInfo
 import com.github.se.stepquest.services.getCachedSteps
 import com.github.se.stepquest.services.isOnline
+import kotlinx.coroutines.delay
 
 @Composable
 fun ProgressionPage(user: UserRepository, context: Context) {
@@ -47,8 +49,13 @@ fun ProgressionPage(user: UserRepository, context: Context) {
   var dailyStepsMade by remember { mutableIntStateOf(stepList["dailySteps"] ?: 0) }
   var weeklyStepsMade by remember { mutableIntStateOf(stepList["weeklySteps"] ?: 0) }
 
-  user.getSteps { steps -> dailyStepsMade = steps[0] }
-  user.getSteps { steps -> weeklyStepsMade = steps[1] }
+    LaunchedEffect(Unit) {
+        while(true){
+            user.getSteps { steps -> dailyStepsMade = steps[0] }
+            user.getSteps { steps -> weeklyStepsMade = steps[1] }
+            delay(100)
+        }
+    }
   cacheDailyWeeklySteps(context, dailyStepsMade, weeklyStepsMade)
 
   var dailyStepGoal by remember { mutableIntStateOf(stepList["dailyStepGoal"] ?: 5000) }
