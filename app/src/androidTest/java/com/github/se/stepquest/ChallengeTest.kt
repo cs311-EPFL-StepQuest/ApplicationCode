@@ -1,10 +1,21 @@
 package com.github.se.stepquest
 
+import android.content.Context
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
 import com.github.se.stepquest.data.model.ChallengeData
 import com.github.se.stepquest.data.model.ChallengeProgression
 import com.github.se.stepquest.data.model.ChallengeType
+import com.github.se.stepquest.screens.HomeScreen
 import com.github.se.stepquest.services.createChallengeItem
+import com.github.se.stepquest.services.someChallengesCompleted
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.ui.theme.StepQuestTheme
+import io.mockk.every
+import io.mockk.mockkStatic
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 
 class ChallengeTest {
@@ -58,6 +69,31 @@ class ChallengeTest {
             ChallengeType.DAILY_STEP_CHALLENGE)
     result = ChallengeType.DAILY_STEP_CHALLENGE.completionFunction(challenge)
     assertEquals(false, result)
+  }
+
+  @get:Rule val composeTestRule = createComposeRule()
+
+  @Test
+  fun testChallengeCompletionPopUp() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+
+    composeTestRule.setContent {
+      StepQuestTheme {
+        HomeScreen(
+            navigationActions = NavigationActions(navController = navController),
+            "testUid",
+            context)
+      }
+    }
+
+    mockkStatic("com.github.se.stepquest.services.ChallengesServiceKt")
+    every { someChallengesCompleted(any(), any()) } answers
+        {
+          secondArg<(Boolean) -> Unit>().invoke(true)
+        }
+    //        composeTestRule.onNodeWithTag("main congratulation dialog text").assertIsDisplayed()
+    //        composeTestRule.onNodeWithTag("Confirm button").assertIsDisplayed()
   }
 
   @Test fun testDeleteChallenge() {}
