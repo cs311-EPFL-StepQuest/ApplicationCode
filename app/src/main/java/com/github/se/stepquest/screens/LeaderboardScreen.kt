@@ -96,9 +96,7 @@ fun LeaderboardCard(
                 color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 4.dp).semantics {
-                    testTag = "NotAv"
-                })
+                modifier = Modifier.padding(vertical = 4.dp).semantics { testTag = "NotAv" })
           } else {
             LazyColumn {
               items(leaderboard.size) { index ->
@@ -109,9 +107,8 @@ fun LeaderboardCard(
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp).semantics {
-                        testTag = "${index + 1}"
-                    })
+                    modifier =
+                        Modifier.padding(vertical = 4.dp).semantics { testTag = "${index + 1}" })
               }
             }
           }
