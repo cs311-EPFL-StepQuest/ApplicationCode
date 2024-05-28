@@ -5,28 +5,6 @@
       <entry key="AddFriendScreenTest">
         <State />
       </entry>
-      <entry key="FriendsListKtTest">
-        <State />
-      </entry>
-      <entry key="MainActivity">
-        <State>
-          <targetSelectedWithDropDown>
-            <Target>
-              <type value="QUICK_BOOT_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\santh\.android\avd\Pixel_8_Pro_API_34.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-05-24T12:09:22.787530400Z" />
-        </State>
-      </entry>
-      <entry key="ProfilePageLayoutTest">
-        <State />
-      </entry>
     </value>
   </component>
 </project>
