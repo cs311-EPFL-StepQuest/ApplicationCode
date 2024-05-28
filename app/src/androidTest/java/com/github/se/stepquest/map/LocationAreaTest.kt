@@ -1,15 +1,20 @@
 package com.github.se.stepquest.map
 
-import androidx.test.platform.app.InstrumentationRegistry
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.database
-import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import okhttp3.internal.platform.Platform
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +35,7 @@ class LocationAreaTest {
   @Before
   fun setUp() {
     locationArea = LocationArea()
-
+    /*
     firebaseAuth = mockk()
     mockRouteID = mockk(relaxed = true)
     mockRouteDataSnapshot = mockk(relaxed = true)
@@ -38,13 +43,18 @@ class LocationAreaTest {
     mockDatabaseReference = mockk(relaxed = true)
     mockDatabase = mockk(relaxed = true)
     mockTask = mockk(relaxed = true)
+    */
 
-    locationArea.firebaseAuth = firebaseAuth
-    locationArea.database = mockDatabase
-
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
-    FirebaseApp.initializeApp(context)
-    // emulatedDatabase = FirebaseDatabaseInstance.instance
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    val options =
+        FirebaseOptions.Builder()
+            .setApplicationId("1:316177260128:android:d6da82112d5626348d2d05")
+            .setApiKey("AIzaSyB7BOcOCQ5f-A3HtoXH6O8cynAryQ3zFjE")
+            .setDatabaseUrl("http://127.0.0.1:9000/?ns=stepquest-4de5e")
+            .build()
+    if (FirebaseApp.getApps(context).isEmpty()) {
+      FirebaseApp.initializeApp(context, options)
+    }
   }
   /*
     @After
@@ -136,27 +146,46 @@ class LocationAreaTest {
   }
   */
   /*
-  object FirebaseDatabaseInstance {
-    val instance: FirebaseDatabase by lazy {
-      val database = FirebaseDatabase.getInstance()
-      database.useEmulator("10.0.2.2", 9000)
-      database
+    object FirebaseDatabaseInstance {
+      val instance: FirebaseDatabase by lazy {
+        val database = FirebaseDatabase.getInstance()
+        database.useEmulator("10.0.2.2", 9000)
+        database
+      }
     }
-  }
-
+  */
   @Test
   fun database_emulator() {
-    val ref = emulatedDatabase.reference
-    locationArea.database = emulatedDatabase
+    val database = Firebase.database
+    val host = if (Platform.isAndroid) "10.0.2.2" else "localhost"
+    database.useEmulator(host, 9000)
+    locationArea.database = database
+
+    val ref = database.reference
 
     val route = ref.child("routes").child("route").child("0")
+    val lon = route.child("longitude")
     route.child("latitude").setValue(0.0)
     route.child("longitude").setValue(0.0)
     locationArea.setArea(LocationDetails(0.0, 0.0), 1000.0)
+    runBlocking {
+      // Wait for the value to be set
+      while (true) {
+        val snapshot = lon.get().await()
+        if (snapshot.exists()) {
+          // Value is set, break out of the loop
+          break
+        }
+      }
+    }
     val localRouteList = mutableListOf<LocationDetails>()
-    locationArea.routesAroundLocation { localRouteList.addAll(it) }
+    val localRouteDetailList = mutableListOf<RouteDetails>()
+
+    locationArea.routesAroundLocation { routeList, routeDetailList ->
+      localRouteList.addAll(routeList)
+      localRouteDetailList.addAll(routeDetailList)
+    }
     assertTrue(localRouteList[0].latitude == 0.0)
     assertTrue(localRouteList[0].longitude == 0.0)
   }
-  */
 }
