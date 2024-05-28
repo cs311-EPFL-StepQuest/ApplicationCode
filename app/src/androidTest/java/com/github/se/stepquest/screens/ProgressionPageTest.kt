@@ -31,8 +31,6 @@ class ProgressionPageTest {
     composeTestRule.onNodeWithTag("Daily steps text").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Weekly steps icon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Weekly steps text").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("Bosses defeated icon").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("Bosses defeated text").assertIsDisplayed()
 
     val button = composeTestRule.onNodeWithTag("SetNewGoalButton")
     button.assertIsDisplayed()

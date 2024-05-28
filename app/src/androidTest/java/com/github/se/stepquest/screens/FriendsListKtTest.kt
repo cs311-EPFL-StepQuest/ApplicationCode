@@ -1,86 +1,84 @@
 package com.github.se.stepquest.screens
 
-import com.google.firebase.database.getValue
+import android.content.Context
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.test.core.app.ApplicationProvider
+import com.github.se.stepquest.Friend
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.viewModels.FriendsListState
+import com.github.se.stepquest.viewModels.FriendsViewModel
+import io.mockk.mockk
 import org.junit.Assert.*
+import org.junit.Rule
+import org.junit.Test
 
 
-/*class FriendsListKtTest {
+class FriendsListKtTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var navigationActions: NavigationActions
-  private lateinit var context: Context
-  private lateinit var database: FirebaseDatabase
-  private lateinit var friendsRef: DatabaseReference
-
-  @Before
-  fun setup() {
-    navigationActions = mockk(relaxed = true)
-    context = mockk(relaxed = true)
-    database = mockk(relaxed = true)
-    friendsRef = mockk(relaxed = true)
-    every { database.reference } returns
-        mockk {
-          every { child(any()) } returns
-              mockk {
-                every { child(any()) } returns mockk { every { child(any()) } returns friendsRef }
-              }
-        }
-  }
+  private val mockNavigationActions = mockk<NavigationActions>(relaxed = true)
+  private val context: Context = ApplicationProvider.getApplicationContext()
 
   @Test
-  fun everything_is_displayed() {
+  fun testFriendsListIsDisplayed() {
+    // Arrange
+    val friendsViewModel = FriendsViewModel()
+    val testState =
+        FriendsListState(
+            currentFriendsList =
+                listOf(Friend(name = "Alice", status = true), Friend(name = "Bob", status = false)),
+            isOnline = true)
+    friendsViewModel.state_.value = testState
+
+    // Act
     composeTestRule.setContent {
-      StepQuestTheme { FriendsListScreen(navigationActions = navigationActions) }
+      FriendsListScreenCheck(
+          navigationActions = mockNavigationActions,
+          userId = "testUserId",
+          context = context,
+          friendsViewModel = friendsViewModel)
     }
-    composeTestRule.onNodeWithText("No friends yet").assertExists()
-  }
+    friendsViewModel.state_.value = testState
 
-  @Test
-  fun display_with_friends() {
-
-    val fakeFriendsList =
-        listOf(
-            Friend("Alice", true),
-            Friend("Bob", false),
-            Friend("Charlie", true),
-            Friend("David", false),
-        )
-    composeTestRule.setContent {
-      StepQuestTheme {
-        FriendsListScreen(
-            navigationActions = navigationActions,
-            "testUserId")
-      }
-    }
-
+    // Assert
     composeTestRule.onNodeWithText("Friends").assertIsDisplayed()
-    fakeFriendsList.forEach { friend ->
-      composeTestRule.onNodeWithText(friend.name).assertIsDisplayed()
-    }
-    composeTestRule.onNodeWithText("Alice").performClick()
-    composeTestRule.onNodeWithText("Alice").assertExists()
+    composeTestRule.onNodeWithText("Alice").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Bob").assertIsDisplayed()
   }
 
   @Test
-  fun data_base_friends() {
-    val fakeFriendsList = mutableListOf(Friend("Alice", true), Friend("Bob", false))
-    every { friendsRef.addListenerForSingleValueEvent(any()) } answers
-        {
-          val listener = arg<ValueEventListener>(0)
-          listener.onDataChange(
-              mockk { every { getValue<List<Friend>>()?.toMutableList() } returns fakeFriendsList })
-        }
+  fun testEmptyFriendsList() {
+    val friendsViewModel = FriendsViewModel()
+    val testState = FriendsListState(currentFriendsList = emptyList(), isOnline = true)
+    friendsViewModel.state_.value = testState
     composeTestRule.setContent {
-      StepQuestTheme {
-        FriendsListScreen(
-            navigationActions = navigationActions,
-            "testUserId")
-      }
+      FriendsListScreenCheck(
+          navigationActions = mockNavigationActions,
+          userId = "testUserId",
+          context = context,
+          friendsViewModel = friendsViewModel)
     }
-    composeTestRule.onNodeWithText("Friends").assertIsDisplayed()
-    fakeFriendsList.forEach { friend ->
-      composeTestRule.onNodeWithText(friend.name).assertIsDisplayed()
-    }
+    composeTestRule.onNodeWithText("No friends yet").assertIsDisplayed()
   }
-}*/
+
+  @Test
+  fun testFriendsListWhenOffline() {
+    val friendsViewModel = FriendsViewModel()
+    val testState = FriendsListState(currentFriendsList = emptyList(), isOnline = false)
+    friendsViewModel.state_.value = testState
+    composeTestRule.setContent {
+      FriendsListScreenCheck(
+          navigationActions = mockNavigationActions,
+          userId = "testUserId",
+          context = context,
+          friendsViewModel = friendsViewModel)
+    }
+    friendsViewModel.state_.value = testState
+    composeTestRule
+        .onNodeWithText("You must be online to view your friend list.")
+        .assertIsDisplayed()
+  }
+}
