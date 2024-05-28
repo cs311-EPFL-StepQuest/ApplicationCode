@@ -44,15 +44,8 @@ fun ProfilePageLayout(
       modifier = Modifier.padding(32.dp).fillMaxSize(),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-          Spacer(modifier = Modifier.weight(1f))
-          Image(
-              painter = painterResource(id = R.drawable.settings),
-              contentDescription = "Settings",
-              modifier = Modifier.size(30.dp),
-          )
-        }
         Text(text = "Profile", fontWeight = FontWeight.Bold, fontSize = 40.sp)
+        Spacer(modifier = Modifier.height(16.dp))
         Image(
             painter = rememberAsyncImagePainter(profilePicture),
             contentDescription = "Profile Picture",

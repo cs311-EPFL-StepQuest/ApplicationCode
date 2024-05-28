@@ -3,7 +3,6 @@ package com.github.se.stepquest.screens
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -45,14 +44,6 @@ fun HomeScreen(
       containerColor = Color(0xFF0D99FF),
       topBar = {
         Row(modifier = Modifier.height(100.dp).fillMaxWidth().padding(start = 15.dp, end = 15.dp)) {
-          // Messages icon
-          TextButton(onClick = { /*TODO*/}, modifier = Modifier.testTag("messages_button")) {
-            Image(
-                painter = painterResource(com.github.se.stepquest.R.drawable.messages),
-                modifier = Modifier.fillMaxHeight().size(50.dp),
-                contentDescription = "messages_icon")
-          }
-          Spacer(Modifier.weight(1f))
           // Notifications icon
           TextButton(
               onClick = {
@@ -65,6 +56,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxHeight().size(50.dp),
                     contentDescription = "notifications_icon")
               }
+          Spacer(Modifier.weight(1f))
           // Profile icon
           TextButton(
               onClick = {
@@ -81,27 +73,6 @@ fun HomeScreen(
       bottomBar = {}) { innerPadding ->
         // Main content of the home screen
         Column(modifier = Modifier.padding(innerPadding).fillMaxWidth()) {
-          // Start game button
-          Button(
-              onClick = { /* start game when ready */},
-              shape = RoundedCornerShape(20.dp),
-              colors = ButtonDefaults.buttonColors(Color.White),
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .padding(start = 25.dp, end = 25.dp, top = 5.dp)
-                      .height(70.dp)) {
-                Text(
-                    text = "Start Game",
-                    color = Color.Black,
-                    modifier = Modifier.padding(end = 70.dp),
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold)
-                Image(
-                    painter = painterResource(com.github.se.stepquest.R.drawable.play_icon),
-                    contentDescription = "play_icon",
-                    modifier = Modifier.size(40.dp))
-              }
-
           // Challenges tab
           Card(
               modifier = Modifier.fillMaxWidth().padding(25.dp).height(190.dp),
@@ -152,7 +123,7 @@ fun HomeScreen(
                           },
                           colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
                           modifier =
-                              Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                              Modifier.padding(horizontal = 30.dp, vertical = 10.dp)
                                   .height(40.dp)
                                   .fillMaxWidth()
                                   .align(Alignment.CenterHorizontally)) {
@@ -171,7 +142,7 @@ fun HomeScreen(
               modifier =
                   Modifier.fillMaxWidth()
                       .padding(start = 25.dp, end = 25.dp, bottom = 30.dp)
-                      .height(260.dp),
+                      .height(300.dp),
               colors = CardDefaults.cardColors(containerColor = Color.White)) {
                 Text(
                     text = "Leaderboard",
@@ -203,6 +174,7 @@ fun HomeScreen(
                                 modifier = Modifier.weight(1f))
                           }
                     }
+                      Spacer(modifier = Modifier.weight(1f))
                     Button(
                         onClick = {
                           navigationActions.navigateTo(
@@ -210,7 +182,7 @@ fun HomeScreen(
                         },
                         colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
                         modifier =
-                            Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                            Modifier.padding(horizontal = 30.dp, vertical = 10.dp)
                                 .height(40.dp)
                                 .fillMaxWidth()
                                 .align(Alignment.CenterHorizontally)) {
