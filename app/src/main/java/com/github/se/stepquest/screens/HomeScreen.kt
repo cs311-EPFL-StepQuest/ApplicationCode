@@ -174,7 +174,7 @@ fun HomeScreen(
                                 modifier = Modifier.weight(1f))
                           }
                     }
-                      Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.weight(1f))
                     Button(
                         onClick = {
                           navigationActions.navigateTo(

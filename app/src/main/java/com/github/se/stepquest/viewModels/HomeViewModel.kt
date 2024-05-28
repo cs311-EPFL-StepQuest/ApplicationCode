@@ -21,7 +21,7 @@ data class HomeScreenState(
 )
 
 class HomeViewModel : ViewModel() {
-  private val _state = MutableStateFlow(HomeScreenState())
+  val _state = MutableStateFlow(HomeScreenState())
   val state: StateFlow<HomeScreenState> = _state.asStateFlow()
 
   fun initialize(userId: String, context: Context) {

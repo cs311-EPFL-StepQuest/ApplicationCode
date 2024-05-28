@@ -2,7 +2,16 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="AddFriendScreenTest">
+      <entry key="LoginScreenTest">
+        <State />
+      </entry>
+      <entry key="NotificationsTest">
+        <State />
+      </entry>
+      <entry key="ProfilePageLayoutTest">
+        <State />
+      </entry>
+      <entry key="SetStepGoalsDialogTest">
         <State />
       </entry>
     </value>

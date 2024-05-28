@@ -35,7 +35,9 @@ fun FriendsListScreenCheck(
     context: Context,
     friendsViewModel: FriendsViewModel = viewModel()
 ) {
-  if (isOnline(context)) {
+  LaunchedEffect(Unit) { friendsViewModel.checkOnlineStatus(context) }
+  val state by friendsViewModel.state.collectAsState()
+  if (state.isOnline) {
     FriendsListScreen(navigationActions, userId, friendsViewModel)
   } else {
     Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
@@ -113,11 +115,9 @@ fun FriendsListScreen(
 
 @Composable
 fun FriendItem(friend: Friend, onClick: () -> Unit) {
-  val blueThemeColor = colorResource(id = R.color.blueTheme)
-  val backgroundColor = if (friend.status) blueThemeColor else Color.Gray
-  val status = if (friend.status) "ONLINE" else "OFFLINE"
+  val blueThemeColor = Color.Gray
   Surface(
-      color = backgroundColor,
+      color = blueThemeColor,
       modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth().padding(horizontal = 16.dp),
       shape = MaterialTheme.shapes.medium,
       onClick = onClick) {
@@ -127,10 +127,6 @@ fun FriendItem(friend: Friend, onClick: () -> Unit) {
               Text(
                   text = friend.name,
                   modifier = Modifier.weight(1f),
-                  color = Color.White,
-                  style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold))
-              Text(
-                  text = status,
                   color = Color.White,
                   style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold))
             }
