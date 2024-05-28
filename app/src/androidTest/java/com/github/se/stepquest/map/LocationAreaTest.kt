@@ -158,7 +158,10 @@ class LocationAreaTest {
   fun database_emulator() {
     val database = Firebase.database
     val host = if (Platform.isAndroid) "10.0.2.2" else "localhost"
-    database.useEmulator(host, 9000)
+    try {
+      database.useEmulator(host, 9000)
+    } catch (e: IllegalStateException) {}
+
     locationArea.database = database
 
     val ref = database.reference
