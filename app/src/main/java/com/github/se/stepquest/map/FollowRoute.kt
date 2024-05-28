@@ -1,15 +1,22 @@
 package com.github.se.stepquest.map
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.lifecycle.MutableLiveData
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.GoogleMap
@@ -22,7 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
-class FollowRoute() {
+class FollowRoute private constructor() {
 
   var userOnRoute = MutableLiveData<Boolean>()
   // Define a Job to manage the coroutine
@@ -30,13 +37,29 @@ class FollowRoute() {
   var followingRoute = MutableLiveData<Boolean>()
   var RouteDetail = MutableLiveData<RouteDetails>()
   private var currentToast: Toast? = null
+    var isPictureTaken = MutableLiveData<Boolean>(false)
 
   init {
     followingRoute.postValue(false)
   }
 
+    companion object {
+        const val REQUEST_IMAGE_CAPTURE = 1
+
+        @Volatile
+        private var INSTANCE: FollowRoute? = null
+
+        fun getInstance(): FollowRoute {
+            return INSTANCE ?: synchronized(this) {
+                val instance = FollowRoute()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
+
   @SuppressLint("PotentialBehaviorOverride")
-  fun drawRouteDetail(googleMap: GoogleMap, context: Context, onClear: () -> Unit) {
+  fun drawRouteDetail(googleMap: GoogleMap, context: Context, onClear: () -> Unit, locationViewModel: LocationViewModel) {
     googleMap.setOnMarkerClickListener { clickedMarker ->
       if (clickedMarker.title == "Route") {
 
@@ -105,8 +128,21 @@ class FollowRoute() {
 
           val button: Button = view.findViewById(R.id.dialog_button)
           button.setOnClickListener {
-            // Perform your action here
-            Toast.makeText(context, "Button clicked!", Toast.LENGTH_SHORT).show()
+              dispatchTakePictureIntent(context as Activity)
+            if (isPictureTaken.value == true) {
+                Log.d("AAAAAAAAAAAAFollowRoute", "Picture taken")
+                val checkpointLocation = LocationDetails(clickedMarker.position.latitude, clickedMarker.position.longitude)
+                val pictureLocation = locationViewModel.currentLocation.value
+                val distance = compareCheckpoints(checkpointLocation, pictureLocation!!)
+                if (distance == -1f) {
+                    //'display too far from location' message//
+                    Toast.makeText(context, "Too far from location!", Toast.LENGTH_SHORT).show()
+
+                } else {
+                    Toast.makeText(context, "Near location!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
           }
           builder
               .setView(view)
@@ -245,4 +281,18 @@ class FollowRoute() {
   fun stopCheckIfOnRoute() {
     checkRouteJob?.cancel()
   }
+
+    private fun dispatchTakePictureIntent(activity: Activity) {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(activity.packageManager)?.also {
+                activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+            }
+        }
+    }
+
+    fun setPictureTaken() {
+        isPictureTaken.postValue(true)
+    }
 }
+
+

@@ -85,7 +85,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var routeEndMarker: Marker? = null
   val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
-  val followRoute = FollowRoute()
+  val followRoute = FollowRoute.getInstance()
   val locationArea = LocationArea()
 
   // Instantiate all necessary variables to take pictures
@@ -255,7 +255,7 @@ fun Map(locationViewModel: LocationViewModel) {
                               locationViewModel.currentLocation.value!!.longitude),
                           15f))
                   followRoute.drawRouteDetail(
-                      map.value!!, context, onClear = { currentMarker = null })
+                      map.value!!, context, onClear = { currentMarker = null }, locationViewModel)
                 },
                 modifier =
                     Modifier.padding(16.dp)
@@ -363,7 +363,7 @@ fun Map(locationViewModel: LocationViewModel) {
                               searchableLocation!!.latitude, searchableLocation!!.longitude))
                       locationArea.drawRoutesOnMap(map.value!!)
                       followRoute.drawRouteDetail(
-                          map.value!!, context, onClear = { currentMarker = null })
+                          map.value!!, context, onClear = { currentMarker = null }, locationViewModel)
                     },
                     modifier =
                         Modifier.align(Alignment.CenterEnd)

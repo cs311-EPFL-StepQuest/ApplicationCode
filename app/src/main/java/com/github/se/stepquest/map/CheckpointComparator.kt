@@ -1,6 +1,6 @@
 package com.github.se.stepquest.map
 
-fun compareImages(referenceLocation: LocationDetails, newImageLocation: LocationDetails): Float {
+fun compareCheckpoints(referenceLocation: LocationDetails, newImageLocation: LocationDetails): Float {
   val distance = calculateDistance(referenceLocation, newImageLocation)
   if (distance >= 20f) {
     return -1f
@@ -15,7 +15,7 @@ Box(modifier = Modifier.fillMaxWidth()) {
                         onClick = {
                           val checkpointLocation = //get checkpoint location//
                           val pictureLocation = //get current location//
-                          val distance = compareImages(checkpointLocation, pictureLocation)
+                          val distance = compareCheckpoints(checkpointLocation, pictureLocation)
                           if (distance == -1f) {
                             //'display too far from location' message//
                           } else {
