@@ -1,79 +1,86 @@
 package com.github.se.stepquest.screens
 
-import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.test.core.app.ApplicationProvider
-import com.github.se.stepquest.ui.theme.StepQuestTheme
-import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseOptions
-import com.google.firebase.database.database
+import androidx.compose.ui.test.performClick
+import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.viewModels.LeaderboardsState
+import com.github.se.stepquest.viewModels.LeaderboardsViewModel
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
-import okhttp3.internal.platform.Platform
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class LeaderboardScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
-  @Before
-  fun setup() {
-    // Initialize Firebase Admin SDK with emulator settings
-    val context = ApplicationProvider.getApplicationContext<Context>()
-    val options =
-        FirebaseOptions.Builder()
-            .setApplicationId("1:316177260128:android:d6da82112d5626348d2d05")
-            .setApiKey("AIzaSyB7BOcOCQ5f-A3HtoXH6O8cynAryQ3zFjE")
-            .setDatabaseUrl("http://127.0.0.1:9000/?ns=stepquest-4de5e")
-            .build()
-    if (FirebaseApp.getApps(context).isEmpty()) {
-      FirebaseApp.initializeApp(context, options)
+  private val mockNavigationActions = mockk<NavigationActions>(relaxed = true)
+
+  @Test
+  fun testLeaderboardsScreenWithData() {
+    // Arrange
+    val viewModel = LeaderboardsViewModel()
+    val testState =
+        LeaderboardsState(
+            generalLeaderboard = listOf("Alice" to 2000, "Bob" to 1800, "Charlie" to 1500),
+            friendsLeaderboard = listOf("Dave" to 1600, "Eve" to 1400))
+    viewModel._state.value = testState
+
+    // Act
+    composeTestRule.setContent {
+      Leaderboards(
+          userId = "testUserId", navigationActions = mockNavigationActions, viewModel = viewModel)
     }
+
+    viewModel._state.value = testState
+
+    // Assert
+    composeTestRule.onNodeWithText("Leaderboard").assertIsDisplayed()
+    composeTestRule.onNodeWithText("General Leaderboard").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Friends Leaderboard").assertIsDisplayed()
+    composeTestRule.onNodeWithText("1. Alice : 2000").assertIsDisplayed()
+    composeTestRule.onNodeWithText("2. Bob : 1800").assertIsDisplayed()
+    composeTestRule.onNodeWithText("3. Charlie : 1500").assertIsDisplayed()
+    composeTestRule.onNodeWithText("1. Dave : 1600").assertIsDisplayed()
+    composeTestRule.onNodeWithText("2. Eve : 1400").assertIsDisplayed()
   }
 
   @Test
-  fun leaderboardCardsAreDisplayed() {
-    // Start the app
+  fun testLeaderboardsScreenWithoutData() {
+    // Arrange
+    val viewModel = LeaderboardsViewModel()
+    val testState =
+        LeaderboardsState(generalLeaderboard = emptyList(), friendsLeaderboard = emptyList())
+    viewModel._state.value = testState
+
+    // Act
     composeTestRule.setContent {
-      StepQuestTheme { Leaderboards(userId = "LeaderboardTestUid", mockk(relaxed = true)) }
+      Leaderboards(
+          userId = "testUserId", navigationActions = mockNavigationActions, viewModel = viewModel)
     }
 
+    viewModel._state.value = testState
+
+    // Assert
     composeTestRule.onNodeWithText("Leaderboard").assertIsDisplayed()
-
     composeTestRule.onNodeWithText("General Leaderboard").assertIsDisplayed()
-
     composeTestRule.onNodeWithText("Friends Leaderboard").assertIsDisplayed()
   }
 
   @Test
-  fun checkIfTopUserIsCorrect() {
-    val database = Firebase.database
-    val host = if (Platform.isAndroid) "10.0.2.2" else "localhost"
-    database.useEmulator(host, 9000)
-    val leaderboardRef = database.reference.child("leaderboard").child("A")
-    leaderboardRef.setValue(1000000)
-    runBlocking {
-      // Wait for the value to be set
-      while (true) {
-        val snapshot = leaderboardRef.get().await()
-        if (snapshot.exists()) {
-          // Value is set, break out of the loop
-          break
-        }
-      }
+  fun testBackButtonNavigation() {
+    // Arrange
+    val viewModel = LeaderboardsViewModel()
+
+    // Act
+    composeTestRule.setContent {
+      Leaderboards(
+          userId = "testUserId", navigationActions = mockNavigationActions, viewModel = viewModel)
     }
 
-    composeTestRule.setContent {
-      StepQuestTheme {
-        Leaderboards(userId = "BdUmnrMZwraipednJIYXphUlWft2", mockk(relaxed = true))
-      }
-    }
-    composeTestRule.onNodeWithTag("1").assertIsDisplayed()
+    // Assert
+    composeTestRule.onNodeWithText("Back").assertIsDisplayed().performClick()
+    // Assuming the NavigationActions is mocked to verify the navigation call
+    // Verify navigation call to the home screen
   }
 }

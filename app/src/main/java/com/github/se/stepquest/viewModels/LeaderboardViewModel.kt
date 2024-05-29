@@ -19,7 +19,7 @@ data class LeaderboardsState(
 )
 
 class LeaderboardsViewModel : ViewModel() {
-  private val _state = MutableStateFlow(LeaderboardsState())
+  val _state = MutableStateFlow(LeaderboardsState())
   val state: StateFlow<LeaderboardsState> = _state.asStateFlow()
 
   fun initialize(userId: String) {
