@@ -60,21 +60,6 @@ fun createChallengeItem(
             currentUserId,
             ChallengeProgression(friendUserId, 0, 0),
             ChallengeProgression(currentUserId, 0, 0))
-    ChallengeType.ROUTE_CHALLENGE ->
-        ChallengeData(
-            DateFormat.format("MMMM d, yyyy ", currentDate.time)
-                .toString(), // use of the current date for Uid
-            ChallengeType.REGULAR_STEP_CHALLENGE,
-            stepsToMake = 0,
-            kilometersToWalk = 2,
-            daysToComplete = 1,
-            getEndDate(currentDate, 1),
-            friendUsername,
-            friendUserId,
-            currentUsername,
-            currentUserId,
-            ChallengeProgression(friendUserId, 0, 0),
-            ChallengeProgression(currentUserId, 0, 0))
   }
 }
 
