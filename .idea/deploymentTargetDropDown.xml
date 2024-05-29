@@ -5,10 +5,7 @@
       <entry key="HomeScreenTest">
         <State />
       </entry>
-      <entry key="ProfilePageLayoutTest">
-        <State />
-      </entry>
-      <entry key="SetStepGoalsDialogTest">
+      <entry key="MainActivity">
         <State />
       </entry>
     </value>
