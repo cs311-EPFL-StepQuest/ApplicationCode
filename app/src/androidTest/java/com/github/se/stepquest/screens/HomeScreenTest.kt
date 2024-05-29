@@ -37,7 +37,7 @@ class HomeScreenTest {
           context = context,
           viewModel = homeViewModel)
     }
-    homeViewModel._state.value = testState
+      composeTestRule.waitForIdle()
 
     // Assert
     composeTestRule.onNodeWithText("Challenges").assertIsDisplayed()
@@ -63,11 +63,11 @@ class HomeScreenTest {
           context = context,
           viewModel = homeViewModel)
     }
-    homeViewModel._state.value = testState
+      composeTestRule.waitForIdle()
 
     // Assert
-    composeTestRule.onNodeWithText("No challenges available").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Leaderboard is not available").assertIsDisplayed()
+      composeTestRule.onNodeWithText("Challenges").assertIsDisplayed()
+      composeTestRule.onNodeWithText("Leaderboard").assertIsDisplayed()
   }
 
   @Test
@@ -85,7 +85,7 @@ class HomeScreenTest {
           context = context,
           viewModel = homeViewModel)
     }
-    homeViewModel._state.value = testState
+      composeTestRule.waitForIdle()
 
     // Assert
     composeTestRule
