@@ -68,12 +68,6 @@ fun FriendDialogBox(friend: Friend, userId: String, onDismiss: () -> Unit) {
                   }
               Text(text = friend.name, fontWeight = FontWeight.Bold, fontSize = 40.sp)
               Spacer(modifier = Modifier.height(2.dp))
-              /*profilePictureURL?.let { uri ->
-                Image(
-                    painter = rememberAsyncImagePainter(uri),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier.size(200.dp).clip(RoundedCornerShape(100.dp)))
-              }*/
               Spacer(modifier = Modifier.height(16.dp))
               if (challengeMode) {
                 ButtonElement(
@@ -95,8 +89,23 @@ fun FriendDialogBox(friend: Friend, userId: String, onDismiss: () -> Unit) {
                       }
                     })
                 ButtonElement(
-                    buttonText = "Daily Step Challenge", onClick = { /* to be added soon */})
-                ButtonElement(buttonText = "Route Challenge", onClick = { /* to be added soon */})
+                    buttonText = "Daily Step Challenge",
+                    onClick = {
+                      getUsername(userId) { currentUsername ->
+                        getUserId(friend.name) { friendUserId ->
+                          val challenge =
+                              createChallengeItem(
+                                  userId,
+                                  currentUsername,
+                                  friendUserId,
+                                  friend.name,
+                                  ChallengeType.DAILY_STEP_CHALLENGE)
+                          sendPendingChallenge(challenge)
+                          challengeSentVisible = true
+                          challengeMode = false
+                        }
+                      }
+                    })
               } else {
                 if (challengeSentVisible) {
                   Text(
@@ -104,7 +113,6 @@ fun FriendDialogBox(friend: Friend, userId: String, onDismiss: () -> Unit) {
                       color = Color.Green,
                       modifier = Modifier.padding(top = 4.dp))
                 }
-                ButtonElement(buttonText = "Connection", onClick = { /*handle connection*/})
                 ButtonElement(buttonText = "Challenge", onClick = { challengeMode = true })
               }
             }
