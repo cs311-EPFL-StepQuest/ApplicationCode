@@ -119,6 +119,7 @@ fun Map(locationViewModel: LocationViewModel) {
   var makingRoute by remember { mutableStateOf(false) }
   var displayButtons by remember { mutableStateOf(true) }
   val followingRoute by followRoute.followingRoute.observeAsState()
+  val show_follow_route_button by followRoute.show_follow_route_button.observeAsState()
 
   val launcherMultiplePermissions =
       rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -169,6 +170,7 @@ fun Map(locationViewModel: LocationViewModel) {
     locationViewModel.locationUpdated.postValue(false)
     stopCreatingRoute = true
     makingRoute = false
+    followRoute.show_follow_route_button.value = false
     if (followingRoute == true) {
       followRoute.stopCheckIfOnRoute()
       Log.d("FollowRoute", "stop check following route")
@@ -214,8 +216,15 @@ fun Map(locationViewModel: LocationViewModel) {
           LaunchedEffect(followingRoute) {
             if (followingRoute == true) {
               Log.d("FollowRoute", "start check if on route")
-              displayButtons = false
+              followRoute.show_follow_route_button.value = false
               followRoute.checkIfOnRoute(locationViewModel, context, onGoBackBUttonClick)
+            }
+          }
+
+          LaunchedEffect(show_follow_route_button) {
+            if (show_follow_route_button == true) {
+              Log.d("FollowRoute", "show follow route button")
+              displayButtons = false
             }
           }
 
@@ -412,6 +421,29 @@ fun Map(locationViewModel: LocationViewModel) {
                       painter = painterResource(id = R.drawable.goback),
                       modifier = Modifier.size(20.dp),
                       contentDescription = "go back button")
+                })
+          }
+          if (show_follow_route_button == true) {
+            Log.d("FollowRoute", "show follow route button")
+            FloatingActionButton(
+                onClick = {
+                  followRoute.followingRoute.value = true
+                  followRoute.show_follow_route_button.value = false
+                  Toast.makeText(context, "Start Following Route! Have Fun!", Toast.LENGTH_LONG)
+                      .show()
+                },
+                modifier =
+                    Modifier.size(85.dp)
+                        .padding(16.dp)
+                        .align(Alignment.BottomEnd)
+                        .offset(y = (-90).dp)
+                        .testTag("followRouteButton"),
+                containerColor = Color.White,
+                content = {
+                  Image(
+                      painter = painterResource(id = R.drawable.follow_route_button),
+                      modifier = Modifier.size(30.dp),
+                      contentDescription = "follow route button")
                 })
           }
         }
