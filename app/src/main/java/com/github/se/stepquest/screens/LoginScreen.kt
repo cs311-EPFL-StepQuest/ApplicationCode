@@ -23,6 +23,14 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.viewModels.LoginViewModel
 
+/**
+ * Screen to log in when entering the app. If online, enter the app normally. If offline, check for
+ * cached login data.
+ *
+ * @param navigationActions the handler for navigating the app.
+ * @param context the application's context.
+ * @param loginViewModel the Login screen's viewModel.
+ */
 @Composable
 fun LoginScreen(
     navigationActions: NavigationActions,

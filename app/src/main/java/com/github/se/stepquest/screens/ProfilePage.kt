@@ -1,4 +1,4 @@
-package com.github.se.stepquest
+package com.github.se.stepquest.screens
 
 import android.content.Context
 import android.net.Uri
@@ -22,10 +22,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import com.github.se.stepquest.R
+import com.github.se.stepquest.Routes
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.viewModels.ProfilePageViewModel
 
+/**
+ * Screen for the profile page.
+ *
+ * @param navigationActions the handler for navigating the app.
+ * @param userId the current user's database ID.
+ * @param profilePicture the current user's profile picture.
+ * @param context the application's context.
+ * @param viewModel the profile page's viewModel.
+ */
 @Composable
 fun ProfilePageLayout(
     navigationActions: NavigationActions,

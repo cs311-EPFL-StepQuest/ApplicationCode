@@ -39,6 +39,7 @@ import com.github.se.stepquest.services.getUsername
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
+/** Screen displaying the global and friend score leaderboards. */
 @Composable
 fun Leaderboards(userId: String, navigationActions: NavigationActions) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)

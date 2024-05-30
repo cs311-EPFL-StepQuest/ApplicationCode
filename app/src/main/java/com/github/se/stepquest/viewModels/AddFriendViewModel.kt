@@ -18,12 +18,18 @@ data class AddFriendState(
     val username: String? = null
 )
 
+/** ViewModel handling the behaviour of the AddFriend screen. */
 class AddFriendViewModel : ViewModel() {
   private val _state = MutableStateFlow(AddFriendState())
   val state: StateFlow<AddFriendState> = _state
 
   private val database = FirebaseDatabase.getInstance()
 
+  /**
+   * Adds the current user's username to the viewModel.
+   *
+   * @param userId the current user's database ID.
+   */
   fun fetchCurrentUser(userId: String) {
     viewModelScope.launch {
       getCurrentUser(database.reference, userId) { username ->
@@ -32,11 +38,21 @@ class AddFriendViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Updates the user search query.
+   *
+   * @param query the current query.
+   */
   fun updateSearchQuery(query: String) {
     _state.value = _state.value.copy(searchQuery = query)
     performSearch(query)
   }
 
+  /**
+   * Finds usernames matching the search query in the database.
+   *
+   * @param query the current query.
+   */
   private fun performSearch(query: String) {
     val lowercaseQuery = query.lowercase()
     _state.value = _state.value.copy(loading = true)
@@ -65,6 +81,13 @@ class AddFriendViewModel : ViewModel() {
         })
   }
 
+  /**
+   * Retrieves the current user's username from the database.
+   *
+   * @param database the database instance reference.
+   * @param userId the current user's database ID.
+   * @param callback the action to execute when the database connection is over.
+   */
   private fun getCurrentUser(
       database: DatabaseReference,
       userId: String,

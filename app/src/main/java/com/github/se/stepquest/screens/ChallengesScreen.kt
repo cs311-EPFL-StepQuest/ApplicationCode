@@ -19,6 +19,13 @@ import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.viewModels.ChallengesViewModel
 
+/**
+ * Screen displaying the user's active challenges.
+ *
+ * @param userId the current user's database ID.
+ * @param navigationActions the handler for navigating the app.
+ * @param viewModel the Challenges screen's viewModel.
+ */
 @Composable
 fun ChallengesScreen(
     userId: String,
@@ -54,6 +61,11 @@ fun ChallengesScreen(
   }
 }
 
+/**
+ * One active challenge item displaying various information on the challenge.
+ *
+ * @param challenge the information on the challenge.
+ */
 @Composable
 fun ChallengeItem(challenge: ChallengeData) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)

@@ -18,11 +18,17 @@ data class FriendsListState(
     val isOnline: Boolean = true
 )
 
+/** ViewModel handling the behaviour of the FriendsList screen. */
 class FriendsViewModel : ViewModel() {
 
   val state_ = MutableStateFlow(FriendsListState())
   val state: StateFlow<FriendsListState> = state_
 
+  /**
+   * Retrieves the friends list.
+   *
+   * @param userId the current user's database ID.
+   */
   fun fetchFriends(userId: String) {
     viewModelScope.launch {
       fetchFriendsListFromDatabase(userId) { friendsList ->
@@ -31,18 +37,34 @@ class FriendsViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Updates the currently selected friend profile.
+   *
+   * @param friend the current friend.
+   */
   fun selectFriend(friend: Friend) {
     state_.value = state_.value.copy(selectedFriend = friend, showFriendProfile = true)
   }
 
+  /** Unselects the currently selected friend profile. */
   fun deselectFriend() {
     state_.value = state_.value.copy(selectedFriend = null, showFriendProfile = false)
   }
 
+  /**
+   * Switches views between the FriendsList screen and the AddFriend screen.
+   *
+   * @param show whether or not the AddFriend screen should be displayed.
+   */
   fun toggleAddFriendScreen(show: Boolean) {
     state_.value = state_.value.copy(showAddFriendScreen = show)
   }
 
+  /**
+   * Checks if the user is online.
+   *
+   * @param context the application's context.
+   */
   fun checkOnlineStatus(context: Context) {
     val online = isOnline(context)
     state_.value = state_.value.copy(isOnline = online)

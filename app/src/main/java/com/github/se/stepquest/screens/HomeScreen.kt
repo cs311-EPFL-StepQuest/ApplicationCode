@@ -20,6 +20,14 @@ import com.github.se.stepquest.Routes
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 
+/**
+ * The application's home screen.
+ *
+ * @param navigationActions the handler for navigating the app.
+ * @param userId the current user's database ID.
+ * @param context the application's context.
+ * @param viewModel the Home screen's viewModel.
+ */
 @Composable
 fun HomeScreen(
     navigationActions: NavigationActions,

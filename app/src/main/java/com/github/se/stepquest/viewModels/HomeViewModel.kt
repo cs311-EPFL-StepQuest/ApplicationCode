@@ -20,10 +20,17 @@ data class HomeScreenState(
     val isOnline: Boolean = false
 )
 
+/** ViewModel handling the behaviour of the Home screen. */
 class HomeViewModel : ViewModel() {
   val _state = MutableStateFlow(HomeScreenState())
   val state: StateFlow<HomeScreenState> = _state.asStateFlow()
 
+  /**
+   * Initialises the home screen.
+   *
+   * @param userId the current user's database ID.
+   * @param context the application's context.
+   */
   fun initialize(userId: String, context: Context) {
     viewModelScope.launch {
       _state.value = _state.value.copy(isOnline = isOnline(context))
@@ -57,6 +64,7 @@ class HomeViewModel : ViewModel() {
     }
   }
 
+  /** Removes the challenge completion pop-up. */
   fun dismissChallengeCompletionPopUp() {
     _state.value = _state.value.copy(showChallengeCompletionPopUp = false)
   }

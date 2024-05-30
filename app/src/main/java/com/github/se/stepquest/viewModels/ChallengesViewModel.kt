@@ -10,10 +10,16 @@ import kotlinx.coroutines.launch
 
 data class ChallengesState(val challenges: List<ChallengeData> = listOf())
 
+/** ViewModel handling the behaviour of the Challenges screen. */
 class ChallengesViewModel : ViewModel() {
   private val _state = MutableStateFlow(ChallengesState())
   val state: StateFlow<ChallengesState> = _state
 
+  /**
+   * Loads the user's active challenges.
+   *
+   * @param userId the current user's database ID.
+   */
   fun loadChallenges(userId: String) {
     viewModelScope.launch {
       getChallenges(userId) { receivedChallenges ->

@@ -25,6 +25,14 @@ import com.github.se.stepquest.R
 import com.github.se.stepquest.data.model.ChallengeType
 import com.github.se.stepquest.viewModels.FriendDialogViewModel
 
+/**
+ * Screen to send challenges to a friend.
+ *
+ * @param friend the current friend.
+ * @param userId the current user's database ID.
+ * @param onDismiss the action to execute when closing the screen.
+ * @param viewModel the FriendDialog screen's viewModel.
+ */
 @Composable
 fun FriendDialogBox(
     friend: Friend,
@@ -81,6 +89,12 @@ fun FriendDialogBox(
       }
 }
 
+/**
+ * Standardised button for the FriendDialog screen.
+ *
+ * @param buttonText the text to display on the button.
+ * @param onClick the action to execute when clicking the button.
+ */
 @Composable
 fun ButtonElement(buttonText: String, onClick: () -> Unit) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)

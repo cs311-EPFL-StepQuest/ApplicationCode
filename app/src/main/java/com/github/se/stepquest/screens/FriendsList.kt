@@ -28,6 +28,14 @@ import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
 import com.github.se.stepquest.viewModels.FriendsViewModel
 
+/**
+ * Checks if the user is online before displaying the friend list.
+ *
+ * @param navigationActions the handler for navigating the app.
+ * @param userId the current user's database ID.
+ * @param context the application's context.
+ * @param friendsViewModel the FriendsList screen's viewModel.
+ */
 @Composable
 fun FriendsListScreenCheck(
     navigationActions: NavigationActions,
@@ -49,6 +57,13 @@ fun FriendsListScreenCheck(
   }
 }
 
+/**
+ * Screen displaying the user's friend list.
+ *
+ * @param navigationActions the handler for navigating the app.
+ * @param userId the current user's database ID.
+ * @param friendsViewModel the FriendsList screen's viewModel.
+ */
 @Composable
 fun FriendsListScreen(
     navigationActions: NavigationActions,
@@ -113,6 +128,12 @@ fun FriendsListScreen(
   }
 }
 
+/**
+ * One friend list item.
+ *
+ * @param friend the current friend.
+ * @param onClick the action to execute when clicking the friend item.
+ */
 @Composable
 fun FriendItem(friend: Friend, onClick: () -> Unit) {
   val blueThemeColor = Color.Gray

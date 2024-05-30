@@ -21,11 +21,18 @@ data class ProgressionPageState(
     val dailyGoalAchieved: Boolean = false
 )
 
+/** ViewModel handling the behaviour of the progression page. */
 class ProgressionPageViewModel : ViewModel() {
   private val _state = MutableStateFlow(ProgressionPageState())
   val state: StateFlow<ProgressionPageState>
     get() = _state
 
+  /**
+   * Initialises the progression page.
+   *
+   * @param user the handler for user progress.
+   * @param context the application's context.
+   */
   fun initialize(user: UserRepository, context: Context) {
     viewModelScope.launch(Dispatchers.IO) {
       val stepList = getCachedStepInfo(context)
@@ -49,6 +56,12 @@ class ProgressionPageViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Retrieves daily and weekly step counts.
+   *
+   * @param user the handler for user progress.
+   * @param context the application's context.
+   */
   private fun fetchOnlineData(user: UserRepository, context: Context) {
     viewModelScope.launch(Dispatchers.IO) {
       user.getSteps { steps ->
@@ -65,16 +78,19 @@ class ProgressionPageViewModel : ViewModel() {
     }
   }
 
-  fun updateSteps(dailySteps: Int, weeklySteps: Int, context: Context) {
-    _state.value = _state.value.copy(dailyStepsMade = dailySteps, weeklyStepsMade = weeklySteps)
-    cacheDailyWeeklySteps(context, dailySteps, weeklySteps)
-  }
-
+  /**
+   * Updates the user's step goals.
+   *
+   * @param dailyGoal the new daily goal.
+   * @param weeklyGoal the new weekly goal.
+   * @param context the application's context.
+   */
   fun updateGoals(dailyGoal: Int, weeklyGoal: Int, context: Context) {
     _state.value = _state.value.copy(dailyStepGoal = dailyGoal, weeklyStepGoal = weeklyGoal)
     cacheStepGoals(context, dailyGoal, weeklyGoal)
   }
 
+  /** Resets the user's daily goal achievement. */
   fun resetDailyGoalAchievement() {
     _state.value = _state.value.copy(dailyGoalAchieved = false)
   }

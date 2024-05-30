@@ -23,6 +23,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.stepquest.R
 import com.github.se.stepquest.viewModels.StepGoalsViewModel
 
+/**
+ * Screen to set the user's step goals.
+ *
+ * @param onDismiss the action to execute once the update is done.
+ * @param onConfirm the action to execute if the user confirms.
+ * @param viewModel the StepGoal screen's viewModel.
+ */
 @Composable
 fun SetStepGoalsDialog(
     onDismiss: () -> Unit,

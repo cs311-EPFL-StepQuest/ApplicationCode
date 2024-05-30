@@ -28,6 +28,7 @@ data class NewPlayerScreenState(
     val blueThemeColor: Int = R.color.blueTheme
 )
 
+/** ViewModel handling the behaviour of the NewPlayer screen. */
 class NewPlayerViewModel : ViewModel() {
 
   private val _state = MutableStateFlow(NewPlayerScreenState())
@@ -36,11 +37,17 @@ class NewPlayerViewModel : ViewModel() {
   private val database = FirebaseDatabase.getInstance()
   private var checkUsernameJob: Job? = null
 
+  /**
+   * Handles the new player's username.
+   *
+   * @param newUsername the user's new username.
+   */
   fun onUsernameChanged(newUsername: String) {
     _state.value = _state.value.copy(username = newUsername.replace("\\s".toRegex(), "").take(25))
     checkUsernameAvailability()
   }
 
+  /** Checks if the chosen username is available. */
   private fun checkUsernameAvailability() {
     checkUsernameJob?.cancel()
     checkUsernameJob =
@@ -52,6 +59,13 @@ class NewPlayerViewModel : ViewModel() {
         }
   }
 
+  /**
+   * Handles sign-in completion.
+   *
+   * @param context the application's context.
+   * @param userId the current user's database ID.
+   * @param navigationActions the handler for navigating the app.
+   */
   fun onSignInClicked(context: Context, userId: String, navigationActions: NavigationActions) {
     if (_state.value.isUsernameAvailable) {
       addUsername(_state.value.username, userId, database)
@@ -62,6 +76,13 @@ class NewPlayerViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Adds the new user's username to the database.
+   *
+   * @param username the username to add.
+   * @param userId the current user's database ID.
+   * @param database the database instance.
+   */
   private fun addUsername(username: String, userId: String, database: FirebaseDatabase) {
     val databaseRef = database.reference
     databaseRef.addListenerForSingleValueEvent(
@@ -79,6 +100,13 @@ class NewPlayerViewModel : ViewModel() {
         })
   }
 
+  /**
+   * Checks in the database if a username is available.
+   *
+   * @param username the username to check.
+   * @param database the database instance
+   * @param callback the function to call when a result is obtained.
+   */
   private fun usernameIsAvailable(
       username: String,
       database: FirebaseDatabase,
@@ -98,6 +126,12 @@ class NewPlayerViewModel : ViewModel() {
         })
   }
 
+  /**
+   * Runs a certain action after a given delay.
+   *
+   * @param delayMillis the number of milliseconds to wait.
+   * @param action the action to execute once the delay has passed.
+   */
   private fun runAfterDelay(delayMillis: Long, action: () -> Unit) {
     Handler(Looper.getMainLooper()).postDelayed(action, delayMillis)
   }

@@ -19,11 +19,18 @@ import kotlinx.coroutines.launch
 
 data class ProfilePageState(val totalStepsMade: Int = 0, val username: String = "No name")
 
+/** ViewModel handling the behaviour of the profile page. */
 class ProfilePageViewModel : ViewModel() {
   private val _state = MutableStateFlow(ProfilePageState())
   val state: StateFlow<ProfilePageState>
     get() = _state
 
+  /**
+   * Initialises the profile page.
+   *
+   * @param userId the current user's database ID.
+   * @param context the application's context.
+   */
   fun initialize(userId: String, context: Context) {
     viewModelScope.launch(Dispatchers.IO) {
       val stepList = getCachedStepInfo(context)
