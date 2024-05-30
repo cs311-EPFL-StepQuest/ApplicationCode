@@ -1,4 +1,4 @@
-package com.github.se.stepquest
+package com.github.se.stepquest.screens
 
 import SetStepGoalsDialog
 import android.content.Context
@@ -19,11 +19,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.github.se.stepquest.screens.CongratulationDialog
+import com.github.se.stepquest.R
+import com.github.se.stepquest.UserRepository
 import com.github.se.stepquest.services.getCachedSteps
 import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.viewModels.ProgressionPageViewModel
 
+/**
+ * Screen displaying the user's progression towards their goals.
+ *
+ * @param user the handler for user progress.
+ * @param context the application's context.
+ * @param viewModel the progression page's viewModel.
+ */
 @Composable
 fun ProgressionPage(
     user: UserRepository,
@@ -87,6 +95,14 @@ fun ProgressionPage(
   }
 }
 
+/**
+ * Builds the display for the user's stats when online.
+ *
+ * @param dailyStepsMade the user's step count for the day.
+ * @param dailyStepGoal the user's step goal for one day.
+ * @param weeklyStepsMade the user's step count for the week.
+ * @param weeklyStepGoal the user's step goal for one week.
+ */
 @Composable
 fun BuildStats(dailyStepsMade: Int, dailyStepGoal: Int, weeklyStepsMade: Int, weeklyStepGoal: Int) {
   Box(modifier = Modifier.height(40.dp))
@@ -100,6 +116,11 @@ fun BuildStats(dailyStepsMade: Int, dailyStepGoal: Int, weeklyStepsMade: Int, we
   Box(modifier = Modifier.height(60.dp))
 }
 
+/**
+ * Builds the display for the user's stats when offline.
+ *
+ * @param context the application's context.
+ */
 @Composable
 fun OfflineStats(context: Context) {
   Box(modifier = Modifier.height(40.dp))
@@ -117,6 +138,13 @@ fun OfflineStats(context: Context) {
   Box(modifier = Modifier.height(60.dp))
 }
 
+/**
+ * Builds the display for one stat line.
+ *
+ * @param icon the stat's icon.
+ * @param title the stat's title.
+ * @param value the stat's value.
+ */
 @Composable
 fun BuildStatLine(icon: Int, title: String, value: String) {
   Row(modifier = Modifier.fillMaxWidth().offset(20.dp, 0.dp)) {

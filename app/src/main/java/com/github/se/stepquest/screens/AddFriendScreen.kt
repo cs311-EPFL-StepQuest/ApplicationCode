@@ -26,6 +26,13 @@ import com.github.se.stepquest.R
 import com.github.se.stepquest.services.sendFriendRequest
 import com.github.se.stepquest.viewModels.AddFriendViewModel
 
+/**
+ * Screen to add friends by searching their username in the database.
+ *
+ * @param onDismiss the action to execute when closing the screen.
+ * @param userId the current user's database ID.
+ * @param viewModel the AddFriend screen's viewModel.
+ */
 @Composable
 fun AddFriendScreen(
     onDismiss: () -> Unit,
@@ -91,6 +98,13 @@ fun AddFriendScreen(
       }
 }
 
+/**
+ * One search result item, displaying a username. When clicked, expands to show the option to add
+ * the user as a friend.
+ *
+ * @param currentUser the current user's username.
+ * @param name the search result user's username.
+ */
 @Composable
 fun UserItem(currentUser: String, name: String) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)

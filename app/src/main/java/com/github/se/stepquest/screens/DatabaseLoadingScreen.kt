@@ -14,6 +14,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.viewModels.DatabaseLoadingViewModel
 
+/**
+ * Screen displayed when the app is waiting for database results.
+ *
+ * @param navigationActions the handler for navigating the app.
+ * @param startService the service to start afterwards.
+ * @param userId the current user's database ID.
+ * @param viewModel the DatabaseLoading screen's viewModel.
+ */
 @Composable
 fun DatabaseLoadingScreen(
     navigationActions: NavigationActions,

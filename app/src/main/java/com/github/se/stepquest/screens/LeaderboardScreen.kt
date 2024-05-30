@@ -25,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.viewModels.LeaderboardsViewModel
 
+/** Screen displaying the global and friend score leaderboards. */
 @Composable
 fun Leaderboards(
     userId: String,

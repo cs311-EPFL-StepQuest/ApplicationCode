@@ -18,6 +18,12 @@ import com.github.se.stepquest.UserRepository
 import com.github.se.stepquest.data.model.NotificationData
 import com.github.se.stepquest.viewModels.NotificationViewModel
 
+/**
+ * Screen displaying the user's notifications.
+ *
+ * @param userRepository the handler for user progress.
+ * @param notificationViewModel the Notification screen's viewModel.
+ */
 @Composable
 fun NotificationScreen(
     userRepository: UserRepository,
@@ -44,6 +50,13 @@ fun NotificationScreen(
   }
 }
 
+/**
+ * Builds the notification list.
+ *
+ * @param notificationList the list to fill.
+ * @param userId the current user's database ID.
+ * @param notificationViewModel the Notification screen's viewModel.
+ */
 @Composable
 private fun NotificationList(
     notificationList: List<NotificationData>,
@@ -57,6 +70,13 @@ private fun NotificationList(
   }
 }
 
+/**
+ * Builds a single notification.
+ *
+ * @param data the notification to build.
+ * @param userId the current user's database ID.
+ * @param notificationViewModel the Notification screen's viewModel.
+ */
 @Composable
 private fun BuildNotification(
     data: NotificationData?,

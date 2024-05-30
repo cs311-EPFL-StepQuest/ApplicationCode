@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import com.github.se.stepquest.screens.ProfilePageLayout
 import com.github.se.stepquest.ui.theme.StepQuestTheme
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -12,7 +13,6 @@ import com.google.firebase.database.ValueEventListener
 import io.mockk.every
 import io.mockk.junit4.MockKRule
 import io.mockk.mockk
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

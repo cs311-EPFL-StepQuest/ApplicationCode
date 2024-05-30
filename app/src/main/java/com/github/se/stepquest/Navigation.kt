@@ -33,6 +33,8 @@ import com.github.se.stepquest.screens.Leaderboards
 import com.github.se.stepquest.screens.LoginScreen
 import com.github.se.stepquest.screens.NewPlayerScreen
 import com.github.se.stepquest.screens.NotificationScreen
+import com.github.se.stepquest.screens.ProfilePageLayout
+import com.github.se.stepquest.screens.ProgressionPage
 import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination

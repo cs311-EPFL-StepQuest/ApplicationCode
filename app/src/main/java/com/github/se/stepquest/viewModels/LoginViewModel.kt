@@ -21,14 +21,26 @@ data class LoginScreenState(
     val blueThemeColor: Color = Color(0xFF0D99FF)
 )
 
+/** ViewModel handling the behaviour of the Login screen. */
 class LoginViewModel : ViewModel() {
   private val _state = MutableStateFlow(LoginScreenState())
   val state: StateFlow<LoginScreenState> = _state.asStateFlow()
 
+  /**
+   * Initialises the viewModel's state.
+   *
+   * @param context the application's context.
+   */
   fun initialize(context: Context) {
     _state.value = LoginScreenState(isOnline = isOnline(context))
   }
 
+  /**
+   * Handles the actions after authenticating.
+   *
+   * @param result the result of the authentication.
+   * @param navigationActions the handler for navigating the app.
+   */
   fun onSignInResult(
       result: FirebaseAuthUIAuthenticationResult,
       navigationActions: NavigationActions
@@ -45,6 +57,13 @@ class LoginViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Handles the case where a user tries entering the app while offline. If the user has previously
+   * logged in, enter the app normally. If the user has never logged in, display an error message.
+   *
+   * @param context the application's context.
+   * @param navigationActions the handler for navigating the app.
+   */
   fun onEnterAppClicked(context: Context, navigationActions: NavigationActions) {
     val cacheCheck = getCachedInfo(context)
 

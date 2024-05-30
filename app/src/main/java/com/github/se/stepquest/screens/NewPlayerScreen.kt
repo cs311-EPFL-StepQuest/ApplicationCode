@@ -19,6 +19,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.viewModels.NewPlayerViewModel
 
+/**
+ * Sign-up screen for new players.
+ *
+ * @param navigationActions the handler for navigating the app.
+ * @param context the application's context.
+ * @param userId the current user's database ID.
+ * @param newPlayerViewModel the NewPlayer screen's viewModel.
+ */
 @Composable
 fun NewPlayerScreen(
     navigationActions: NavigationActions,

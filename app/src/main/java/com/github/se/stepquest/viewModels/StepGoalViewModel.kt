@@ -8,19 +8,27 @@ import kotlinx.coroutines.launch
 
 data class StepGoalsState(val newDailyStepGoal: String = "", val newWeeklyStepGoal: String = "")
 
+/** ViewModel handling the behaviour of the StepGoal update screen. */
 class StepGoalsViewModel : ViewModel() {
   private val _state = MutableStateFlow(StepGoalsState())
   val state: StateFlow<StepGoalsState>
     get() = _state
 
+  /**
+   * Updates the user's daily step goal.
+   *
+   * @param newDailyStepGoal the user's new daily step goal.
+   */
   fun updateDailyStepGoal(newDailyStepGoal: String) {
     _state.value = _state.value.copy(newDailyStepGoal = newDailyStepGoal)
   }
 
-  fun updateWeeklyStepGoal(newWeeklyStepGoal: String) {
-    _state.value = _state.value.copy(newWeeklyStepGoal = newWeeklyStepGoal)
-  }
-
+  /**
+   * Confirms the user's new step goals.
+   *
+   * @param onConfirm the action to execute if the user confirms.
+   * @param onDismiss the action to execute once the update is done.
+   */
   fun calculateAndConfirmGoals(
       onConfirm: (dailyStepGoal: Int, weeklyStepGoal: Int) -> Unit,
       onDismiss: () -> Unit
@@ -33,6 +41,12 @@ class StepGoalsViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Rounds the user's daily step goals.
+   *
+   * @param newDailyStepGoal the user's new daily step goal.
+   * @param newWeeklyStepGoal the user's new weekly step goal.
+   */
   private fun calculateStepGoals(
       newDailyStepGoal: String,
       newWeeklyStepGoal: String

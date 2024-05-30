@@ -20,18 +20,32 @@ data class FriendDialogState(
     val friend: Friend? = null
 )
 
+/** ViewModel handling the behaviour of the FriendDialog screen. */
 class FriendDialogViewModel : ViewModel() {
   private val _state = MutableStateFlow(FriendDialogState())
   val state: StateFlow<FriendDialogState> = _state
 
+  /**
+   * Adds the friend's information to the viewModel.
+   *
+   * @param friend the current friend.
+   */
   fun setFriend(friend: Friend) {
     _state.value = _state.value.copy(friend = friend)
   }
 
+  /** Switches views between the base screen and the different challenges to send. */
   fun toggleChallengeMode() {
     _state.value = _state.value.copy(challengeMode = !_state.value.challengeMode)
   }
 
+  /**
+   * Sends a challenge to a friend.
+   *
+   * @param userId the current user's database ID.
+   * @param friendName the friend's name.
+   * @param challengeType the type of the challenge to send.
+   */
   fun sendChallenge(userId: String, friendName: String, challengeType: ChallengeType) {
     viewModelScope.launch {
       getUsername(userId) { currentUsername ->
@@ -46,6 +60,12 @@ class FriendDialogViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Runs a certain action after a given delay.
+   *
+   * @param delayMillis the number of milliseconds to wait.
+   * @param action the action to execute once the delay has passed.
+   */
   private fun runAfterDelay(delayMillis: Long, action: () -> Unit) {
     Handler(Looper.getMainLooper()).postDelayed(action, delayMillis)
   }

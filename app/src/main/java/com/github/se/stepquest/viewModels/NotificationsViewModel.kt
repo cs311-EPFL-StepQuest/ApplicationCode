@@ -16,12 +16,18 @@ import com.google.firebase.database.getValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+/** ViewModel handling the behaviour of the Notification screen. */
 class NotificationViewModel : ViewModel() {
   private val _notificationList = MutableStateFlow<List<NotificationData>>(emptyList())
   val notificationList: StateFlow<List<NotificationData>> = _notificationList
 
   private val notificationRepository = INotificationRepository()
 
+  /**
+   * Retrieves the user's notifications in the database.
+   *
+   * @param userId the current user's database ID.
+   */
   fun updateNotificationList(userId: String) {
     notificationRepository
         .getNotificationList(userId)
@@ -44,6 +50,13 @@ class NotificationViewModel : ViewModel() {
             })
   }
 
+  /**
+   * Handles actions when accepting the notification. If it's a friend request, add the user as a
+   * friend. If it's a challenge, accept the challenge.
+   *
+   * @param data the original notification.
+   * @param userId the current user's database ID.
+   */
   fun handleNotificationAction(data: NotificationData, userId: String) {
     when (data.type) {
       NotificationType.FRIEND_REQUEST -> handleFriendRequest(data)
@@ -53,6 +66,11 @@ class NotificationViewModel : ViewModel() {
     removeNotification(data)
   }
 
+  /**
+   * Accepts a friend request from a notification.
+   *
+   * @param data the original notification.
+   */
   private fun handleFriendRequest(data: NotificationData) {
     val database = FirebaseDatabase.getInstance()
     val currentUserRef = database.reference.child("users").child(data.userUuid).child("username")
@@ -77,6 +95,12 @@ class NotificationViewModel : ViewModel() {
         })
   }
 
+  /**
+   * Accepts a challenge from a notification.
+   *
+   * @param data the original notification.
+   * @param userId the current user's database ID.
+   */
   private fun handleChallenge(data: NotificationData, userId: String) {
     getPendingChallenge(userId, data.objectUuid) { challenge ->
       if (challenge != null) {
@@ -85,6 +109,11 @@ class NotificationViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Removes a notification from the list.
+   *
+   * @param data the notification to remove.
+   */
   fun removeNotification(data: NotificationData) {
     notificationRepository.removeNotification(data.userUuid, data.uuid)
   }

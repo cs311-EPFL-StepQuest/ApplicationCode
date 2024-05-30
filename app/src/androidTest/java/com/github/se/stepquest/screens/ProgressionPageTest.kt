@@ -5,7 +5,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.core.app.ApplicationProvider
-import com.github.se.stepquest.ProgressionPage
 import com.github.se.stepquest.TestUserRepository1
 import com.github.se.stepquest.TestUserRepository2
 import org.junit.Before
