@@ -64,20 +64,8 @@ fun FriendDialogBox(
                 ButtonElement(
                     buttonText = "Daily Step Challenge",
                     onClick = {
-                      getUsername(userId) { currentUsername ->
-                        getUserId(friend.name) { friendUserId ->
-                          val challenge =
-                              createChallengeItem(
-                                  userId,
-                                  currentUsername,
-                                  friendUserId,
-                                  friend.name,
-                                  ChallengeType.DAILY_STEP_CHALLENGE)
-                          sendPendingChallenge(challenge)
-                          challengeSentVisible = true
-                          challengeMode = false
-                        }
-                      }
+                      viewModel.sendChallenge(
+                          userId, friend.name, ChallengeType.DAILY_STEP_CHALLENGE)
                     })
               } else {
                 if (state.challengeSentVisible) {
