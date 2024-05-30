@@ -24,6 +24,7 @@ import com.github.se.stepquest.UserRepository
 import com.github.se.stepquest.services.getCachedSteps
 import com.github.se.stepquest.services.isOnline
 import com.github.se.stepquest.viewModels.ProgressionPageViewModel
+import kotlinx.coroutines.delay
 
 /**
  * Screen displaying the user's progression towards their goals.
@@ -38,11 +39,21 @@ fun ProgressionPage(
     context: Context,
     viewModel: ProgressionPageViewModel = viewModel()
 ) {
+  var dailyStepsMade by remember { mutableStateOf(0) }
+  var weeklyStepsMade by remember { mutableStateOf(0) }
   val state by viewModel.state.collectAsState()
   var showDialog by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     viewModel.initialize(user, context) // Pass the UserRepository here
+    if (isOnline(context)) {
+      while (true) {
+        viewModel.updateSteps()
+        dailyStepsMade = state.dailyStepsMade
+        weeklyStepsMade = state.weeklyStepsMade
+        delay(1000)
+      }
+    }
   }
 
   Column(modifier = Modifier.fillMaxSize()) {
@@ -57,9 +68,9 @@ fun ProgressionPage(
                   Modifier.size(200.dp, 250.dp).offset(0.dp, (-60).dp).testTag("CharacterImage"))
           if (isOnline(context)) {
             BuildStats(
-                dailyStepsMade = state.dailyStepsMade,
+                dailyStepsMade = dailyStepsMade,
                 dailyStepGoal = state.dailyStepGoal,
-                weeklyStepsMade = state.weeklyStepsMade,
+                weeklyStepsMade = weeklyStepsMade,
                 weeklyStepGoal = state.weeklyStepGoal)
           } else {
             OfflineStats(context)

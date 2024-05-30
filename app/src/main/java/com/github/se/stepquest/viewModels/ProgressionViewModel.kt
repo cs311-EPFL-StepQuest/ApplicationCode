@@ -1,5 +1,6 @@
 package com.github.se.stepquest.viewModels
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,10 @@ data class ProgressionPageState(
 /** ViewModel handling the behaviour of the progression page. */
 class ProgressionPageViewModel : ViewModel() {
   private val _state = MutableStateFlow(ProgressionPageState())
+
+  private var _user: UserRepository? = null
+
+  @SuppressLint("StaticFieldLeak") private var _context: Context? = null
   val state: StateFlow<ProgressionPageState>
     get() = _state
 
@@ -41,6 +46,9 @@ class ProgressionPageViewModel : ViewModel() {
       val dailyStepGoal = stepList["dailyStepGoal"] ?: 5000
       val weeklyStepGoal = stepList["weeklyStepGoal"] ?: 35000
       val dailyGoalAchieved = dailyStepsMade >= dailyStepGoal
+
+      _user = user
+      _context = context
 
       _state.value =
           ProgressionPageState(
@@ -93,5 +101,21 @@ class ProgressionPageViewModel : ViewModel() {
   /** Resets the user's daily goal achievement. */
   fun resetDailyGoalAchievement() {
     _state.value = _state.value.copy(dailyGoalAchieved = false)
+  }
+
+  /** Updates the user's step count. */
+  fun updateSteps() {
+    if (_user != null && _context != null) {
+      if (isOnline(_context!!)) {
+        _user!!.getSteps { steps ->
+          val onlineDailySteps = steps[0]
+          val onlineWeeklySteps = steps[1]
+          _state.value =
+              _state.value.copy(
+                  dailyStepsMade = onlineDailySteps, weeklyStepsMade = onlineWeeklySteps)
+          cacheDailyWeeklySteps(_context!!, onlineDailySteps, onlineWeeklySteps)
+        }
+      }
+    }
   }
 }
