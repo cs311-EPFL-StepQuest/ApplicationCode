@@ -103,6 +103,13 @@ class StepCounterService(
               val currentSteps = dataSnapshot.getValue(Int::class.java) ?: 0
               val totalSteps = currentSteps + newSteps
               stepsRef.setValue(totalSteps)
+
+              val dailyStepGoal = (getCachedStepInfo(context!!)["dailyStepGoal"] ?: 5000)
+
+              if (totalSteps >= dailyStepGoal) {
+
+                awardPoints(dailyStepGoal, s)
+              }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -144,6 +151,35 @@ class StepCounterService(
     }
   }
 
+  private fun awardPoints(dailyStepGoal: Int, date: CharSequence) {
+
+    if (userId == null) return
+
+    val hasReceivedRef =
+        database.reference.child("users").child(userId).child("hasReceivedPoints $date")
+
+    hasReceivedRef.addListenerForSingleValueEvent(
+        object : ValueEventListener {
+
+          override fun onDataChange(snapshot: DataSnapshot) {
+            val hasReceivedPoints = snapshot.getValue(Boolean::class.java) ?: false
+
+            if (!hasReceivedPoints) {
+
+              val earnedPoints = dailyStepGoal.floorDiv(100)
+
+              getUsername(userId) { addPoints(it, earnedPoints) }
+
+              hasReceivedRef.setValue(true)
+            }
+          }
+
+          override fun onCancelled(databaseError: DatabaseError) {
+            Log.e("StepCounterService", "Database error: ${databaseError.message}")
+          }
+        })
+  }
+
   fun cleanUpOldSteps(userId: String) {
     // clean up old daily steps
     val userRef = database.reference.child("users").child(userId)
@@ -179,6 +215,12 @@ class StepCounterService(
               if (nodeName != null &&
                   nodeName.contains("weeklySteps") &&
                   nodeName != "weeklySteps $current_period") {
+                userRef.child(nodeName).removeValue()
+              }
+
+              if (nodeName != null &&
+                  nodeName.contains("hasReceivedPoints") &&
+                  nodeName != "hasReceivedPoints $s") {
                 userRef.child(nodeName).removeValue()
               }
             }

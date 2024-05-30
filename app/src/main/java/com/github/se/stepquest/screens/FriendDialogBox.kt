@@ -62,8 +62,11 @@ fun FriendDialogBox(
                           userId, friend.name, ChallengeType.REGULAR_STEP_CHALLENGE)
                     })
                 ButtonElement(
-                    buttonText = "Daily Step Challenge", onClick = { /* to be added soon */})
-                ButtonElement(buttonText = "Route Challenge", onClick = { /* to be added soon */})
+                    buttonText = "Daily Step Challenge",
+                    onClick = {
+                      viewModel.sendChallenge(
+                          userId, friend.name, ChallengeType.DAILY_STEP_CHALLENGE)
+                    })
               } else {
                 if (state.challengeSentVisible) {
                   Text(
@@ -71,7 +74,6 @@ fun FriendDialogBox(
                       color = Color.Green,
                       modifier = Modifier.padding(top = 4.dp))
                 }
-                ButtonElement(buttonText = "Connection", onClick = { /*handle connection*/})
                 ButtonElement(
                     buttonText = "Challenge", onClick = { viewModel.toggleChallengeMode() })
               }
