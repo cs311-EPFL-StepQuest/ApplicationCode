@@ -49,13 +49,13 @@ fun ProgressionPage(user: UserRepository, context: Context) {
   var dailyStepsMade by remember { mutableIntStateOf(stepList["dailySteps"] ?: 0) }
   var weeklyStepsMade by remember { mutableIntStateOf(stepList["weeklySteps"] ?: 0) }
 
-    LaunchedEffect(Unit) {
-        while(true){
-            user.getSteps { steps -> dailyStepsMade = steps[0] }
-            user.getSteps { steps -> weeklyStepsMade = steps[1] }
-            delay(100)
-        }
+  LaunchedEffect(Unit) {
+    while (true) {
+      user.getSteps { steps -> dailyStepsMade = steps[0] }
+      user.getSteps { steps -> weeklyStepsMade = steps[1] }
+      delay(100)
     }
+  }
   cacheDailyWeeklySteps(context, dailyStepsMade, weeklyStepsMade)
 
   var dailyStepGoal by remember { mutableIntStateOf(stepList["dailyStepGoal"] ?: 5000) }
