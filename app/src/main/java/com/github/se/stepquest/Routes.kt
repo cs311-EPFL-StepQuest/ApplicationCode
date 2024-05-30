@@ -22,4 +22,6 @@ open class Routes(val routName: String, val title: String) {
   object NotificationScreen : Routes(routName = "/notifications", title = "Notifications")
 
   object ChallengeScreen : Routes(routName = "/challenges", title = "Challenges")
+
+  object Leaderboard : Routes(routName = "/leaderboard", title = "Leaderboard")
 }

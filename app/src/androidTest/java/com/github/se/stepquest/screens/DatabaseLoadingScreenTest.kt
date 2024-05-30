@@ -1,4 +1,4 @@
-/*package com.github.se.stepquest.screens
+package com.github.se.stepquest.screens
 
 import android.content.Context
 import android.content.Intent
@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.ui.navigation.NavigationActions
@@ -29,6 +30,12 @@ class DatabaseLoadingScreenTest {
   private lateinit var usernameRef: DatabaseReference
 
   @get:Rule val composeTestRule = createComposeRule()
+
+  @get:Rule
+  val permissionRule =
+      GrantPermissionRule.grant(
+          android.Manifest.permission.BODY_SENSORS,
+          android.Manifest.permission.ACTIVITY_RECOGNITION)
 
   @Before
   fun setup() {
@@ -56,7 +63,7 @@ class DatabaseLoadingScreenTest {
           listener.onDataChange(mockk { every { getValue(String::class.java) } returns null })
         }
     composeTestRule.setContent {
-      DatabaseLoadingScreen(navigationActions, { startServiceLambda() }, "testUserId", context)
+      DatabaseLoadingScreen(navigationActions, { startServiceLambda() }, "testUserId")
     }
 
     composeTestRule.onNodeWithText("Waiting for database...").assertIsDisplayed()
@@ -64,4 +71,4 @@ class DatabaseLoadingScreenTest {
       navigationActions.navigateTo(TopLevelDestination(Routes.NewPlayerScreen.routName))
     }
   }
-}*/
+}

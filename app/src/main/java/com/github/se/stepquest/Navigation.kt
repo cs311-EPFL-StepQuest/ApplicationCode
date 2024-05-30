@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,9 +29,12 @@ import com.github.se.stepquest.screens.ChallengesScreen
 import com.github.se.stepquest.screens.DatabaseLoadingScreen
 import com.github.se.stepquest.screens.FriendsListScreenCheck
 import com.github.se.stepquest.screens.HomeScreen
+import com.github.se.stepquest.screens.Leaderboards
 import com.github.se.stepquest.screens.LoginScreen
 import com.github.se.stepquest.screens.NewPlayerScreen
 import com.github.se.stepquest.screens.NotificationScreen
+import com.github.se.stepquest.screens.ProfilePageLayout
+import com.github.se.stepquest.screens.ProgressionPage
 import com.github.se.stepquest.services.StepCounterService
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
@@ -92,7 +94,7 @@ fun AppNavigationHost(
       startDestination = startDestination) {
         composable(Routes.LoginScreen.routName) { LoginScreen(navigationActions, context) }
         composable(Routes.DatabaseLoadingScreen.routName) {
-          DatabaseLoadingScreen(navigationActions, startServiceLambda, userId, context)
+          DatabaseLoadingScreen(navigationActions, startServiceLambda, userId)
         }
         composable(Routes.NewPlayerScreen.routName) {
           NewPlayerScreen(navigationActions, context, userId)
@@ -115,10 +117,10 @@ fun AppNavigationHost(
         }
         composable(Routes.NotificationScreen.routName) { NotificationScreen(IUserRepository()) }
         composable(Routes.ChallengeScreen.routName) { ChallengesScreen(userId, navigationActions) }
+        composable(Routes.Leaderboard.routName) { Leaderboards(userId, navigationActions) }
       }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BuildMainScreen() {
   val navigationController: NavHostController = rememberNavController()
