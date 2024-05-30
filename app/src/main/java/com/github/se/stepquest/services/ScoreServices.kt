@@ -130,6 +130,8 @@ fun checkUserExistsOnLeaderboard(username: String) {
         }
 
         override fun onCancelled(error: DatabaseError) {}
+      })
+}
 
 fun addPoints(
     username: String,
