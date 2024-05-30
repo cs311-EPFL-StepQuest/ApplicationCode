@@ -116,23 +116,6 @@ fun getUserPlacement(username: String, callback: (Int?) -> Unit) {
           })
 }
 
-fun checkUserExistsOnLeaderboard(username: String) {
-  val database = FirebaseDatabase.getInstance()
-  val leaderboardRef = database.reference.child("leaderboard")
-
-  // Check if the user exists in the leaderboard
-  leaderboardRef.addListenerForSingleValueEvent(
-      object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-          if (!dataSnapshot.hasChild(username)) {
-            leaderboardRef.child(username).setValue(0)
-          }
-        }
-
-        override fun onCancelled(error: DatabaseError) {}
-      })
-}
-
 fun addPoints(
     username: String,
     points: Int,

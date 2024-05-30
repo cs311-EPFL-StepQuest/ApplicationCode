@@ -5,24 +5,8 @@
       <entry key="HomeScreenTest">
         <State />
       </entry>
-      <entry key="LeaderboardScreenTest">
-        <State />
-      </entry>
       <entry key="MainActivity">
-        <State>
-          <targetSelectedWithDropDown>
-            <Target>
-              <type value="QUICK_BOOT_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\santh\.android\avd\Medium_Phone_API_34.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-05-28T08:56:16.696289500Z" />
-        </State>
+        <State />
       </entry>
     </value>
   </component>
