@@ -563,9 +563,9 @@ fun Map(locationViewModel: LocationViewModel) {
                 locationViewModel.currentLocation.value!!.latitude,
                 locationViewModel.currentLocation.value!!.longitude)
 
-        if(onStartUp){
-            map.value!!.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f))
-            onStartUp = false
+        if (onStartUp) {
+          map.value!!.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f))
+          onStartUp = false
         }
 
         if (currentMarker == null) {
