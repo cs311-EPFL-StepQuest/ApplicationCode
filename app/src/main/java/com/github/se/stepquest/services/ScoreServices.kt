@@ -1,11 +1,11 @@
 package com.github.se.stepquest.services
 
+import android.util.Log
 import com.github.se.stepquest.Friend
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import android.util.Log
 
 fun getTopLeaderboard(top: Int, callback: (List<Pair<String, Int>>?) -> Unit) {
   val database = FirebaseDatabase.getInstance()
