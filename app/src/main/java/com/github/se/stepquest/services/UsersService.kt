@@ -38,11 +38,3 @@ fun getUserId(username: String, callback: (String) -> Unit) {
         }
       })
 }
-
-fun getUserProfilePictureWithUid(userId: String) {}
-
-fun getUserProfilePictureWithUsername(username: String) {}
-
-fun getOnlineStatusWithUid(userId: String) {}
-
-fun getOnlineStatusWithUsername(username: String) {}

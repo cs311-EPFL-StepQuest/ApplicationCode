@@ -44,33 +44,3 @@ class INotificationRepository : NotificationRepository {
     notificationCollection.child(userUuid).child(notificationData.uuid).setValue(notificationData)
   }
 }
-
-class TestNotificationRepository : NotificationRepository {
-  private val notificationCollection =
-      FirebaseDatabase.getInstance().reference.child("notifications")
-
-  override fun getNotificationList(userUuid: String): DatabaseReference {
-    return notificationCollection.child("testUser2")
-  }
-
-  override fun removeNotification(userUuid: String, notificationUuid: String) {
-    println("Remove userId: $userUuid; notificationId: $notificationUuid")
-    getNotificationList(userUuid)
-        .child(notificationUuid)
-        .addListenerForSingleValueEvent(
-            object : ValueEventListener {
-              override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (data in dataSnapshot.children) {
-                  println("Data: ${data.value}")
-                  data.ref.removeValue()
-                }
-              }
-
-              override fun onCancelled(databaseError: DatabaseError) {}
-            })
-  }
-
-  override fun createNotification(userUuid: String, notificationData: NotificationData) {
-    notificationCollection.child(userUuid).child(notificationData.uuid).setValue(notificationData)
-  }
-}

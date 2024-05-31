@@ -6,6 +6,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.core.app.ApplicationProvider
 import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.viewModels.HomeScreenState
+import com.github.se.stepquest.viewModels.HomeViewModel
 import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
