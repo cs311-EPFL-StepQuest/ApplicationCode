@@ -1,6 +1,9 @@
 package com.github.se.stepquest.map
 
-fun compareCheckpoints(referenceLocation: LocationDetails, newImageLocation: LocationDetails): Float {
+fun compareCheckpoints(
+    referenceLocation: LocationDetails,
+    newImageLocation: LocationDetails
+): Float {
   val distance = calculateDistance(referenceLocation, newImageLocation)
   if (distance >= 20f) {
     return -1f

@@ -402,4 +402,3 @@ object Constants {
   const val CAMERA_BUTTON_SHUTTER_ACTION_ID2 = "com.android.camera2:id/shutter_button"
   const val CAMERA_BUTTON_DONE_ACTION_ID2 = "com.android.camera2:id/done_button"
 }
-

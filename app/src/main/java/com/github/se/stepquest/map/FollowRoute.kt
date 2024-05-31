@@ -2,12 +2,9 @@ package com.github.se.stepquest.map
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.provider.MediaStore
@@ -16,12 +13,12 @@ import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.lifecycle.MutableLiveData
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.*
@@ -36,30 +33,40 @@ class FollowRoute private constructor() {
   private var checkRouteJob: Job? = null
   var followingRoute = MutableLiveData<Boolean>()
   var RouteDetail = MutableLiveData<RouteDetails>()
+    var clickedCheckpoints = mutableListOf<LocationDetails>()
   private var currentToast: Toast? = null
-    var isPictureTaken = MutableLiveData<Boolean>(false)
+  private lateinit var clickedMarker: Marker
+  private lateinit var locationViewModel: LocationViewModel
+  private lateinit var context: Context
+  private var checkpointDialog: AlertDialog? = null
 
   init {
     followingRoute.postValue(false)
   }
 
-    companion object {
-        const val REQUEST_IMAGE_CAPTURE = 1
+  companion object {
+    const val REQUEST_IMAGE_CAPTURE = 1
 
-        @Volatile
-        private var INSTANCE: FollowRoute? = null
+    @SuppressLint("StaticFieldLeak")
+    @Volatile private var INSTANCE: FollowRoute? = null
 
-        fun getInstance(): FollowRoute {
-            return INSTANCE ?: synchronized(this) {
-                val instance = FollowRoute()
-                INSTANCE = instance
-                instance
-            }
-        }
+    fun getInstance(): FollowRoute {
+      return INSTANCE
+          ?: synchronized(this) {
+            val instance = FollowRoute()
+            INSTANCE = instance
+            instance
+          }
     }
+  }
 
   @SuppressLint("PotentialBehaviorOverride")
-  fun drawRouteDetail(googleMap: GoogleMap, context: Context, onClear: () -> Unit, locationViewModel: LocationViewModel) {
+  fun drawRouteDetail(
+      googleMap: GoogleMap,
+      context: Context,
+      onClear: () -> Unit,
+      locationViewModel: LocationViewModel
+  ) {
     googleMap.setOnMarkerClickListener { clickedMarker ->
       if (clickedMarker.title == "Route") {
 
@@ -128,28 +135,22 @@ class FollowRoute private constructor() {
 
           val button: Button = view.findViewById(R.id.dialog_button)
           button.setOnClickListener {
-              dispatchTakePictureIntent(context as Activity)
-            if (isPictureTaken.value == true) {
-                Log.d("AAAAAAAAAAAAFollowRoute", "Picture taken")
-                val checkpointLocation = LocationDetails(clickedMarker.position.latitude, clickedMarker.position.longitude)
-                val pictureLocation = locationViewModel.currentLocation.value
-                val distance = compareCheckpoints(checkpointLocation, pictureLocation!!)
-                if (distance == -1f) {
-                    //'display too far from location' message//
-                    Toast.makeText(context, "Too far from location!", Toast.LENGTH_SHORT).show()
-
-                } else {
-                    Toast.makeText(context, "Near location!", Toast.LENGTH_SHORT).show()
-                }
-            }
-
+              if (clickedCheckpoints.contains(LocationDetails(clickedMarker.position.latitude, clickedMarker.position.longitude))) {
+                  Toast.makeText(context, "You have already taken a picture of this checkpoint", Toast.LENGTH_SHORT).show()
+              } else {
+                  this.clickedMarker = clickedMarker
+                  this.locationViewModel = locationViewModel
+                  this.context = context
+                  dispatchTakePictureIntent(context as Activity)
+              }
           }
-          builder
-              .setView(view)
-              .setTitle(it.name) // Set the title of the dialog to the checkpoint title
-              .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
-              .create()
-              .show()
+          checkpointDialog =
+              builder
+                  .setView(view)
+                  .setTitle(it.name) // Set the title of the dialog to the checkpoint title
+                  .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
+                  .create()
+          checkpointDialog?.show()
         }
       }
       true // Return true to indicate that we have handled the event
@@ -282,17 +283,26 @@ class FollowRoute private constructor() {
     checkRouteJob?.cancel()
   }
 
-    private fun dispatchTakePictureIntent(activity: Activity) {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(activity.packageManager)?.also {
-                activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-            }
-        }
+  private fun dispatchTakePictureIntent(activity: Activity) {
+    Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+      takePictureIntent.resolveActivity(activity.packageManager)?.also {
+        activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+      }
     }
+  }
 
-    fun setPictureTaken() {
-        isPictureTaken.postValue(true)
+  fun onPictureTaken() {
+    val marker = this.clickedMarker
+
+    val checkpointLocation = LocationDetails(marker.position.latitude, marker.position.longitude)
+    val pictureLocation = locationViewModel.currentLocation.value
+    val distance = compareCheckpoints(checkpointLocation, pictureLocation!!)
+    if (distance == -1f) {
+      Toast.makeText(context, "The pictures don't match! Try again", Toast.LENGTH_SHORT).show()
+    } else {
+      Toast.makeText(context, "The picture match! Congratulations!", Toast.LENGTH_SHORT).show()
+        clickedCheckpoints.add(checkpointLocation)
+      checkpointDialog?.dismiss()
     }
+  }
 }
-
-

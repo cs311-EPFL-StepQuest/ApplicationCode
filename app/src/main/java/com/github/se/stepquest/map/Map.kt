@@ -169,6 +169,7 @@ fun Map(locationViewModel: LocationViewModel) {
       Log.d("FollowRoute", "stop check following route")
     }
     followRoute.followingRoute.value = false
+      followRoute.clickedCheckpoints = mutableListOf()
     displayButtons = true
     locationViewModel.cleanAllocations()
     cleanGoogleMap(map.value!!, onClear = { currentMarker = null })
@@ -246,7 +247,7 @@ fun Map(locationViewModel: LocationViewModel) {
             FloatingActionButton(
                 onClick = {
                   // CALL FUNCTIONS TO SEARCH FOR NEARBY ROUTES
-                  locationArea.setArea(locationViewModel.currentLocation.value!!)
+                  locationArea.setArea(locationViewModel.currentLocation.value!!, 5000.0)
                   locationArea.drawRoutesOnMap(map.value!!)
                   map.value!!.moveCamera(
                       CameraUpdateFactory.newLatLngZoom(
@@ -363,7 +364,10 @@ fun Map(locationViewModel: LocationViewModel) {
                               searchableLocation!!.latitude, searchableLocation!!.longitude))
                       locationArea.drawRoutesOnMap(map.value!!)
                       followRoute.drawRouteDetail(
-                          map.value!!, context, onClear = { currentMarker = null }, locationViewModel)
+                          map.value!!,
+                          context,
+                          onClear = { currentMarker = null },
+                          locationViewModel)
                     },
                     modifier =
                         Modifier.align(Alignment.CenterEnd)
