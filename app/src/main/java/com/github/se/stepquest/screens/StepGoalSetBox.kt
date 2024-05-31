@@ -1,30 +1,14 @@
-package com.github.se.stepquest
-
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,15 +19,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.se.stepquest.R
+import com.github.se.stepquest.viewModels.StepGoalsViewModel
 
+/**
+ * Screen to set the user's step goals.
+ *
+ * @param onDismiss the action to execute once the update is done.
+ * @param onConfirm the action to execute if the user confirms.
+ * @param viewModel the StepGoal screen's viewModel.
+ */
 @Composable
 fun SetStepGoalsDialog(
     onDismiss: () -> Unit,
-    onConfirm: (dailyStepGoal: Int, weeklyStepGoal: Int) -> Unit
+    onConfirm: (dailyStepGoal: Int, weeklyStepGoal: Int) -> Unit,
+    viewModel: StepGoalsViewModel = viewModel()
 ) {
+  val state by viewModel.state.collectAsState()
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-  var newDailyStepGoal by remember { mutableStateOf("") }
-  val newWeeklyStepGoal by remember { mutableStateOf("") }
 
   Dialog(onDismissRequest = { onDismiss() }) {
     Surface(
@@ -68,8 +62,10 @@ fun SetStepGoalsDialog(
                 Spacer(modifier = Modifier.height(2.dp))
                 TextField(
                     modifier = Modifier.testTag("daily_steps_setter"),
-                    value = newDailyStepGoal,
-                    onValueChange = { newDailyStepGoal = it.filter { it.isDigit() }.take(5) },
+                    value = state.newDailyStepGoal,
+                    onValueChange = {
+                      viewModel.updateDailyStepGoal(it.filter { it.isDigit() }.take(5))
+                    },
                     label = { Text("Enter your daily step goal") },
                     placeholder = { Text("5000") },
                     keyboardOptions =
@@ -77,20 +73,10 @@ fun SetStepGoalsDialog(
                             keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
                     keyboardActions =
                         KeyboardActions(
-                            onDone = {
-                              val (dailyStep, weeklyStep) =
-                                  calculateStepGoals(newDailyStepGoal, newWeeklyStepGoal)
-                              onConfirm(dailyStep, weeklyStep)
-                              onDismiss()
-                            }))
+                            onDone = { viewModel.calculateAndConfirmGoals(onConfirm, onDismiss) }))
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = {
-                      val (dailyStep, weeklyStep) =
-                          calculateStepGoals(newDailyStepGoal, newWeeklyStepGoal)
-                      onConfirm(dailyStep, weeklyStep)
-                      onDismiss()
-                    },
+                    onClick = { viewModel.calculateAndConfirmGoals(onConfirm, onDismiss) },
                     colors = ButtonDefaults.buttonColors(blueThemeColor),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.padding(horizontal = 4.dp)) {
@@ -99,28 +85,4 @@ fun SetStepGoalsDialog(
               }
         }
   }
-}
-
-fun calculateStepGoals(newDailyStepGoal: String, newWeeklyStepGoal: String): Pair<Int, Int> {
-  val dailyStep =
-      newDailyStepGoal
-          .filter { it.isDigit() }
-          .take(5)
-          .let {
-            if (it.isBlank()) {
-              5000 // Default value if blank
-            } else {
-              val parsedInput = it.toIntOrNull() ?: 0
-              val roundedValue = (parsedInput + 249) / 250 * 250
-              if (roundedValue < 1000) {
-                1000
-              } else {
-                roundedValue
-              }
-            }
-          }
-
-  val weeklyStep = newWeeklyStepGoal.takeIf { it.isNotBlank() }?.toInt() ?: (dailyStep * 7)
-
-  return Pair(dailyStep, weeklyStep)
 }

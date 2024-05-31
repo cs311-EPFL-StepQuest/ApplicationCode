@@ -156,6 +156,8 @@ fun Map(locationViewModel: LocationViewModel) {
   var searchableLocation by remember { mutableStateOf<LatLng?>(null) }
   var currentMarker: Marker? by remember { mutableStateOf(null) }
 
+  var onStartUp by remember { mutableStateOf(true) }
+
   val keyboardController = LocalSoftwareKeyboardController.current
 
   // Define the function with the click logic of Go Back Button
@@ -588,6 +590,11 @@ fun Map(locationViewModel: LocationViewModel) {
             LatLng(
                 locationViewModel.currentLocation.value!!.latitude,
                 locationViewModel.currentLocation.value!!.longitude)
+
+        if (onStartUp) {
+          map.value!!.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f))
+          onStartUp = false
+        }
 
         if (currentMarker == null) {
           val customIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)

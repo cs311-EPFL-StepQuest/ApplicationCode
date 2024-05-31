@@ -23,6 +23,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.se.stepquest.R
 
+/**
+ * Text box announcing the user has completed a goal (step goal, challenge...)
+ *
+ * @param titleText the category of the goal that was completed.
+ * @param mainText the congratulatory text.
+ * @param xpNumber the number of points awarded to the user.
+ * @param onConfirm the action to execute when closing the box.
+ */
 @Composable
 fun CongratulationDialog(
     titleText: String,
