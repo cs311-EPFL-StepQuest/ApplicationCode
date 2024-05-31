@@ -32,6 +32,7 @@ class FollowRoute private constructor() {
   // Define a Job to manage the coroutine
   private var checkRouteJob: Job? = null
   var followingRoute = MutableLiveData<Boolean>()
+  var show_follow_route_button = MutableLiveData<Boolean>()
   var RouteDetail = MutableLiveData<RouteDetails>()
     var clickedCheckpoints = mutableListOf<LocationDetails>()
   private var currentToast: Toast? = null
@@ -42,6 +43,8 @@ class FollowRoute private constructor() {
 
   init {
     followingRoute.postValue(false)
+    show_follow_route_button.postValue(false)
+    stopCheckIfOnRoute()
   }
 
   companion object {
@@ -79,7 +82,7 @@ class FollowRoute private constructor() {
           val checkpoints = it.checkpoints
           val points = routedetail?.map { LatLng(it.latitude, it.longitude) }
           if (points != null) {
-            followingRoute.postValue(true)
+            show_follow_route_button.postValue(true)
             // clean up the map
             cleanGoogleMap(googleMap, onClear = onClear)
             if (points.isNotEmpty()) {
@@ -260,8 +263,9 @@ class FollowRoute private constructor() {
                     userOnRoute.postValue(false)
                     AlertDialog.Builder(context)
                         .apply {
-                          setTitle("Finish route")
-                          setMessage("You are off the route. Stop following the route. Bye!")
+                          setTitle("Too far from route")
+                          setMessage(
+                              "You are too far from the route, please come closer to the start point (red marker) and start the route again. Bye!")
                           setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
                         }
                         .create()
