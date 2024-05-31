@@ -108,10 +108,6 @@ class LocationArea(context: Context) {
 
               cacheRouteData(context, routeList, routeDetailList)
 
-              //            getcacheRouteData(context).let { (routeList, routeDetailList) ->
-              //              callback(routeList, routeDetailList)
-              //            }
-
               // Call the callback with the collected data
               callback(routeList, routeDetailList)
             }
