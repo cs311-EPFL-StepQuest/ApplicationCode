@@ -16,7 +16,7 @@ data class ChallengesState(
 
 /** ViewModel handling the behaviour of the Challenges screen. */
 class ChallengesViewModel : ViewModel() {
-  private val _state = MutableStateFlow(ChallengesState())
+  val _state = MutableStateFlow(ChallengesState())
   val state: StateFlow<ChallengesState> = _state
 
   /**

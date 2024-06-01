@@ -29,11 +29,11 @@ class ChallengesUITest {
     val composeTestRule = createComposeRule()
 
     private val mockNavigationActions = mockk<NavigationActions>(relaxed = true)
-    private val mockViewModel = mockk<ChallengesViewModel>(relaxed = true)
 
     @Test
     fun testChallengesScreenDisplaysCorrectly() {
         // Arrange
+        val challengesViewModel = ChallengesViewModel()
         val challenges = listOf(
             ChallengeData(
                 uuid = "1",
@@ -46,22 +46,21 @@ class ChallengesUITest {
                 senderProgress = ChallengeProgression("user2", 300, 0)
             )
         )
-        val state = MutableStateFlow(
-            ChallengesState(
+        val testState = ChallengesState(
                 challenges = challenges,
                 challengeText = "Walk 1000 steps!"
             )
-        )
-        every { mockViewModel.state } returns state
 
         // Act
         composeTestRule.setContent {
             ChallengesScreen(
                 userId = "testUser",
                 navigationActions = mockNavigationActions,
-                viewModel = mockViewModel
+                viewModel = challengesViewModel
             )
         }
+
+        challengesViewModel._state.value = testState
 
         // Assert
         composeTestRule.onNodeWithText("Back").assertIsDisplayed()
