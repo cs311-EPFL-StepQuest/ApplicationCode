@@ -9,7 +9,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-data class ChallengesState(val challenges: List<ChallengeData> = listOf(), val challengeText: String = "Not available")
+data class ChallengesState(
+    val challenges: List<ChallengeData> = listOf(),
+    val challengeText: String = "Not available"
+)
 
 /** ViewModel handling the behaviour of the Challenges screen. */
 class ChallengesViewModel : ViewModel() {
@@ -36,8 +39,12 @@ class ChallengesViewModel : ViewModel() {
    */
   fun challengeTypeAction(challengeData: ChallengeData) {
     when (challengeData.type) {
-      ChallengeType.REGULAR_STEP_CHALLENGE -> _state.value = _state.value.copy(challengeText = "Walk ${challengeData.stepsToMake} steps!")
-      ChallengeType.DAILY_STEP_CHALLENGE -> _state.value = _state.value.copy(challengeText = "Walk ${challengeData.stepsToMake} steps today!")
+      ChallengeType.REGULAR_STEP_CHALLENGE ->
+          _state.value =
+              _state.value.copy(challengeText = "Walk ${challengeData.stepsToMake} steps!")
+      ChallengeType.DAILY_STEP_CHALLENGE ->
+          _state.value =
+              _state.value.copy(challengeText = "Walk ${challengeData.stepsToMake} steps today!")
     }
   }
 }

@@ -69,23 +69,25 @@ fun ChallengesScreen(
 @Composable
 fun ChallengeItem(challenge: ChallengeData, viewModel: ChallengesViewModel = viewModel()) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
-    val state by viewModel.state.collectAsState()
-    LaunchedEffect(Unit) { viewModel.challengeTypeAction(challenge) }
+  val state by viewModel.state.collectAsState()
+  LaunchedEffect(Unit) { viewModel.challengeTypeAction(challenge) }
   Surface(
       color = blueThemeColor,
       modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth().padding(horizontal = 16.dp),
       shape = MaterialTheme.shapes.medium) {
         Column(modifier = Modifier.padding(8.dp)) {
-          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            Text(
-                text = "Challengers: ${challenge.senderUsername} and ${challenge.challengedUsername}",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier =
-                Modifier.padding(vertical = 4.dp)
-            )
-          }
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center) {
+                Text(
+                    text =
+                        "Challengers: ${challenge.senderUsername} and ${challenge.challengedUsername}",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp))
+              }
           Spacer(modifier = Modifier.height(16.dp))
           Row(
               modifier = Modifier.fillMaxWidth(),
@@ -96,9 +98,7 @@ fun ChallengeItem(challenge: ChallengeData, viewModel: ChallengesViewModel = vie
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier =
-                    Modifier.padding(vertical = 4.dp)
-                )
+                    modifier = Modifier.padding(vertical = 4.dp))
               }
           Spacer(modifier = Modifier.height(16.dp))
           Row(
@@ -110,9 +110,7 @@ fun ChallengeItem(challenge: ChallengeData, viewModel: ChallengesViewModel = vie
                     color = Color.Black,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier =
-                    Modifier.padding(vertical = 4.dp)
-                )
+                    modifier = Modifier.padding(vertical = 4.dp))
               }
         }
       }
