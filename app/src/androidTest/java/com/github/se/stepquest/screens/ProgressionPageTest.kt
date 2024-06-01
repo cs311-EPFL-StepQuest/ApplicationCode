@@ -41,4 +41,9 @@ class ProgressionPageTest {
     composeTestRule.onNodeWithTag("main congratulation dialog text").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Confirm button").assertIsDisplayed()
   }
+
+  @Test
+  fun offline_stats_work() {
+    composeTestRule.setContent { OfflineStats(context) }
+  }
 }

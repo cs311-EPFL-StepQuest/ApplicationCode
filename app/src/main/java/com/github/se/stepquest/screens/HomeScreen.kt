@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
+import com.github.se.stepquest.viewModels.HomeViewModel
 
 /**
  * The application's home screen.
