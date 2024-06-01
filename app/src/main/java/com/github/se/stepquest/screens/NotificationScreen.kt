@@ -78,7 +78,7 @@ private fun NotificationList(
  * @param notificationViewModel the Notification screen's viewModel.
  */
 @Composable
-private fun BuildNotification(
+fun BuildNotification(
     data: NotificationData?,
     userId: String,
     notificationViewModel: NotificationViewModel
@@ -96,7 +96,7 @@ private fun BuildNotification(
                 Icons.Default.Close,
                 contentDescription = "Close",
                 modifier =
-                    Modifier.size(20.dp, 20.dp).clickable {
+                    Modifier.size(20.dp, 20.dp).testTag("CloseNotification").clickable {
                       notificationViewModel.removeNotification(data)
                     })
           }
@@ -108,13 +108,15 @@ private fun BuildNotification(
             Button(
                 onClick = { notificationViewModel.handleNotificationAction(data, userId) },
                 content = { Text("Accept") },
-                modifier = Modifier.fillMaxWidth().weight(1f).height(35.dp),
+                modifier =
+                    Modifier.fillMaxWidth().weight(1f).height(35.dp).testTag("AcceptNotification"),
                 colors = ButtonDefaults.buttonColors(colorResource(id = R.color.blueTheme)))
             Box(modifier = Modifier.width(20.dp))
             Button(
                 onClick = { notificationViewModel.removeNotification(data) },
                 content = { Text("Reject") },
-                modifier = Modifier.fillMaxWidth().weight(1f).height(35.dp),
+                modifier =
+                    Modifier.fillMaxWidth().weight(1f).height(35.dp).testTag("RejectNotification"),
                 colors = ButtonDefaults.buttonColors(colorResource(id = R.color.lightGrey)))
           }
       Divider(color = colorResource(id = R.color.blueTheme), thickness = 1.dp)

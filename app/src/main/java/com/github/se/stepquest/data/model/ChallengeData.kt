@@ -19,23 +19,7 @@ data class ChallengeData(
     val senderUserUuid: String = "",
     var challengedProgress: ChallengeProgression = ChallengeProgression("", 0, 0),
     var senderProgress: ChallengeProgression = ChallengeProgression("", 0, 0)
-) {
-
-  constructor() :
-      this(
-          uuid = "",
-          type = ChallengeType.REGULAR_STEP_CHALLENGE,
-          stepsToMake = 0,
-          kilometersToWalk = 0,
-          daysToComplete = 0,
-          dateTime = "",
-          challengedUsername = "",
-          challengedUserUuid = "",
-          senderUsername = "",
-          senderUserUuid = "",
-          challengedProgress = ChallengeProgression("", 0, 0),
-          senderProgress = ChallengeProgression("", 0, 0))
-}
+)
 
 data class ChallengeProgression(
     val userUuid: String = "",
