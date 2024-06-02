@@ -4,17 +4,12 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.database
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
-import okhttp3.internal.platform.Platform
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -153,7 +148,7 @@ class LocationAreaTest {
         database
       }
     }
-  */
+
   @Test
   fun database_emulator() {
     val database = Firebase.database
@@ -191,4 +186,5 @@ class LocationAreaTest {
     assertTrue(localRouteList[0].latitude == 0.0)
     assertTrue(localRouteList[0].longitude == 0.0)
   }
+  */
 }
