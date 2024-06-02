@@ -24,7 +24,7 @@ class CheckpointComparatorKtTest {
   fun testCloseLocations() {
     val referenceLocation = LocationDetails(0.0, 0.0)
     val newImageLocation = LocationDetails(0.0, 0.0001)
-    val distance = compareCheckpoints(referenceLocation, newImageLocation)
+    val distance = compareCheckpoints(referenceLocation, newImageLocation, 20f)
     assertNotEquals(0f, distance)
     assertNotEquals(-1f, distance)
   }

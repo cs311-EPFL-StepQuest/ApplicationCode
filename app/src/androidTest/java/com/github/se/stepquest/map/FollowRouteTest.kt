@@ -25,12 +25,14 @@ class FollowRouteTest {
 
   @get:Rule val instantTaskExecutorRule = InstantTaskExecutorRule()
   private val testDispatcher = TestCoroutineDispatcher()
+  private lateinit var locationViewModel: LocationViewModel
 
   @Before
   fun setUp() {
     Dispatchers.setMain(testDispatcher)
-    followRoute = FollowRoute()
+    followRoute = FollowRoute.getInstance()
     context = ApplicationProvider.getApplicationContext<Context>()
+    locationViewModel = LocationViewModel()
   }
 
   @After
@@ -68,7 +70,8 @@ class FollowRouteTest {
         context,
         onClear = {
           var currentMarker = null
-        })
+        },
+        locationViewModel)
     // Invoke the lambda with the mocked marker
     assert(listenerSlot.isCaptured)
     listenerSlot.captured.onMarkerClick(clickedMarker)

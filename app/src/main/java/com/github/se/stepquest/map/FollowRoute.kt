@@ -1,10 +1,12 @@
 package com.github.se.stepquest.map
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.provider.MediaStore
@@ -13,6 +15,8 @@ import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.GoogleMap
@@ -34,7 +38,7 @@ class FollowRoute private constructor() {
   var followingRoute = MutableLiveData<Boolean>()
   var show_follow_route_button = MutableLiveData<Boolean>()
   var RouteDetail = MutableLiveData<RouteDetails>()
-    var clickedCheckpoints = mutableListOf<LocationDetails>()
+  var clickedCheckpoints = mutableListOf<LocationDetails>()
   private var currentToast: Toast? = null
   private lateinit var clickedMarker: Marker
   private lateinit var locationViewModel: LocationViewModel
@@ -50,8 +54,7 @@ class FollowRoute private constructor() {
   companion object {
     const val REQUEST_IMAGE_CAPTURE = 1
 
-    @SuppressLint("StaticFieldLeak")
-    @Volatile private var INSTANCE: FollowRoute? = null
+    @SuppressLint("StaticFieldLeak") @Volatile private var INSTANCE: FollowRoute? = null
 
     fun getInstance(): FollowRoute {
       return INSTANCE
@@ -63,7 +66,7 @@ class FollowRoute private constructor() {
     }
   }
 
-  @SuppressLint("PotentialBehaviorOverride")
+  @SuppressLint("PotentialBehaviorOverride", "InflateParams")
   fun drawRouteDetail(
       googleMap: GoogleMap,
       context: Context,
@@ -126,34 +129,58 @@ class FollowRoute private constructor() {
       } else if (clickedMarker.title == "Checkpoint") {
         // Handle checkpoint click, show image and title
         val checkpoint = clickedMarker.tag as? Checkpoint
-        checkpoint?.let {
-          val builder = AlertDialog.Builder(context)
-          val inflater = LayoutInflater.from(context)
-          val view = inflater.inflate(R.layout.dialog_image, null)
 
-          val imageView: ImageView = view.findViewById(R.id.dialog_image)
-          BitmapFactory.decodeStream(it.image.inputStream()).also { bitmap ->
-            imageView.setImageBitmap(bitmap)
-          }
+        val checkpointLocation =
+            LocationDetails(clickedMarker.position.latitude, clickedMarker.position.longitude)
+        val currentLocation = locationViewModel.currentLocation.value
+        if (followingRoute.value!!) {
+          if (compareCheckpoints(checkpointLocation, currentLocation!!, 20f) != -1f) {
 
-          val button: Button = view.findViewById(R.id.dialog_button)
-          button.setOnClickListener {
-              if (clickedCheckpoints.contains(LocationDetails(clickedMarker.position.latitude, clickedMarker.position.longitude))) {
-                  Toast.makeText(context, "You have already taken a picture of this checkpoint", Toast.LENGTH_SHORT).show()
+            checkpoint?.let {
+              val builder = AlertDialog.Builder(context)
+              val inflater = LayoutInflater.from(context)
+              val view: android.view.View
+              // Check if the checkpoint has an image
+              if (it.image.isEmpty()) {
+                view = inflater.inflate(R.layout.dialog_without_image, null)
               } else {
-                  this.clickedMarker = clickedMarker
-                  this.locationViewModel = locationViewModel
-                  this.context = context
-                  dispatchTakePictureIntent(context as Activity)
+                view = inflater.inflate(R.layout.dialog_image, null)
+                val imageView: ImageView = view.findViewById(R.id.dialog_image)
+                BitmapFactory.decodeStream(it.image.inputStream()).also { bitmap ->
+                  imageView.setImageBitmap(bitmap)
+                }
+
+                val button: Button = view.findViewById(R.id.dialog_button)
+                button.setOnClickListener {
+                  if (clickedCheckpoints.contains(
+                      LocationDetails(
+                          clickedMarker.position.latitude, clickedMarker.position.longitude))) {
+                    Toast.makeText(
+                            context,
+                            "You have already taken a picture of this checkpoint",
+                            Toast.LENGTH_SHORT)
+                        .show()
+                  } else {
+                    this.clickedMarker = clickedMarker
+                    this.locationViewModel = locationViewModel
+                    this.context = context
+                    dispatchTakePictureIntent(context as Activity)
+                  }
+                }
               }
+
+              checkpointDialog =
+                  builder
+                      .setView(view)
+                      .setTitle(it.name) // Set the title of the dialog to the checkpoint title
+                      .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
+                      .create()
+              checkpointDialog?.show()
+            }
+          } else {
+            Toast.makeText(context, "You are too far from the checkpoint", Toast.LENGTH_SHORT)
+                .show()
           }
-          checkpointDialog =
-              builder
-                  .setView(view)
-                  .setTitle(it.name) // Set the title of the dialog to the checkpoint title
-                  .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
-                  .create()
-          checkpointDialog?.show()
         }
       }
       true // Return true to indicate that we have handled the event
@@ -288,9 +315,17 @@ class FollowRoute private constructor() {
   }
 
   private fun dispatchTakePictureIntent(activity: Activity) {
-    Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-      takePictureIntent.resolveActivity(activity.packageManager)?.also {
-        activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+    if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) !=
+        PackageManager.PERMISSION_GRANTED) {
+      // Permission is not granted
+      ActivityCompat.requestPermissions(
+          activity, arrayOf(Manifest.permission.CAMERA), REQUEST_IMAGE_CAPTURE)
+    } else {
+      // Permission has already been granted
+      Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+        takePictureIntent.resolveActivity(activity.packageManager)?.also {
+          activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
       }
     }
   }
@@ -305,7 +340,7 @@ class FollowRoute private constructor() {
       Toast.makeText(context, "The pictures don't match! Try again", Toast.LENGTH_SHORT).show()
     } else {
       Toast.makeText(context, "The picture match! Congratulations!", Toast.LENGTH_SHORT).show()
-        clickedCheckpoints.add(checkpointLocation)
+      clickedCheckpoints.add(checkpointLocation)
       checkpointDialog?.dismiss()
     }
   }
