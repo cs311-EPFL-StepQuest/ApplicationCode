@@ -260,18 +260,18 @@ fun Map(locationViewModel: LocationViewModel) {
             FloatingActionButton(
                 onClick = {
                   // CALL FUNCTIONS TO SEARCH FOR NEARBY ROUTES
-                  if (map.value != null && locationViewModel.currentLocation.value != null) {
-                    locationArea.setArea(locationViewModel.currentLocation.value!!)
-                    locationArea.drawRoutesOnMap(map.value!!)
-                    map.value!!.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            LatLng(
-                                locationViewModel.currentLocation.value!!.latitude,
-                                locationViewModel.currentLocation.value!!.longitude),
-                            15f))
-                    followRoute.drawRouteDetail(
-                        map.value!!, context, onClear = { currentMarker = null })
-                  }
+                  // if (map.value != null && locationViewModel.currentLocation.value != null) {
+                  locationArea.setArea(locationViewModel.currentLocation.value!!)
+                  locationArea.drawRoutesOnMap(map.value!!)
+                  map.value!!.moveCamera(
+                      CameraUpdateFactory.newLatLngZoom(
+                          LatLng(
+                              locationViewModel.currentLocation.value!!.latitude,
+                              locationViewModel.currentLocation.value!!.longitude),
+                          15f))
+                  followRoute.drawRouteDetail(
+                      map.value!!, context, onClear = { currentMarker = null })
+                  // }
                 },
                 modifier =
                     Modifier.padding(16.dp)
