@@ -19,12 +19,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.github.se.stepquest.R
+import com.github.se.stepquest.services.addPoints
+import com.github.se.stepquest.services.getUsername
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -250,10 +253,17 @@ class FollowRoute private constructor() {
                 // check reach final point or not
                 withContext(Dispatchers.Main) {
                   userOnRoute.value = true
+                  // Give points to the user
+                  val currentUser = FirebaseAuth.getInstance().currentUser!!.uid
+                  val routeLength = calculateRouteLength(RouteDetail.value!!.routeDetails!!)
+                  val reward = routeLength.toInt().floorDiv(100) + clickedCheckpoints.size * 5 + 10
+                  getUsername(currentUser) { addPoints(it, reward) }
+
                   AlertDialog.Builder(context)
                       .apply {
                         setTitle("Finish route")
-                        setMessage("Congratulation! You have reached the finish point.")
+                        setMessage(
+                            "Congratulation! You have reached the finish point. You have earned $reward points.")
                         setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
                       }
                       .create()

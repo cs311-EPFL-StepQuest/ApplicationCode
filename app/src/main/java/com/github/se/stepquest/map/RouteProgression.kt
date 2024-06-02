@@ -37,6 +37,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.github.se.stepquest.services.addPoints
+import com.github.se.stepquest.services.getUsername
+import com.google.firebase.auth.FirebaseAuth
 import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +57,7 @@ fun RouteProgression(
   var extraCheckpoints by rememberSaveable { mutableIntStateOf(0) }
   // Save and round routeLength to two decimal places
 
-  reward = (routeLength * 100).toInt()
+  reward = routeLength.toInt().floorDiv(100) + numCheckpoints * 5
   // Create a unique routeID (might find a better way)
   routeID = "route_${System.currentTimeMillis()}"
   extraKilometers = (routeLength / 10).toInt()
@@ -166,6 +169,8 @@ fun RouteProgression(
                       onClick = {
                         saveRoute(
                             stopRoute, routeName, routeID, routeLength, numCheckpoints, reward)
+                        val currentUser = FirebaseAuth.getInstance().currentUser!!.uid
+                        getUsername(currentUser) { addPoints(it, reward) }
                       },
                       enabled = routeName.isNotEmpty(),
                       colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
