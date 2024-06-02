@@ -272,5 +272,4 @@ class FollowRouteTest {
   //
   //    assertEquals(expectedTrackpoints, trackpoints)
   //  }
-
 }
