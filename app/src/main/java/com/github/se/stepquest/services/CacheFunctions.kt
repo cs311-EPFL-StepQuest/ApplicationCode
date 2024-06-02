@@ -2,6 +2,10 @@ package com.github.se.stepquest.services
 
 import android.content.Context
 import android.net.ConnectivityManager
+import com.github.se.stepquest.map.LocationDetails
+import com.github.se.stepquest.map.RouteDetails
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 fun isOnline(context: Context): Boolean {
 
@@ -92,4 +96,42 @@ fun getCachedStepInfo(context: Context): Map<String, Int> {
       "weeklyStepGoal" to weeklyStepGoal,
       "weeklySteps" to weeklySteps,
       "totalSteps" to totalSteps)
+}
+
+fun cacheRouteData(
+    context: Context,
+    routeList: List<LocationDetails>,
+    routeDetailList: List<RouteDetails>
+) {
+  val sharedPreferences = context.getSharedPreferences("RouteData", Context.MODE_PRIVATE)
+  val editor = sharedPreferences.edit()
+  val gson = Gson()
+
+  // Convert the lists to JSON strings
+  val routeListJson = gson.toJson(routeList)
+  val routeDetailListJson = gson.toJson(routeDetailList)
+
+  // Save the JSON strings in SharedPreferences
+  editor.putString("routeList", routeListJson)
+  editor.putString("routeDetailList", routeDetailListJson)
+  editor.apply()
+}
+
+fun getcacheRouteData(context: Context): Pair<List<LocationDetails>, List<RouteDetails>> {
+  val sharedPreferences = context.getSharedPreferences("RouteData", Context.MODE_PRIVATE)
+  val gson = Gson()
+
+  // Get the JSON strings from SharedPreferences
+  val routeListJson = sharedPreferences.getString("routeList", null)
+  val routeDetailListJson = sharedPreferences.getString("routeDetailList", null)
+
+  // Convert the JSON strings back to lists
+  val routeListType = object : TypeToken<List<LocationDetails>>() {}.type
+  val routeDetailListType = object : TypeToken<List<RouteDetails>>() {}.type
+
+  val routeList: List<LocationDetails> = gson.fromJson(routeListJson, routeListType) ?: emptyList()
+  val routeDetailList: List<RouteDetails> =
+      gson.fromJson(routeDetailListJson, routeDetailListType) ?: emptyList()
+
+  return Pair(routeList, routeDetailList)
 }

@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import io.mockk.mockk
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -24,13 +25,15 @@ class LocationAreaTest {
   private lateinit var mockDatabaseReference: DatabaseReference
   private lateinit var mockDatabase: FirebaseDatabase
   private lateinit var mockTask: Task<DataSnapshot>
+  private lateinit var context: Context
 
   private lateinit var emulatedDatabase: FirebaseDatabase
 
   @Before
   fun setUp() {
-    locationArea = LocationArea()
-    /*
+    context = mockk<Context>(relaxed = true)
+    locationArea = LocationArea(context)
+
     firebaseAuth = mockk()
     mockRouteID = mockk(relaxed = true)
     mockRouteDataSnapshot = mockk(relaxed = true)
@@ -38,7 +41,6 @@ class LocationAreaTest {
     mockDatabaseReference = mockk(relaxed = true)
     mockDatabase = mockk(relaxed = true)
     mockTask = mockk(relaxed = true)
-    */
 
     val context = ApplicationProvider.getApplicationContext<Context>()
     val options =
