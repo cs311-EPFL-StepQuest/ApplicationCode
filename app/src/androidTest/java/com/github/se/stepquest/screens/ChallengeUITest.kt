@@ -24,7 +24,7 @@ class ChallengesUITest {
 
   @Test
   fun testChallengesScreenDisplaysCorrectly() {
-    // Arrange
+    //Arrange
     val challengesViewModel = ChallengesViewModel()
     val challenges =
         listOf(
@@ -39,7 +39,7 @@ class ChallengesUITest {
                 senderProgress = ChallengeProgression("user2", 300, 0)))
     val testState = ChallengesState(challenges = challenges, challengeText = "Walk 1000 steps!")
 
-    // Act
+    //Act
     composeTestRule.setContent {
       ChallengesScreen(
           userId = "testUser",
@@ -49,7 +49,7 @@ class ChallengesUITest {
 
     challengesViewModel._state.value = testState
 
-    // Assert
+    //Assert
     composeTestRule.onNodeWithText("Back").assertIsDisplayed()
     composeTestRule.onNodeWithText("Challenges").assertIsDisplayed()
     composeTestRule.onNodeWithText("Challengers: Alice and Bob").assertIsDisplayed()
