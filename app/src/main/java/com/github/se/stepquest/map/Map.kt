@@ -86,7 +86,7 @@ fun Map(locationViewModel: LocationViewModel) {
   val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
   val followRoute = FollowRoute.getInstance()
-  val locationArea = LocationArea()
+  val locationArea = LocationArea(context)
 
   // Instantiate all necessary variables to take pictures
   var currentCheckpointHasPicture by remember { mutableStateOf(false) }
@@ -155,6 +155,8 @@ fun Map(locationViewModel: LocationViewModel) {
   var searchable by remember { mutableStateOf(false) }
   var searchableLocation by remember { mutableStateOf<LatLng?>(null) }
   var currentMarker: Marker? by remember { mutableStateOf(null) }
+
+  var onStartUp by remember { mutableStateOf(true) }
 
   val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -592,6 +594,11 @@ fun Map(locationViewModel: LocationViewModel) {
             LatLng(
                 locationViewModel.currentLocation.value!!.latitude,
                 locationViewModel.currentLocation.value!!.longitude)
+
+        if (onStartUp) {
+          map.value!!.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f))
+          onStartUp = false
+        }
 
         if (currentMarker == null) {
           val customIcon = BitmapFactory.decodeResource(context.resources, R.drawable.location_dot)

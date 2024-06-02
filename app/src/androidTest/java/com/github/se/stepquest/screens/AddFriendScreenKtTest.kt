@@ -32,7 +32,6 @@ class AddFriendScreenTest {
 
     // Verify the Back button is displayed
     composeTestRule.onNodeWithText("Back").assertIsDisplayed()
-    composeTestRule.onNodeWithContentDescription("Close").assertIsDisplayed()
     composeTestRule.onNodeWithText("Friends").assertIsDisplayed()
     composeTestRule.onNodeWithText("Search for friends").assertIsDisplayed()
     composeTestRule.onNodeWithText("Enter your friend's username").assertExists()

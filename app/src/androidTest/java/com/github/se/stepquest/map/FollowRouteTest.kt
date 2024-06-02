@@ -15,9 +15,12 @@ import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 
 class FollowRouteTest {
   private lateinit var followRoute: FollowRoute
@@ -75,6 +78,86 @@ class FollowRouteTest {
     // Invoke the lambda with the mocked marker
     assert(listenerSlot.isCaptured)
     listenerSlot.captured.onMarkerClick(clickedMarker)
+  }
+
+  @Test
+  fun createTrackpoint_returnsNonEmptyTrackpoints_whenRouteIsNotEmpty() {
+    // Arrange
+    val routeDetails =
+        listOf(
+            LocationDetails(0.0, 0.0),
+            LocationDetails(0.1, 0.1),
+            LocationDetails(0.2, 0.2),
+            LocationDetails(0.3, 0.3),
+            LocationDetails(0.4, 0.4))
+    val route =
+        RouteDetails(routeID = "1", routeDetails = routeDetails, emptyList(), userID = "user123")
+    followRoute.RouteDetail.postValue(route)
+
+    // Act
+    val trackpoints = followRoute.createTrackpoint(interval = 0.15)
+
+    assertTrue(trackpoints.isNotEmpty())
+  }
+
+  @Test
+  fun createTrackpoint_returnsEmptyList_whenRouteIsEmpty() {
+    // Arrange
+    val routeDetails = emptyList<LocationDetails>()
+    val route =
+        RouteDetails(routeID = "1", routeDetails = routeDetails, emptyList(), userID = "user123")
+    followRoute.RouteDetail.postValue(route)
+
+    // Act
+    val trackpoints = followRoute.createTrackpoint(interval = 0.15)
+
+    // Assert
+    assertTrue(trackpoints.isEmpty())
+  }
+
+  @Test
+  fun test_followingRoute_isFalseAtStartup() {
+    // Assert
+    assertEquals(false, followRoute.followingRoute.value)
+  }
+
+  @Test
+  fun test_show_follow_route_isTrueIfValidPoints() {
+    // Mock dependencies
+    assertEquals(false, followRoute.show_follow_route_button.value)
+
+    val googleMap = mockk<GoogleMap>(relaxed = true)
+    val clickedMarker = mockk<Marker>(relaxed = true)
+    val routeDetails =
+        RouteDetails(
+            routeID = "1",
+            routeDetails = listOf(LocationDetails(34.0, -118.0), LocationDetails(35.0, -119.0)),
+            userID = "user123",
+            checkpoints = listOf(Checkpoint("Checkpoint 1", LocationDetails(34.5, -118.5))))
+
+    // Set expectations
+    every { clickedMarker.title } returns "Route"
+    every { clickedMarker.tag } returns routeDetails
+    mockkStatic(BitmapDescriptorFactory::class)
+    every { BitmapDescriptorFactory.defaultMarker(any()) } returns mockk()
+
+    // Mocking setOnMarkerClickListener using slot
+    val listenerSlot = slot<GoogleMap.OnMarkerClickListener>()
+    every { googleMap.setOnMarkerClickListener(capture(listenerSlot)) } answers {}
+
+    // Invoke function
+    followRoute.drawRouteDetail(
+        googleMap,
+        context,
+        onClear = {
+          var currentMarker = null
+        })
+
+    // Simulate marker click
+    listenerSlot.captured.onMarkerClick(clickedMarker)
+
+    assertEquals(routeDetails, followRoute.RouteDetail.value)
+    assertEquals(true, followRoute.show_follow_route_button.value)
   }
 
   //  @Test

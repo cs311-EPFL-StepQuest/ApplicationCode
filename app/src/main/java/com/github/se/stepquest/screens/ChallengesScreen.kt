@@ -1,46 +1,41 @@
 package com.github.se.stepquest.screens
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.stepquest.R
 import com.github.se.stepquest.Routes
 import com.github.se.stepquest.data.model.ChallengeData
-import com.github.se.stepquest.services.getChallenges
 import com.github.se.stepquest.ui.navigation.NavigationActions
 import com.github.se.stepquest.ui.navigation.TopLevelDestination
+import com.github.se.stepquest.viewModels.ChallengesViewModel
 
+/**
+ * Screen displaying the user's active challenges.
+ *
+ * @param userId the current user's database ID.
+ * @param navigationActions the handler for navigating the app.
+ * @param viewModel the Challenges screen's viewModel.
+ */
 @Composable
 fun ChallengesScreen(
     userId: String,
     navigationActions: NavigationActions,
-    testChallenges: List<ChallengeData> = listOf()
+    viewModel: ChallengesViewModel = viewModel()
 ) {
-  var challenges by remember { mutableStateOf(testChallenges) }
-  getChallenges(userId) { receivedChallenges -> challenges = receivedChallenges }
+  val state by viewModel.state.collectAsState()
+
+  LaunchedEffect(Unit) { viewModel.loadChallenges(userId) }
+
   Surface(color = Color.White, modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier.padding(16.dp).fillMaxWidth(),
@@ -49,7 +44,7 @@ fun ChallengesScreen(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.Start,
               verticalAlignment = Alignment.CenterVertically) {
-                androidx.compose.material.Text(
+                Text(
                     text = "Back",
                     fontSize = 20.sp,
                     modifier =
@@ -59,54 +54,63 @@ fun ChallengesScreen(
                         })
               }
           Spacer(modifier = Modifier.height(16.dp))
-          androidx.compose.material.Text(
-              text = "Challenges", fontWeight = FontWeight.Bold, fontSize = 40.sp)
+          Text(text = "Challenges", fontWeight = FontWeight.Bold, fontSize = 40.sp)
           Spacer(modifier = Modifier.height(16.dp))
-          Column { challenges.forEach { challenge -> ChallengeItem(challenge = challenge) } }
+          Column { state.challenges.forEach { challenge -> ChallengeItem(challenge = challenge) } }
         }
   }
 }
 
+/**
+ * One active challenge item displaying various information on the challenge.
+ *
+ * @param challenge the information on the challenge.
+ */
 @Composable
-fun ChallengeItem(challenge: ChallengeData) {
+fun ChallengeItem(challenge: ChallengeData, viewModel: ChallengesViewModel = viewModel()) {
   val blueThemeColor = colorResource(id = R.color.blueTheme)
+  val state by viewModel.state.collectAsState()
+  LaunchedEffect(Unit) { viewModel.challengeTypeAction(challenge) }
   Surface(
       color = blueThemeColor,
       modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth().padding(horizontal = 16.dp),
       shape = MaterialTheme.shapes.medium) {
         Column(modifier = Modifier.padding(8.dp)) {
-          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = CenterVertically) {
-            Text(
-                text = "Sender: ${challenge.senderUsername}",
-                color = Color.White,
-            )
-            Spacer(modifier = Modifier.width(100.dp))
-            Text(
-                text = "Challenged: ${challenge.challengedUsername}",
-                color = Color.White,
-            )
-          }
-          Spacer(modifier = Modifier.height(16.dp))
           Row(
               modifier = Modifier.fillMaxWidth(),
-              verticalAlignment = CenterVertically,
+              verticalAlignment = Alignment.CenterVertically,
               horizontalArrangement = Arrangement.Center) {
                 Text(
-                    text = "Message: ${challenge.type.messageText}",
+                    text =
+                        "Challengers: ${challenge.senderUsername} and ${challenge.challengedUsername}",
                     color = Color.White,
-                )
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp))
               }
           Spacer(modifier = Modifier.height(16.dp))
           Row(
               modifier = Modifier.fillMaxWidth(),
-              verticalAlignment = CenterVertically,
-              horizontalArrangement = Arrangement.Center // Aligns items horizontally to the center
-              ) {
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center) {
+                Text(
+                    text = "Challenge: ${state.challengeText}",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp))
+              }
+          Spacer(modifier = Modifier.height(16.dp))
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center) {
                 Text(
                     text = "End Date: ${challenge.dateTime}",
                     color = Color.Black,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                )
+                    modifier = Modifier.padding(vertical = 4.dp))
               }
         }
       }

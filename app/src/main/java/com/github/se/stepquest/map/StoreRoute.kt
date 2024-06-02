@@ -10,9 +10,9 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
 
 class StoreRoute {
-  private var firebaseAuth: FirebaseAuth
-  private var database: FirebaseDatabase
-  private var storage: FirebaseStorage
+  var firebaseAuth: FirebaseAuth
+  var database: FirebaseDatabase
+  var storage: FirebaseStorage
 
   init {
     firebaseAuth = FirebaseAuth.getInstance()
