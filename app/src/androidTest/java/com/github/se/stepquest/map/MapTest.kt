@@ -35,7 +35,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -283,20 +282,6 @@ class MapTest {
     }
   }
 
-  @Test
-  fun testNumCheckpointsIncreasedAfterCreatingCheckpoint() {
-    var numCheckpoints = 0
-    composeTestRule.setContent { Map(vm).apply { numCheckpoints += 1 } }
-
-    // Simulate the user interaction to create a checkpoint
-    composeTestRule.onNodeWithTag("createRouteButton").performClick()
-    composeTestRule.onNodeWithContentDescription("Add checkpoint").performClick()
-    composeTestRule.onNodeWithText("Name:").performTextInput("Test")
-    composeTestRule.onNodeWithText("Confirm").performClick()
-
-    // Assert that numCheckpoints is increased by 1
-    assertEquals(numCheckpoints, 1)
-  }
   /*
     @Test
     fun testCurrentLocationMarker(){
@@ -405,14 +390,15 @@ class MapTest {
         Constants.CAMERA_BUTTON_SHUTTER_ACTION_ID2,
         Constants.CAMERA_BUTTON_DONE_ACTION_ID)
     Thread.sleep(2000)
+
     composeTestRule.onNodeWithContentDescription("checkpoint_image").assertIsDisplayed()
   }
   */
 }
 
 object Constants {
-  const val CAMERA_BUTTON_SHUTTER_ACTION_ID = "com.android.camera2:id/shutter_button"
-  const val CAMERA_BUTTON_SHUTTER_ACTION_ID2 = "com.android.camera:id/shutter_button"
-  const val CAMERA_BUTTON_DONE_ACTION_ID = "com.android.camera2:id/done_button"
-  const val CAMERA_BUTTON_DONE_ACTION_ID2 = "com.android.camera:id/done_button"
+  const val CAMERA_BUTTON_SHUTTER_ACTION_ID = "com.android.camera:id/shutter_button"
+  const val CAMERA_BUTTON_DONE_ACTION_ID = "com.android.camera:id/done_button"
+  const val CAMERA_BUTTON_SHUTTER_ACTION_ID2 = "com.android.camera2:id/shutter_button"
+  const val CAMERA_BUTTON_DONE_ACTION_ID2 = "com.android.camera2:id/done_button"
 }

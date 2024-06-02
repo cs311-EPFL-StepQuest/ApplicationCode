@@ -208,6 +208,8 @@ dependencies {
     androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
     implementation("com.google.android.libraries.places:places:2.6.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation("com.google.firebase:firebase-storage")
 
 }
 

@@ -9,12 +9,17 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sqrt
@@ -22,6 +27,8 @@ import kotlin.math.sqrt
 class LocationArea(context: Context) {
   var firebaseAuth: FirebaseAuth
   var database: FirebaseDatabase
+  var storage: FirebaseStorage
+
   lateinit var center: LatLng
   var radius: Double = 1000.0
   val context = context
@@ -29,6 +36,7 @@ class LocationArea(context: Context) {
   init {
     firebaseAuth = FirebaseAuth.getInstance()
     database = FirebaseDatabase.getInstance()
+    storage = Firebase.storage
   }
 
   fun setArea(centerLocation: LocationDetails, radius: Double = 1000.0) {
@@ -64,6 +72,7 @@ class LocationArea(context: Context) {
                     insideArea = true
                   }
                 }
+
                 if (insideArea) {
                   // Retrieve the list of LocationDetails for the route
                   val routeDataSnapshot = routeID.child("route")
@@ -80,17 +89,33 @@ class LocationArea(context: Context) {
                   // Retrieve the list of Checkpoints
                   val checkpointsSnapshot = routeID.child("checkpoints")
                   val checkpointsList = mutableListOf<Checkpoint>()
+                  val imageDownloadTasks = mutableListOf<Task<ByteArray>>()
+
                   for (checkpointSnapshot in checkpointsSnapshot.children) {
                     val name = checkpointSnapshot.child("name").getValue<String>().orEmpty()
                     val locationSnapshot = checkpointSnapshot.child("location")
                     val latitude = locationSnapshot.child("latitude").getValue<Double>()
                     val longitude = locationSnapshot.child("longitude").getValue<Double>()
+                    val imageURL = checkpointSnapshot.child("imageURL").getValue<String>().orEmpty()
+
                     if (latitude != null && longitude != null) {
                       val locationDetails = LocationDetails(latitude, longitude)
                       checkpointsList.add(Checkpoint(name, locationDetails))
+                      // Group tasks to download the iamges
+
+                      if (imageURL.isNotEmpty()) {
+                        val imageRef = storage.getReferenceFromUrl(imageURL)
+                        imageDownloadTasks.add(imageRef.getBytes(1024 * 1024))
+                      }
                     }
                   }
-
+                  // Retrieve all images from database
+                  Tasks.whenAllSuccess<ByteArray>(imageDownloadTasks).addOnSuccessListener { images
+                    ->
+                    for ((index, image) in images.withIndex()) {
+                      checkpointsList[index].image = image
+                    }
+                  }
                   // Retrieve the userID
                   val userID = routeID.child("userid").getValue<String>().orEmpty()
 
