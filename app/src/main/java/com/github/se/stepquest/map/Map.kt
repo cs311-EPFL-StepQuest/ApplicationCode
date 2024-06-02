@@ -88,7 +88,7 @@ fun Map(locationViewModel: LocationViewModel) {
   val storeRoute = StoreRoute()
   var allroutes by remember { mutableStateOf("") }
   val followRoute = FollowRoute()
-  val locationArea = LocationArea()
+  val locationArea = LocationArea(context)
 
   // Instantiate all necessary variables to take pictures
   var currentCheckpointHasPicture by remember { mutableStateOf(false) }
