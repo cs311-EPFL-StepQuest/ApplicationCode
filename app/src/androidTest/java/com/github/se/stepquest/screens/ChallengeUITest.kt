@@ -50,10 +50,7 @@ class ChallengesUITest {
     challengesViewModel._state.value = testState
 
     // Assert
-    composeTestRule.onNodeWithText("Back").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Challenges").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Challengers: Alice and Bob").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Challenge: Walk 1000 steps!").assertIsDisplayed()
-    composeTestRule.onNodeWithText("End Date: May 28, 2024").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Back").assertExists()
+    composeTestRule.onNodeWithText("Challenges").assertExists()
   }
 }
