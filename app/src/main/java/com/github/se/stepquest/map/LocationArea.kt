@@ -9,6 +9,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -87,17 +89,33 @@ class LocationArea(context: Context) {
                   // Retrieve the list of Checkpoints
                   val checkpointsSnapshot = routeID.child("checkpoints")
                   val checkpointsList = mutableListOf<Checkpoint>()
+                  val imageDownloadTasks = mutableListOf<Task<ByteArray>>()
+
                   for (checkpointSnapshot in checkpointsSnapshot.children) {
                     val name = checkpointSnapshot.child("name").getValue<String>().orEmpty()
                     val locationSnapshot = checkpointSnapshot.child("location")
                     val latitude = locationSnapshot.child("latitude").getValue<Double>()
                     val longitude = locationSnapshot.child("longitude").getValue<Double>()
+                    val imageURL = checkpointSnapshot.child("imageURL").getValue<String>().orEmpty()
+
                     if (latitude != null && longitude != null) {
                       val locationDetails = LocationDetails(latitude, longitude)
                       checkpointsList.add(Checkpoint(name, locationDetails))
+                      // Group tasks to download the iamges
+
+                      if (imageURL.isNotEmpty()) {
+                        val imageRef = storage.getReferenceFromUrl(imageURL)
+                        imageDownloadTasks.add(imageRef.getBytes(1024 * 1024))
+                      }
                     }
                   }
-
+                  // Retrieve all images from database
+                  Tasks.whenAllSuccess<ByteArray>(imageDownloadTasks).addOnSuccessListener { images
+                    ->
+                    for ((index, image) in images.withIndex()) {
+                      checkpointsList[index].image = image
+                    }
+                  }
                   // Retrieve the userID
                   val userID = routeID.child("userid").getValue<String>().orEmpty()
 

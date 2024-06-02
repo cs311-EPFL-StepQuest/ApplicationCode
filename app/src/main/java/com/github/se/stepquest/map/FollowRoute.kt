@@ -1,20 +1,28 @@
 package com.github.se.stepquest.map
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.github.se.stepquest.R
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.*
@@ -22,7 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
-class FollowRoute() {
+class FollowRoute private constructor() {
 
   var userOnRoute = MutableLiveData<Boolean>()
   // Define a Job to manage the coroutine
@@ -30,7 +38,12 @@ class FollowRoute() {
   var followingRoute = MutableLiveData<Boolean>()
   var show_follow_route_button = MutableLiveData<Boolean>()
   var RouteDetail = MutableLiveData<RouteDetails>()
+  var clickedCheckpoints = mutableListOf<LocationDetails>()
   private var currentToast: Toast? = null
+  private lateinit var clickedMarker: Marker
+  private lateinit var locationViewModel: LocationViewModel
+  private lateinit var context: Context
+  private var checkpointDialog: AlertDialog? = null
 
   init {
     followingRoute.postValue(false)
@@ -38,8 +51,28 @@ class FollowRoute() {
     stopCheckIfOnRoute()
   }
 
-  @SuppressLint("PotentialBehaviorOverride")
-  fun drawRouteDetail(googleMap: GoogleMap, context: Context, onClear: () -> Unit) {
+  companion object {
+    const val REQUEST_IMAGE_CAPTURE = 1
+
+    @SuppressLint("StaticFieldLeak") @Volatile private var INSTANCE: FollowRoute? = null
+
+    fun getInstance(): FollowRoute {
+      return INSTANCE
+          ?: synchronized(this) {
+            val instance = FollowRoute()
+            INSTANCE = instance
+            instance
+          }
+    }
+  }
+
+  @SuppressLint("PotentialBehaviorOverride", "InflateParams")
+  fun drawRouteDetail(
+      googleMap: GoogleMap,
+      context: Context,
+      onClear: () -> Unit,
+      locationViewModel: LocationViewModel
+  ) {
     googleMap.setOnMarkerClickListener { clickedMarker ->
       if (clickedMarker.title == "Route") {
 
@@ -96,27 +129,63 @@ class FollowRoute() {
       } else if (clickedMarker.title == "Checkpoint") {
         // Handle checkpoint click, show image and title
         val checkpoint = clickedMarker.tag as? Checkpoint
-        checkpoint?.let {
-          val builder = AlertDialog.Builder(context)
-          val inflater = LayoutInflater.from(context)
-          val view = inflater.inflate(R.layout.dialog_image, null)
 
-          val imageView: ImageView = view.findViewById(R.id.dialog_image)
-          BitmapFactory.decodeStream(it.image.inputStream()).also { bitmap ->
-            imageView.setImageBitmap(bitmap)
-          }
+        val checkpointLocation =
+            LocationDetails(clickedMarker.position.latitude, clickedMarker.position.longitude)
+        val currentLocation = locationViewModel.currentLocation.value
 
-          val button: Button = view.findViewById(R.id.dialog_button)
-          button.setOnClickListener {
-            // Perform your action here
-            Toast.makeText(context, "Button clicked!", Toast.LENGTH_SHORT).show()
+        // Display checkpoint dialog if user is following a route
+        if (followingRoute.value!!) {
+          checkpoint?.let {
+            val builder = AlertDialog.Builder(context)
+            val inflater = LayoutInflater.from(context)
+            val view: android.view.View
+            // Check if the checkpoint has an image
+            if (it.image.isEmpty()) {
+              view = inflater.inflate(R.layout.checkpoint_without_image, null)
+            } else {
+              // Check if the user is close to the checkpoint
+              if (compareCheckpoints(checkpointLocation, currentLocation!!, 20f) == -1f) {
+                // Don't display camera button
+                view = inflater.inflate(R.layout.checkpoint_with_image_far, null)
+                val imageView: ImageView = view.findViewById(R.id.dialog_image)
+                BitmapFactory.decodeStream(it.image.inputStream()).also { bitmap ->
+                  imageView.setImageBitmap(bitmap)
+                }
+              } else {
+                // Display camera button
+                view = inflater.inflate(R.layout.checkpoint_with_image, null)
+                val imageView: ImageView = view.findViewById(R.id.dialog_image)
+                BitmapFactory.decodeStream(it.image.inputStream()).also { bitmap ->
+                  imageView.setImageBitmap(bitmap)
+                }
+                val button: Button = view.findViewById(R.id.dialog_button)
+                button.setOnClickListener {
+                  if (clickedCheckpoints.contains(
+                      LocationDetails(checkpointLocation.latitude, checkpointLocation.longitude))) {
+                    Toast.makeText(
+                            context,
+                            "You have already taken a picture of this checkpoint",
+                            Toast.LENGTH_SHORT)
+                        .show()
+                  } else {
+                    this.clickedMarker = clickedMarker
+                    this.locationViewModel = locationViewModel
+                    this.context = context
+                    dispatchTakePictureIntent(context as Activity)
+                  }
+                }
+              }
+            }
+
+            checkpointDialog =
+                builder
+                    .setView(view)
+                    .setTitle(it.name) // Set the title of the dialog to the checkpoint title
+                    .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
+                    .create()
+            checkpointDialog?.show()
           }
-          builder
-              .setView(view)
-              .setTitle(it.name) // Set the title of the dialog to the checkpoint title
-              .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
-              .create()
-              .show()
         }
       }
       true // Return true to indicate that we have handled the event
@@ -248,5 +317,36 @@ class FollowRoute() {
   // Function to stop the checkIfOnRoute coroutine
   fun stopCheckIfOnRoute() {
     checkRouteJob?.cancel()
+  }
+
+  private fun dispatchTakePictureIntent(activity: Activity) {
+    if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) !=
+        PackageManager.PERMISSION_GRANTED) {
+      // Permission is not granted
+      ActivityCompat.requestPermissions(
+          activity, arrayOf(Manifest.permission.CAMERA), REQUEST_IMAGE_CAPTURE)
+    } else {
+      // Permission has already been granted
+      Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+        takePictureIntent.resolveActivity(activity.packageManager)?.also {
+          activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
+      }
+    }
+  }
+
+  fun onPictureTaken() {
+    val marker = this.clickedMarker
+
+    val checkpointLocation = LocationDetails(marker.position.latitude, marker.position.longitude)
+    val pictureLocation = locationViewModel.currentLocation.value
+    val distance = compareCheckpoints(checkpointLocation, pictureLocation!!)
+    if (distance == -1f) {
+      Toast.makeText(context, "The pictures don't match! Try again", Toast.LENGTH_SHORT).show()
+    } else {
+      Toast.makeText(context, "The picture match! Congratulations!", Toast.LENGTH_SHORT).show()
+      clickedCheckpoints.add(checkpointLocation)
+      checkpointDialog?.dismiss()
+    }
   }
 }
