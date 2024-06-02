@@ -89,6 +89,7 @@ class LocationAreaTest {
     assertEquals(center.longitude, locationArea.center.longitude, 0.0)
     assertEquals(radius, locationArea.radius, 0.0)
   }
+  
   /*
     @Test
     fun drawRoutesOnMapTest() {
