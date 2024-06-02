@@ -39,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
@@ -73,7 +72,6 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 
 data class PlaceSuggestion(val name: String, val placeId: String)
 
@@ -93,8 +91,7 @@ fun Map(locationViewModel: LocationViewModel) {
   // Instantiate all necessary variables to take pictures
   var currentCheckpointHasPicture by remember { mutableStateOf(false) }
   val cameraActionPermission = remember { mutableStateOf(false) }
-  val currentImage = remember { mutableStateOf<ImageBitmap?>(null) }
-  val images = remember { MutableStateFlow<List<ImageBitmap>>(emptyList()) }
+  val currentImage = remember { mutableStateOf<Bitmap?>(null) }
 
   var photoFile = getPhotoFile(context)
   val fileProvider =
@@ -108,7 +105,7 @@ fun Map(locationViewModel: LocationViewModel) {
           var takenImage: Bitmap? = null
           // Sometimes the picture in portrait mode is rotated
           rotatePicture(context, fileProvider, photoFile) { takenImage = it }
-          currentImage.value = takenImage?.asImageBitmap()
+          currentImage.value = takenImage
           currentCheckpointHasPicture = true
         }
       }
@@ -181,7 +178,7 @@ fun Map(locationViewModel: LocationViewModel) {
     cleanGoogleMap(map.value!!, onClear = { currentMarker = null })
     Log.i("clean", "cleaned")
     numCheckpoints = 0
-    images.value = emptyList()
+    currentImage.value = null
   }
 
   Scaffold(
@@ -467,6 +464,7 @@ fun Map(locationViewModel: LocationViewModel) {
                         showDialog = false
                         checkpointTitle = ""
                         currentCheckpointHasPicture = false
+                        currentImage.value = null
                       },
                       modifier = Modifier.size(36.dp)) {
                         Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.Black)
@@ -490,7 +488,7 @@ fun Map(locationViewModel: LocationViewModel) {
                   if (currentCheckpointHasPicture) {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                       Image(
-                          bitmap = currentImage.value!!,
+                          bitmap = currentImage.value!!.asImageBitmap(),
                           contentDescription = "checkpoint_image",
                           modifier = Modifier.size(200.dp))
                     }
@@ -529,11 +527,9 @@ fun Map(locationViewModel: LocationViewModel) {
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(48.dp)) {
                   Button(
                       onClick = {
-                        if (locationViewModel.addNewCheckpoint(checkpointTitle)) {
-                          // Add the image to the list of images
-                          if (currentImage.value != null) {
-                            images.value += currentImage.value!!
-                          }
+                        if (locationViewModel.addNewCheckpoint(
+                            checkpointTitle,
+                            if (currentCheckpointHasPicture) currentImage.value else null)) {
                           // Increase checkpoint number
                           numCheckpoints++
                           // Show picture button for next checkpoint

@@ -3,10 +3,15 @@ package com.github.se.stepquest.map
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import com.github.se.stepquest.R
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -92,14 +97,24 @@ class FollowRoute() {
         // Handle checkpoint click, show image and title
         val checkpoint = clickedMarker.tag as? Checkpoint
         checkpoint?.let {
-          AlertDialog.Builder(context)
-              .apply {
-                setTitle(it.name) // Set the title of the dialog to the checkpoint title
-                // put image here
-                setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
-                // If you have an image and want to display it, consider using a custom layout or
-                // fetching the image asynchronously
-              }
+          val builder = AlertDialog.Builder(context)
+          val inflater = LayoutInflater.from(context)
+          val view = inflater.inflate(R.layout.dialog_image, null)
+
+          val imageView: ImageView = view.findViewById(R.id.dialog_image)
+          BitmapFactory.decodeStream(it.image.inputStream()).also { bitmap ->
+            imageView.setImageBitmap(bitmap)
+          }
+
+          val button: Button = view.findViewById(R.id.dialog_button)
+          button.setOnClickListener {
+            // Perform your action here
+            Toast.makeText(context, "Button clicked!", Toast.LENGTH_SHORT).show()
+          }
+          builder
+              .setView(view)
+              .setTitle(it.name) // Set the title of the dialog to the checkpoint title
+              .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
               .create()
               .show()
         }
@@ -174,7 +189,7 @@ class FollowRoute() {
                       }
                       .create()
                       .show()
-                  Log.d("FollowRoute", "You have reached the finish point. Congrat")
+                  Log.d("FollowRoute", "You have reached the finish point. Congrats")
                   onGoBackBUttonClick()
                 }
               } else {

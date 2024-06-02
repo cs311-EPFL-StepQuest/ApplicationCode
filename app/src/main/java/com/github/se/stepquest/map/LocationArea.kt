@@ -9,12 +9,15 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sqrt
@@ -22,6 +25,8 @@ import kotlin.math.sqrt
 class LocationArea(context: Context) {
   var firebaseAuth: FirebaseAuth
   var database: FirebaseDatabase
+  var storage: FirebaseStorage
+
   lateinit var center: LatLng
   var radius: Double = 1000.0
   val context = context
@@ -29,6 +34,7 @@ class LocationArea(context: Context) {
   init {
     firebaseAuth = FirebaseAuth.getInstance()
     database = FirebaseDatabase.getInstance()
+    storage = Firebase.storage
   }
 
   fun setArea(centerLocation: LocationDetails, radius: Double = 1000.0) {
@@ -64,6 +70,7 @@ class LocationArea(context: Context) {
                     insideArea = true
                   }
                 }
+
                 if (insideArea) {
                   // Retrieve the list of LocationDetails for the route
                   val routeDataSnapshot = routeID.child("route")
