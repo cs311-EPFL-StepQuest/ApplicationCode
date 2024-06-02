@@ -133,28 +133,36 @@ class FollowRoute private constructor() {
         val checkpointLocation =
             LocationDetails(clickedMarker.position.latitude, clickedMarker.position.longitude)
         val currentLocation = locationViewModel.currentLocation.value
-        if (followingRoute.value!!) {
-          if (compareCheckpoints(checkpointLocation, currentLocation!!, 20f) != -1f) {
 
-            checkpoint?.let {
-              val builder = AlertDialog.Builder(context)
-              val inflater = LayoutInflater.from(context)
-              val view: android.view.View
-              // Check if the checkpoint has an image
-              if (it.image.isEmpty()) {
-                view = inflater.inflate(R.layout.dialog_without_image, null)
-              } else {
-                view = inflater.inflate(R.layout.dialog_image, null)
+        // Display checkpoint dialog if user is following a route
+        if (followingRoute.value!!) {
+          checkpoint?.let {
+            val builder = AlertDialog.Builder(context)
+            val inflater = LayoutInflater.from(context)
+            val view: android.view.View
+            // Check if the checkpoint has an image
+            if (it.image.isEmpty()) {
+              view = inflater.inflate(R.layout.checkpoint_without_image, null)
+            } else {
+              // Check if the user is close to the checkpoint
+              if (compareCheckpoints(checkpointLocation, currentLocation!!, 20f) == -1f) {
+                // Don't display camera button
+                view = inflater.inflate(R.layout.checkpoint_with_image_far, null)
                 val imageView: ImageView = view.findViewById(R.id.dialog_image)
                 BitmapFactory.decodeStream(it.image.inputStream()).also { bitmap ->
                   imageView.setImageBitmap(bitmap)
                 }
-
+              } else {
+                // Display camera button
+                view = inflater.inflate(R.layout.checkpoint_with_image, null)
+                val imageView: ImageView = view.findViewById(R.id.dialog_image)
+                BitmapFactory.decodeStream(it.image.inputStream()).also { bitmap ->
+                  imageView.setImageBitmap(bitmap)
+                }
                 val button: Button = view.findViewById(R.id.dialog_button)
                 button.setOnClickListener {
                   if (clickedCheckpoints.contains(
-                      LocationDetails(
-                          clickedMarker.position.latitude, clickedMarker.position.longitude))) {
+                      LocationDetails(checkpointLocation.latitude, checkpointLocation.longitude))) {
                     Toast.makeText(
                             context,
                             "You have already taken a picture of this checkpoint",
@@ -168,18 +176,15 @@ class FollowRoute private constructor() {
                   }
                 }
               }
-
-              checkpointDialog =
-                  builder
-                      .setView(view)
-                      .setTitle(it.name) // Set the title of the dialog to the checkpoint title
-                      .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
-                      .create()
-              checkpointDialog?.show()
             }
-          } else {
-            Toast.makeText(context, "You are too far from the checkpoint", Toast.LENGTH_SHORT)
-                .show()
+
+            checkpointDialog =
+                builder
+                    .setView(view)
+                    .setTitle(it.name) // Set the title of the dialog to the checkpoint title
+                    .setPositiveButton("OK") { dialog, which -> dialog.dismiss() }
+                    .create()
+            checkpointDialog?.show()
           }
         }
       }
