@@ -169,8 +169,10 @@ fun RouteProgression(
                       onClick = {
                         saveRoute(
                             stopRoute, routeName, routeID, routeLength, numCheckpoints, reward)
-                        val currentUser = FirebaseAuth.getInstance().currentUser!!.uid
-                        getUsername(currentUser) { addPoints(it, reward) }
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        if (currentUser != null) {
+                          getUsername(currentUser.uid) { addPoints(it, reward) }
+                        }
                       },
                       enabled = routeName.isNotEmpty(),
                       colors = ButtonDefaults.buttonColors(Color(0xFF0D99FF)),
