@@ -48,7 +48,7 @@ class RouteProgressionKtTest {
   @Test
   fun displaysCorrectReward() {
     val routeLength = 10f
-    val reward = (routeLength * 100).toInt()
+    val reward = routeLength.toInt().floorDiv(100)
     composeTestRule.setContent { RouteProgression({}, {}, routeLength, 0) }
 
     composeTestRule.onNodeWithText("Reward: $reward points").assertExists()
