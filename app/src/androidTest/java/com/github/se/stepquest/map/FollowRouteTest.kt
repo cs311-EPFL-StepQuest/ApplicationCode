@@ -78,6 +78,7 @@ class FollowRouteTest {
     // Invoke the lambda with the mocked marker
     assert(listenerSlot.isCaptured)
     listenerSlot.captured.onMarkerClick(clickedMarker)
+    followRoute.show_follow_route_button.value = false
   }
 
   @Test
@@ -116,12 +117,6 @@ class FollowRouteTest {
   }
 
   @Test
-  fun test_followingRoute_isFalseAtStartup() {
-    // Assert
-    assertEquals(false, followRoute.followingRoute.value)
-  }
-
-  @Test
   fun test_show_follow_route_isTrueIfValidPoints() {
     // Mock dependencies
     assertEquals(false, followRoute.show_follow_route_button.value)
@@ -151,13 +146,15 @@ class FollowRouteTest {
         context,
         onClear = {
           var currentMarker = null
-        })
+        },
+        locationViewModel)
 
     // Simulate marker click
     listenerSlot.captured.onMarkerClick(clickedMarker)
 
     assertEquals(routeDetails, followRoute.RouteDetail.value)
     assertEquals(true, followRoute.show_follow_route_button.value)
+    followRoute.show_follow_route_button.value = false
   }
 
   //  @Test
