@@ -1,4 +1,4 @@
-package com.github.se.stepquest.screens
+package com.github.se.stepquest.viewModels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

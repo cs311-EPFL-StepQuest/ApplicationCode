@@ -5,7 +5,10 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.core.app.ApplicationProvider
+import com.github.se.stepquest.data.model.ChallengeData
 import com.github.se.stepquest.ui.navigation.NavigationActions
+import com.github.se.stepquest.viewModels.HomeScreenState
+import com.github.se.stepquest.viewModels.HomeViewModel
 import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
@@ -92,5 +95,24 @@ class HomeScreenTest {
     composeTestRule
         .onNodeWithText("Congratulations! You have completed some challenges!")
         .assertIsDisplayed()
+  }
+
+  @Test
+  fun testHomeScreenWithChallenge() {
+    val homeViewModel = HomeViewModel()
+    val testState = HomeScreenState(isOnline = true, topChallenge = ChallengeData())
+    homeViewModel._state.value = testState
+
+    composeTestRule.setContent {
+      HomeScreen(
+          navigationActions = mockNavigationActions,
+          userId = "test",
+          context = context,
+          viewModel = homeViewModel)
+    }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithText("Main challenge").assertIsDisplayed()
   }
 }
